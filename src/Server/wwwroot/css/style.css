@@ -169,3 +169,29 @@ button.loading::after {
 }
 .blob-1 { width: 300px; height: 300px; background: rgba(99, 102, 241, 0.15); top: -100px; right: -100px; }
 .blob-2 { width: 250px; height: 250px; background: rgba(192, 132, 252, 0.15); bottom: -50px; left: -50px; }
+
+/* Monitor Button */
+.monitor-link {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+
+.btn-outline:hover {
+    border-color: #818cf8;
+    color: #818cf8;
+    background: rgba(129, 140, 248, 0.05);
+    transform: translateY(-1px);
+}

@@ -8,10 +8,19 @@ namespace Server.Controllers
     public class DbTestController : ControllerBase
     {
         private readonly OracleService _oracleService;
+        private readonly LocalDataService _localData;
 
-        public DbTestController(OracleService oracleService)
+        public DbTestController(OracleService oracleService, LocalDataService localData)
         {
             _oracleService = oracleService;
+            _localData = localData;
+        }
+
+        [HttpGet("local-data")]
+        public async Task<IActionResult> GetLocalData()
+        {
+            var data = await _localData.GetConnectionDataAsync();
+            return Ok(data);
         }
 
         [HttpGet("test")]
@@ -45,6 +54,13 @@ namespace Server.Controllers
         [HttpPost("test-custom")]
         public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
         {
+            // 연결 버튼을 누르면 입력한 정보를 로컬에 저장합니다.
+            await _localData.SaveConnectionDataAsync(new Models.ConnectionData 
+            { 
+                UserId = request.UserId, 
+                Password = request.Password 
+            });
+
             var isSuccess = await _oracleService.TestCustomConnectionAsync(
                 request.Host, 
                 request.Port, 

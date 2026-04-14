@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <script src="js/logger-service.js"></script>
 </head>
 
 <body>
@@ -38,7 +39,7 @@
                     </div>
                     <div class="input-group">
                         <label>비밀번호 (Password)</label>
-                        <input type="password" id="password" placeholder="••••••••" required>
+                        <input type="text" id="password" placeholder="••••••••" required>
                     </div>
                 </div>
 
@@ -49,6 +50,10 @@
 
                 <button type="submit" id="testBtn">연결 (Connection Test)</button>
             </form>
+
+            <div class="monitor-link">
+                <button type="button" class="btn-outline" onclick="LogManager.openMonitor()">실시간 모니터링 창 열기 (Launch Monitor)</button>
+            </div>
 
             <div id="result"></div>
         </div>
