@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using Oracle.ManagedDataAccess.Client;
+using Server.Services;
 
 namespace Server.Controllers
 {
@@ -8,17 +7,17 @@ namespace Server.Controllers
     [Route("api/[controller]")]
     public class DbTestController : ControllerBase
     {
-        private readonly dbconnect _db;
+        private readonly OracleService _oracleService;
 
-        public DbTestController(dbconnect db)
+        public DbTestController(OracleService oracleService)
         {
-            _db = db;
+            _oracleService = oracleService;
         }
 
         [HttpGet("test")]
         public async Task<IActionResult> TestConnection()
         {
-            var isSuccess = await _db.TestConnectionAsync();
+            var isSuccess = await _oracleService.TestDefaultConnectionAsync();
             if (isSuccess)
             {
                 return Ok(new { Message = "Oracle DB 연결 성공!", Timestamp = DateTime.Now });
@@ -32,20 +31,44 @@ namespace Server.Controllers
         [HttpGet("query")]
         public IActionResult RunSampleQuery()
         {
-            try
+            var result = _oracleService.GetSysdate();
+            if (result.Success)
             {
-                using var connection = _db.CreateConnection();
-                connection.Open();
-                using var command = connection.CreateCommand();
-                command.CommandText = "SELECT SYSDATE FROM DUAL";
-                
-                var result = command.ExecuteScalar();
-                return Ok(new { Message = "쿼리 실행 성공", Sysdate = result?.ToString() });
+                return Ok(new { Message = "쿼리 실행 성공", Sysdate = result.Sysdate });
             }
-            catch (Exception ex)
+            else
             {
-                return StatusCode(500, new { Message = $"쿼리 실행 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"쿼리 실행 중 오류 발생: {result.Error}" });
             }
         }
+
+        [HttpPost("test-custom")]
+        public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
+        {
+            var isSuccess = await _oracleService.TestCustomConnectionAsync(
+                request.Host, 
+                request.Port, 
+                request.ServiceName, 
+                request.UserId, 
+                request.Password);
+
+            if (isSuccess)
+            {
+                return Ok(new { Message = "연결 성공!", Details = $"Connected to {request.Host}:{request.Port}/{request.ServiceName}" });
+            }
+            else
+            {
+                return BadRequest(new { Message = "연결 실패. 입력 정보를 다시 확인해 주세요." });
+            }
+        }
+    }
+
+    public class OracleConnRequest
+    {
+        public string Host { get; set; } = "localhost";
+        public int Port { get; set; } = 1521;
+        public string ServiceName { get; set; } = "FREE";
+        public string UserId { get; set; } = "system";
+        public string Password { get; set; } = "oracle";
     }
 }

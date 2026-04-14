@@ -1,7 +1,7 @@
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
 
-namespace Server
+namespace Server.Data
 {
     public class dbconnect
     {
@@ -17,20 +17,11 @@ namespace Server
             return new OracleConnection(_connectionString);
         }
 
-        public async Task<bool> TestConnectionAsync()
+        // 특정 정보로 동적 연결 객체를 생성하는 기능도 데이터 레이어에서 제공합니다.
+        public IDbConnection CreateCustomConnection(string host, int port, string serviceName, string userId, string password)
         {
-            using var connection = new OracleConnection(_connectionString);
-            try
-            {
-                await connection.OpenAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // 실 운영 환경에서는 로깅을 권장합니다.
-                Console.WriteLine($"Oracle Connection Error: {ex.Message}");
-                return false;
-            }
+            string customConnStr = $"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))(CONNECT_DATA=(SERVICE_NAME={serviceName})));User Id={userId};Password={password};";
+            return new OracleConnection(customConnStr);
         }
     }
 }
