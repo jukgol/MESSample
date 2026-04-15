@@ -3,12 +3,12 @@ using System.Data;
 
 namespace Server.Services
 {
-    public class OracleService
+    public class DbConnect
     {
-        private readonly dbconnect _db;
-        private readonly ILogger<OracleService> _logger;
+        private readonly DbProvider _db;
+        private readonly ILogger<DbConnect> _logger;
 
-        public OracleService(dbconnect db, ILogger<OracleService> logger)
+        public DbConnect(DbProvider db, ILogger<DbConnect> logger)
         {
             _db = db;
             _logger = logger;

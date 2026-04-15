@@ -7,12 +7,12 @@ namespace Server.Controllers
     [Route("api/[controller]")]
     public class DbTestController : ControllerBase
     {
-        private readonly OracleService _oracleService;
-        private readonly LocalDataService _localData;
+        private readonly DbConnect _dbConnect;
+        private readonly LocalData _localData;
 
-        public DbTestController(OracleService oracleService, LocalDataService localData)
+        public DbTestController(DbConnect dbConnect, LocalData localData)
         {
-            _oracleService = oracleService;
+            _dbConnect = dbConnect;
             _localData = localData;
         }
 
@@ -26,21 +26,34 @@ namespace Server.Controllers
         [HttpGet("test")]
         public async Task<IActionResult> TestConnection()
         {
-            var isSuccess = await _oracleService.TestDefaultConnectionAsync();
+            var savedData = await _localData.GetConnectionDataAsync();
+            
+            if (string.IsNullOrEmpty(savedData.UserId))
+            {
+                return BadRequest(new { Message = "저장된 접속 정보가 없습니다." });
+            }
+
+            var isSuccess = await _dbConnect.TestCustomConnectionAsync(
+                "localhost", 
+                1521,        
+                "FREE",      
+                savedData.UserId, 
+                savedData.Password);
+
             if (isSuccess)
             {
-                return Ok(new { Message = "Oracle DB 연결 성공!", Timestamp = DateTime.Now });
+                return Ok(new { Message = "Oracle DB 자동 연동 성공!", Timestamp = DateTime.Now });
             }
             else
             {
-                return StatusCode(500, new { Message = "Oracle DB 연결 실패. 설정을 확인하세요." });
+                return StatusCode(500, new { Message = "저장된 정보로 DB 연결에 실패했습니다." });
             }
         }
 
         [HttpGet("query")]
         public IActionResult RunSampleQuery()
         {
-            var result = _oracleService.GetSysdate();
+            var result = _dbConnect.GetSysdate();
             if (result.Success)
             {
                 return Ok(new { Message = "쿼리 실행 성공", Sysdate = result.Sysdate });
@@ -54,14 +67,13 @@ namespace Server.Controllers
         [HttpPost("test-custom")]
         public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
         {
-            // 연결 버튼을 누르면 입력한 정보를 로컬에 저장합니다.
             await _localData.SaveConnectionDataAsync(new Models.ConnectionData 
             { 
                 UserId = request.UserId, 
                 Password = request.Password 
             });
 
-            var isSuccess = await _oracleService.TestCustomConnectionAsync(
+            var isSuccess = await _dbConnect.TestCustomConnectionAsync(
                 request.Host, 
                 request.Port, 
                 request.ServiceName, 

@@ -3,26 +3,25 @@ using System.Data;
 
 namespace Server.Data
 {
-    public class dbconnect
+    public class DbProvider
     {
-        private readonly string _connectionString;
+        private readonly IConfiguration _configuration;
 
-        public dbconnect(IConfiguration configuration)
+        public DbProvider(IConfiguration configuration)
         {
-            _connectionString = configuration.GetConnectionString("OracleDb") ?? throw new InvalidOperationException("Connection string 'OracleDb' not found in appsettings.json");
+            _configuration = configuration;
         }
 
         public IDbConnection CreateConnection()
         {
-            return new OracleConnection(_connectionString);
+            var connectionString = _configuration.GetConnectionString("OracleDb");
+            return new OracleConnection(connectionString);
         }
 
-        // 특정 정보로 동적 연결 객체를 생성하는 기능도 데이터 레이어에서 제공합니다.
         public IDbConnection CreateCustomConnection(string host, int port, string serviceName, string userId, string password)
         {
-            // ODP.NET Managed Driver에서 권장하는 Easy Connect Plus 형식을 사용합니다.
-            string customConnStr = $"Data Source={host}:{port}/{serviceName};User Id={userId};Password={password};";
-            return new OracleConnection(customConnStr);
+            var connectionString = $"Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST={host})(PORT={port}))(CONNECT_DATA=(SERVICE_NAME={serviceName})));User Id={userId};Password={password};";
+            return new OracleConnection(connectionString);
         }
     }
 }
