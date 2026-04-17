@@ -1,13 +1,26 @@
+using Microsoft.Extensions.Logging;
 using Server.Data;
+using Server.Proxies;
 using Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddSingleton<DbProvider>(); // dbconnect -> DbProvider
+builder.Services.AddSingleton<DbProvider>();
 builder.Services.AddSingleton<LocalData>();
+
+// 원본 서비스 등록
 builder.Services.AddScoped<DbConnect>();
+
+// AOP 프록시를 적용한 인터페이스 등록
+builder.Services.AddScoped<IDbConnect>(sp => 
+{
+    var target = sp.GetRequiredService<DbConnect>();
+    var logger = sp.GetRequiredService<ILogger<DbConnect>>();
+    return LoggingProxy<IDbConnect>.Create(target, logger);
+});
+
 builder.Services.AddScoped<ProcedureRegistration>();
 
 builder.Services.AddEndpointsApiExplorer();

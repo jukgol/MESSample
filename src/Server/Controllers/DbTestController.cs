@@ -7,10 +7,10 @@ namespace Server.Controllers
     [Route("api/[controller]")]
     public class DbTestController : ControllerBase
     {
-        private readonly DbConnect _dbConnect;
+        private readonly IDbConnect _dbConnect;
         private readonly LocalData _localData;
 
-        public DbTestController(DbConnect dbConnect, LocalData localData)
+        public DbTestController(IDbConnect dbConnect, LocalData localData)
         {
             _dbConnect = dbConnect;
             _localData = localData;
