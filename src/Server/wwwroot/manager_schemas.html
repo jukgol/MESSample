@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MES Schema Manager - Oracle DB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/logger-service.js"></script>
+    <style>
+        body { align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .dashboard-container { height: 85vh; width: 90vw; max-width: 1200px; display: flex; overflow: hidden; }
+        
+        .main-content { display: flex; flex-direction: column; flex: 1; height: 100%; overflow: hidden; padding: 0; }
+        
+        .content-header { padding: 30px 40px 10px 40px; flex-shrink: 0; }
+        .content-header h2 { margin: 0; font-size: 1.6rem; color: #fff; }
+        .content-header .subtitle { margin: 5px 0 0 0; font-size: 0.95rem; opacity: 0.6; }
+
+        .fixed-table-header { padding: 20px 40px 0 40px; flex-shrink: 0; }
+        .table-list { width: 100%; border-collapse: collapse; table-layout: fixed; } 
+        .table-list th { 
+            padding: 15px; text-align: left; background: rgba(255, 255, 255, 0.05); 
+            color: #fff; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .col-idx { width: 80px; } 
+        .col-action { width: 120px; text-align: center; }
+
+        .table-scroll-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            margin: 0 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .table-list td { padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); font-size: 0.95rem; }
+        .table-list tr:hover td { background: rgba(255, 255, 255, 0.04); color: #fff; }
+
+        /* 수정 버튼 스타일 */
+        .btn-edit { background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+        .btn-edit:hover { background: #4f46e5; color: #fff; }
+
+        .action-bar { padding: 20px 40px 30px 40px; display: flex; justify-content: flex-end; flex-shrink: 0; }
+
+        /* [팝업 UI] 모달 스타일 */
+        .modal-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); 
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+        }
+        .modal-content { 
+            background: rgba(30, 32, 50, 0.9); border: 1px solid rgba(255, 255, 255, 0.1); 
+            padding: 40px; border-radius: 24px; width: 450px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+        @keyframes modalFadeIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .modal-header { margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; font-size: 1.4rem; color: #fff; }
+        .modal-body { color: rgba(255, 255, 255, 0.7); line-height: 1.6; margin-bottom: 30px; }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; }
+        
+        .table-scroll-area::-webkit-scrollbar { width: 6px; }
+        .table-scroll-area::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        .empty-message { text-align: center; padding: 100px 0; color: rgba(255, 255, 255, 0.2); font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="decoration blob-1"></div>
+    <div class="decoration blob-2"></div>
+
+    <div id="manager-container" class="dashboard-container">
+        <aside class="sidebar glass-card">
+            <div class="sidebar-header"><h3>Schema Manager</h3></div>
+            <nav class="menu"><button class="menu-item active"><span class="icon">🆔</span><span>스키마 목록</span></button></nav>
+            <div class="sidebar-footer"><button class="btn-outline-sm" onclick="location.href='debug_navigator.html'">뒤로 가기 (Back)</button></div>
+        </aside>
+
+        <main class="main-content glass-card">
+            <div class="content-header">
+                <h2>데이터베이스 스키마 조회</h2>
+                <p class="subtitle">Oracle에 등록된 사용자(User) 목록을 확인합니다.</p>
+            </div>
+            
+            <div class="fixed-table-header">
+                <table class="table-list">
+                    <thead>
+                        <tr>
+                            <th class="col-idx">#</th>
+                            <th>스키마 이름 (USERNAME / ID)</th>
+                            <th class="col-action">작업</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="table-scroll-area" id="table-scroll-container">
+                <table class="table-list">
+                    <tbody id="schema-body">
+                        <tr><td colspan="3" class="empty-message">조회 버튼을 눌러주세요.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-primary" id="btn-fetch-schemas" style="width: auto; padding: 12px 40px;">조회 (Refresh)</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- [팝업 UI] 모달 레이어 -->
+    <div id="edit-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>스키마 정보 수정</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-schema-name" style="font-weight: 600; color: #818cf8; margin-bottom: 20px; font-size: 1.2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;"></p>
+                
+                <div id="privs-container" style="max-height: 300px; overflow-y: auto; border-radius: 12px; background: rgba(0,0,0,0.2);">
+                    <table class="table-list" style="font-size: 0.85rem;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 10px;">구분</th>
+                                <th style="padding: 10px;">권한 / 역할 명칭</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modal-privs-body">
+                            <!-- JS에서 권한 목록을 채워넣음 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline-sm" onclick="closeModal()">취소</button>
+                <button class="btn-primary" style="width: auto; padding: 8px 25px;" onclick="closeModal()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/manager_schemas.js"></script>
+</body>
+</html>

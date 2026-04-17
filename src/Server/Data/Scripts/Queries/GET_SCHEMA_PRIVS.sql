@@ -1,0 +1,16 @@
+-- 특정 사용자의 시스템 권한 조회 (DBA 권한 필요)
+SELECT 
+    'SYSTEM' AS PRIV_TYPE, 
+    PRIVILEGE AS PRIV_NAME 
+FROM 
+    DBA_SYS_PRIVS 
+WHERE 
+    GRANTEE = :schemaName
+UNION ALL
+SELECT 
+    'ROLE' AS PRIV_TYPE, 
+    GRANTED_ROLE AS PRIV_NAME 
+FROM 
+    DBA_ROLE_PRIVS 
+WHERE 
+    GRANTEE = :schemaName

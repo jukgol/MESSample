@@ -8,45 +8,38 @@ namespace Server.Controllers
     public class DbTestController : ControllerBase
     {
         private readonly IDbConnect _dbConnect;
-        private readonly LocalData _localData;
 
-        public DbTestController(IDbConnect dbConnect, LocalData localData)
+        public DbTestController(IDbConnect dbConnect)
         {
             _dbConnect = dbConnect;
-            _localData = localData;
-        }
-
-        [HttpGet("local-data")]
-        public async Task<IActionResult> GetLocalData()
-        {
-            var data = await _localData.GetConnectionDataAsync();
-            return Ok(data);
         }
 
         [HttpGet("test")]
         public async Task<IActionResult> TestConnection()
         {
-            var savedData = await _localData.GetConnectionDataAsync();
-            
-            if (string.IsNullOrEmpty(savedData.UserId))
-            {
-                return BadRequest(new { Message = "저장된 접속 정보가 없습니다." });
-            }
-
-            var isSuccess = await _dbConnect.TestCustomConnectionAsync(
-                "localhost", 
-                1521,        
-                "FREE",      
-                savedData.UserId, 
-                savedData.Password);
+            var isSuccess = await _dbConnect.TestDefaultConnectionAsync();
 
             if (isSuccess)
             {
-                return Ok(new { Message = "Oracle DB 자동 연동 성공!", Timestamp = DateTime.Now });
+                return Ok(new { Message = "Oracle DB 연동 성공!", Timestamp = DateTime.Now });
             }
             else
             {
-                return StatusCode(500, new { Message = "저장된 정보로 DB 연결에 실패했습니다." });
+                return StatusCode(500, new { Message = "DB 연결에 실패했습니다." });
+            }
+        }
+
+        [HttpGet("current-user")]
+        public async Task<IActionResult> GetCurrentUser()
+        {
+            try
+            {
+                var userId = await _dbConnect.GetCurrentUserIdAsync();
+                return Ok(new { UserId = userId });
+            }
+            catch (Exception ex)
+            {
+                return Ok(new { UserId = "Unknown", Error = ex.Message });
             }
         }
 
@@ -78,15 +71,41 @@ namespace Server.Controllers
             }
         }
 
+        [HttpGet("schemas")]
+        public async Task<IActionResult> GetSchemas()
+        {
+            try
+            {
+                var schemas = await _dbConnect.GetSchemasAsync();
+                return Ok(schemas);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"스키마 조회 실패: {ex.Message}" });
+            }
+        }
+
+        [HttpGet("schemas/{schemaName}/privileges")]
+        public async Task<IActionResult> GetSchemaPrivileges([FromRoute] string schemaName)
+        {
+            if (string.IsNullOrEmpty(schemaName)) return BadRequest();
+            
+            try
+            {
+                // URL 디코딩은 ASP.NET Core가 자동으로 수행하지만 명시적으로 처리 로직 확인 가능
+                var privs = await _dbConnect.GetSchemaPrivilegesAsync(schemaName);
+                var result = privs.Select(p => new { p.Type, p.Name });
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"권한 조회 실패: {ex.Message}" });
+            }
+        }
+
         [HttpPost("test-custom")]
         public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
         {
-            await _localData.SaveConnectionDataAsync(new Models.ConnectionData 
-            { 
-                UserId = request.UserId, 
-                Password = request.Password 
-            });
-
             var isSuccess = await _dbConnect.TestCustomConnectionAsync(
                 request.Host, 
                 request.Port, 

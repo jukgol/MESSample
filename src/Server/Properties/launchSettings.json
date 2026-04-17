@@ -10,18 +10,6 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5175"
     },
-    "Direct Login": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "index.html",
-      "applicationUrl": "http://localhost:5175"
-    },
-    "Procedure Manager": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "manager_procedure.html",
-      "applicationUrl": "http://localhost:5175"
-    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,

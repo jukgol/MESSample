@@ -18,6 +18,75 @@ namespace Server.Services
 
         // ... (기존 메서드 생략) ...
 
+        [Log("현재 DB 유저 조회")]
+        public async Task<string> GetCurrentUserIdAsync()
+        {
+            using var connection = _db.CreateConnection();
+            if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+            else connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = "SELECT USER FROM DUAL";
+            var result = command.ExecuteScalar(); // 동기 방식으로 변경
+            return result?.ToString() ?? "Unknown";
+        }
+
+        [Log("스키마 권한 조회")]
+        public async Task<List<(string Type, string Name)>> GetSchemaPrivilegesAsync(string schemaName)
+        {
+            var privs = new List<(string Type, string Name)>();
+            using var connection = _db.CreateConnection();
+            if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+            else connection.Open();
+
+            string queryPath = Path.Combine(AppContext.BaseDirectory, "Data", "Scripts", "Queries", "GET_SCHEMA_PRIVS.sql");
+            string sqlText = File.Exists(queryPath) ? await File.ReadAllTextAsync(queryPath) : "";
+
+            using var command = connection.CreateCommand();
+            command.CommandText = sqlText;
+            
+            // 바인드 변수 설정 (Oracle은 ParameterName에 콜론을 제외한 이름만 넣는 것이 정석)
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = "schemaName";
+            parameter.Value = schemaName.ToUpper();
+            command.Parameters.Add(parameter);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                privs.Add((reader.GetString(0), reader.GetString(1)));
+            }
+            return privs;
+        }
+
+        [Log("DB 스키마 목록 조회")]
+        public async Task<List<string>> GetSchemasAsync()
+        {
+            var schemas = new List<string>();
+            using var connection = _db.CreateConnection();
+            if (connection is System.Data.Common.DbConnection dbConn)
+            {
+                await dbConn.OpenAsync();
+            }
+            else
+            {
+                connection.Open();
+            }
+
+            string queryPath = Path.Combine(AppContext.BaseDirectory, "Data", "Scripts", "Queries", "GET_SCHEMA_LIST.sql");
+            string sqlText = File.Exists(queryPath) ? await File.ReadAllTextAsync(queryPath) : "SELECT USERNAME FROM ALL_USERS ORDER BY USERNAME";
+
+            using var command = connection.CreateCommand();
+            command.CommandText = sqlText;
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                schemas.Add(reader.GetString(0));
+            }
+            return schemas;
+        }
+
         [Log("DB 테이블 목록 조회")]
         public async Task<List<string>> GetTablesAsync()
         {

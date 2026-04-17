@@ -1,37 +1,34 @@
 async function checkConnectionStatus() {
+    console.log('--- DB 상태 및 유저 정보 체크 시작 ---');
     const statusDot = document.getElementById('status-dot');
     const statusText = document.getElementById('status-text');
 
-    try {
-        // 1. 서버에 저장된 로컬 접속 정보 가져오기
-        const dataResponse = await fetch('/api/DbTest/local-data');
-        if (!dataResponse.ok) throw new Error('저장된 접속 정보를 가져올 수 없습니다.');
-        
-        const config = await dataResponse.json();
-        
-        if (!config.userId) {
-            statusText.innerHTML = '저장된 접속 정보가 없습니다. <strong>로그인 페이지</strong>에서 먼저 접속하세요.';
-            return;
-        }
+    if (!statusDot || !statusText) return;
 
-        // 2. 저장된 정보로 DB 연결 테스트 수행
-        // (현재 API 구조상 /api/DbTest/test가 기본 설정을 테스트하므로 이를 활용)
-        const testResponse = await fetch('/api/DbTest/test');
+    try {
+        // 1. 연결 테스트 및 유저 정보 동시 요청 (또는 순차 요청)
+        const [testRes, userRes] = await Promise.all([
+            fetch('/api/DbTest/test'),
+            fetch('/api/DbTest/current-user')
+        ]);
         
-        if (testResponse.ok) {
-            statusDot.className = 'status-dot online';
-            statusText.innerHTML = `Connected: <strong>${config.userId}</strong> | Oracle DB 연동 성공`;
+        const testData = await testRes.json();
+        const userData = await userRes.json();
+
+        if (testRes.ok) {
+            statusDot.style.backgroundColor = '#10b981'; // 초록색
+            statusDot.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.6)';
+            statusText.innerHTML = `User: <strong>${userData.userId}</strong> | Status: <strong>Connected</strong>`;
         } else {
-            statusDot.className = 'status-dot offline';
-            statusText.innerHTML = `ID: <strong>${config.userId}</strong> | DB 연결 실패 (설정 확인 필요)`;
+            statusDot.style.backgroundColor = '#ef4444'; // 빨간색
+            statusText.innerHTML = `User: <strong>${userData.userId}</strong> | Status: <strong style="color:#ff6b6b;">Disconnected</strong>`;
         }
 
     } catch (err) {
-        statusDot.className = 'status-dot offline';
-        statusText.textContent = '서버 통신 오류: DB 상태를 확인할 수 없습니다.';
-        console.error(err);
+        console.error('CheckConnectionStatus Error:', err);
+        statusDot.style.backgroundColor = '#ef4444';
+        statusText.innerHTML = `<span style="color:#ff6b6b;">서버 통신 오류</span>`;
     }
 }
 
-// 페이지 로드 시 실행
-window.addEventListener('DOMContentLoaded', checkConnectionStatus);
+window.addEventListener('load', checkConnectionStatus);

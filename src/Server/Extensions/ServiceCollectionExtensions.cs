@@ -12,7 +12,6 @@ namespace Server.Extensions
         {
             // Singleton 서비스 등록
             services.AddSingleton<DbProvider>();
-            services.AddSingleton<LocalData>();
 
             // Scoped 서비스 및 인터페이스 등록
             services.AddScoped<DbConnect>();
