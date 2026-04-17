@@ -1,32 +1,19 @@
-using Microsoft.Extensions.Logging;
 using Server.Data;
-using Server.Proxies;
-using Server.Services;
+using Server.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// 프로젝트 서비스 일괄 등록 (Extensions/ServiceCollectionExtensions.cs 호출)
 builder.Services.AddControllers();
-builder.Services.AddSingleton<DbProvider>();
-builder.Services.AddSingleton<LocalData>();
-
-// 원본 서비스 등록
-builder.Services.AddScoped<DbConnect>();
-
-// AOP 프록시를 적용한 인터페이스 등록
-builder.Services.AddScoped<IDbConnect>(sp => 
-{
-    var target = sp.GetRequiredService<DbConnect>();
-    var logger = sp.GetRequiredService<ILogger<DbConnect>>();
-    return LoggingProxy<IDbConnect>.Create(target, logger);
-});
-
-builder.Services.AddScoped<ProcedureRegistration>();
+builder.Services.AddProjectServices();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// DB 마이그레이션 실행 (DatabaseMigrator 호출)
+DatabaseMigrator.Run(app.Configuration, app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -45,8 +32,21 @@ app.MapControllers();
 // 서버 시작 시 DB 프로시저 자동 등록
 using (var scope = app.Services.CreateScope())
 {
-    var registration = scope.ServiceProvider.GetRequiredService<ProcedureRegistration>();
+    var registration = scope.ServiceProvider.GetRequiredService<Server.Services.ProcedureRegistration>();
     await registration.DeployProceduresAsync();
 }
+
+// 애플리케이션 종료 시 이벤트 핸들러 등록
+var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
+lifetime.ApplicationStopping.Register(() => 
+{
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    logger.LogInformation("--- [서버 종료 중] 모든 리소스를 정리하고 소켓을 닫습니다... ---");
+});
+
+lifetime.ApplicationStopped.Register(() => 
+{
+    Console.WriteLine("--- [서버 종료 완료] 서버가 안전하게 중단되었습니다. ---");
+});
 
 app.Run();
