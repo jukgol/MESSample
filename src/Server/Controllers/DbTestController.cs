@@ -64,6 +64,20 @@ namespace Server.Controllers
             }
         }
 
+        [HttpGet("tables")]
+        public async Task<IActionResult> GetTables()
+        {
+            try
+            {
+                var tables = await _dbConnect.GetTablesAsync();
+                return Ok(tables);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"테이블 조회 실패: {ex.Message}" });
+            }
+        }
+
         [HttpPost("test-custom")]
         public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
         {

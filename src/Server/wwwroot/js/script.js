@@ -34,9 +34,9 @@ if (dbForm) {
                 resDiv.innerHTML = `<strong>🎉 ${data.message}</strong><br>${data.details}`;
                 LogManager.success(`연결 성공: ${data.details}`);
                 
-                // 1초 후 프로시저 관리 페이지로 이동
+                // 1초 후 테이블 관리 페이지로 이동
                 setTimeout(() => {
-                    window.location.href = 'manager_procedure.html';
+                    window.location.href = 'manager_table.html';
                 }, 1000);
             } else {
                 resDiv.className = 'error';

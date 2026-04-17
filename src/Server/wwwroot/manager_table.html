@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MES Table Manager - Oracle DB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/logger-service.js"></script>
+    <style>
+        body { align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .dashboard-container { height: 85vh; width: 90vw; max-width: 1200px; display: flex; overflow: hidden; }
+        
+        .main-content { display: flex; flex-direction: column; flex: 1; height: 100%; overflow: hidden; padding: 0; }
+        
+        /* 1. 상단 제목 */
+        .content-header { padding: 30px 40px 10px 40px; flex-shrink: 0; }
+        .content-header h2 { margin: 0; font-size: 1.6rem; color: #fff; }
+        .content-header .subtitle { margin: 5px 0 0 0; font-size: 0.95rem; opacity: 0.6; }
+
+        /* 2. 고정된 테이블 헤더 (스크롤 안됨) */
+        .fixed-table-header { padding: 20px 40px 0 40px; flex-shrink: 0; }
+        .table-list { width: 100%; border-collapse: collapse; table-layout: fixed; } 
+        .table-list th { 
+            padding: 15px; text-align: left; background: rgba(255, 255, 255, 0.05); 
+            color: #fff; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .col-idx { width: 80px; } 
+
+        /* 3. 스크롤되는 데이터 영역 */
+        .table-scroll-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            margin: 0 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .table-list td { padding: 14px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.7); font-size: 0.95rem; }
+        .table-list tr:hover td { background: rgba(255, 255, 255, 0.04); color: #fff; }
+
+        /* 4. 하단 버튼 */
+        .action-bar { padding: 20px 40px 30px 40px; display: flex; justify-content: flex-end; flex-shrink: 0; }
+
+        /* 스크롤바 */
+        .table-scroll-area::-webkit-scrollbar { width: 6px; }
+        .table-scroll-area::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+        
+        .empty-message { text-align: center; padding: 100px 0; color: rgba(255, 255, 255, 0.2); font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="decoration blob-1"></div>
+    <div class="decoration blob-2"></div>
+
+    <div id="manager-container" class="dashboard-container">
+        <aside class="sidebar glass-card">
+            <div class="sidebar-header"><h3>Table Manager</h3></div>
+            <nav class="menu"><button class="menu-item active"><span class="icon">📊</span><span>테이블 목록</span></button></nav>
+            <div class="sidebar-footer"><button class="btn-outline-sm" onclick="location.href='index.html'">뒤로 가기 (Back)</button></div>
+        </aside>
+
+        <main class="main-content glass-card">
+            <div class="content-header">
+                <h2>데이터베이스 테이블 조회</h2>
+                <p class="subtitle">Oracle 사용자 테이블 목록을 확인합니다.</p>
+            </div>
+            
+            <div class="fixed-table-header">
+                <table class="table-list">
+                    <thead>
+                        <tr>
+                            <th class="col-idx">#</th>
+                            <th>테이블 이름 (TABLE_NAME)</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="table-scroll-area" id="table-scroll-container">
+                <table class="table-list">
+                    <tbody id="table-body">
+                        <tr><td colspan="2" class="empty-message">조회 버튼을 눌러주세요.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="action-bar">
+                <button class="btn-primary" id="btn-fetch-tables" style="width: auto; padding: 12px 40px;">조회 (Refresh)</button>
+            </div>
+        </main>
+    </div>
+    <script src="js/manager_table.js"></script>
+</body>
+</html>
