@@ -1,22 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
-using Server.Services;
+using Server.Services.Table;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Server.Controllers
+namespace Server.Controllers.Table
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class TablesController : ControllerBase
+    public class TableDataController : ControllerBase
     {
-        private readonly ITableService _tableService;
+        private readonly ITableDataService _tableDataService;
 
-        public TablesController(ITableService tableService)
+        public TableDataController(ITableDataService tableDataService)
         {
-            _tableService = tableService;
+            _tableDataService = tableDataService;
         }
 
         [HttpGet]
@@ -24,12 +24,12 @@ namespace Server.Controllers
         {
             try
             {
-                var tables = await _tableService.GetTablesAsync();
+                var tables = await _tableDataService.GetTablesAsync();
                 return Ok(tables);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"테이블 조회 실패: {ex.Message}" });
+                return StatusCode(500, new { message = $"테이블 조회 실패: {ex.Message}" });
             }
         }
 
@@ -40,18 +40,28 @@ namespace Server.Controllers
 
             try
             {
-                var dt = await _tableService.GetTableDataAsync(tableName);
+                var dtTask = _tableDataService.GetTableDataAsync(tableName);
+                var metaTask = _tableDataService.GetTableMetadataAsync(tableName);
                 
+                await Task.WhenAll(dtTask, metaTask);
+                
+                var dt = dtTask.Result;
+                var meta = metaTask.Result;
+
                 var columns = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
                 var data = dt.AsEnumerable().Select(row => 
                     columns.ToDictionary(col => col, col => row[col] == DBNull.Value ? null : row[col])
                 ).ToList();
 
-                return Ok(new { Columns = columns, Rows = data });
+                return Ok(new { 
+                    columns = columns, 
+                    rows = data, 
+                    metadata = meta 
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"데이터 조회 실패: {ex.Message}" });
+                return StatusCode(500, new { message = $"데이터 조회 실패: {ex.Message}" });
             }
         }
 
@@ -63,7 +73,7 @@ namespace Server.Controllers
 
             try
             {
-                var result = await _tableService.InsertRowAsync(tableName, rowData);
+                var result = await _tableDataService.InsertRowAsync(tableName, rowData);
                 if (result.Success) return Ok(new { Message = result.Message });
                 else return BadRequest(new { Message = result.Message });
             }

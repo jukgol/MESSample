@@ -1,20 +1,58 @@
 using Server.Attributes;
 using Server.Data;
+using Server.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
-namespace Server.Services
+namespace Server.Services.Table
 {
-    public class TableService : ITableService
+    public class TableDataService : ITableDataService
     {
         private readonly DbProvider _db;
 
-        public TableService(DbProvider db)
+        public TableDataService(DbProvider db)
         {
             _db = db;
+        }
+
+        [Log("테이블 메타데이터 조회")]
+        public async Task<List<ColumnMetadata>> GetTableMetadataAsync(string tableName)
+        {
+            var columns = new List<ColumnMetadata>();
+            using var connection = _db.CreateConnection();
+            if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+            else connection.Open();
+
+            // Oracle 시스템 뷰에서 컬럼 상세 정보 조회
+            using var command = connection.CreateCommand();
+            command.CommandText = @"
+                SELECT COLUMN_NAME, DATA_TYPE, NULLABLE, DATA_DEFAULT, IDENTITY_COLUMN
+                FROM ALL_TAB_COLS
+                WHERE TABLE_NAME = :t AND HIDDEN_COLUMN = 'NO'
+                ORDER BY COLUMN_ID";
+            
+            var p = command.CreateParameter();
+            p.ParameterName = "t";
+            p.Value = tableName.ToUpper();
+            command.Parameters.Add(p);
+
+            using var reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                columns.Add(new ColumnMetadata
+                {
+                    Name = reader.GetString(0),
+                    DataType = reader.GetString(1),
+                    IsNullable = reader.GetString(2) == "Y",
+                    HasDefault = !reader.IsDBNull(3),
+                    IsIdentity = reader.GetString(4) == "YES"
+                });
+            }
+            return columns;
         }
 
         [Log("DB 테이블 목록 조회")]
