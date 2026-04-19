@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
 using Server.Models;
+using System.Data;
+using System.Linq;
 
 namespace Server.Controllers
 {
@@ -89,6 +91,28 @@ namespace Server.Controllers
             else
             {
                 return BadRequest(new { Message = "연결 실패. 입력 정보를 다시 확인해 주세요." });
+            }
+        }
+        [HttpGet("tables/{tableName}/data")]
+        public async Task<IActionResult> GetTableData([FromRoute] string tableName)
+        {
+            if (string.IsNullOrEmpty(tableName)) return BadRequest();
+
+            try
+            {
+                var dt = await _dbConnect.GetTableDataAsync(tableName);
+                
+                // DataTable을 List<Dictionary> 형태로 변환 (JSON 직렬화 가능하도록)
+                var columns = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+                var data = dt.AsEnumerable().Select(row => 
+                    columns.ToDictionary(col => col, col => row[col] == DBNull.Value ? null : row[col])
+                ).ToList();
+
+                return Ok(new { Columns = columns, Rows = data });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"데이터 조회 실패: {ex.Message}" });
             }
         }
     }

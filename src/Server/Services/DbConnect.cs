@@ -156,6 +156,34 @@ namespace Server.Services
             return true;
         }
 
+        [Log("테이블 데이터 조회")]
+        public async Task<DataTable> GetTableDataAsync(string tableName)
+        {
+            var dt = new DataTable();
+            using var connection = _db.CreateConnection();
+            if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+            else connection.Open();
+
+            // 테이블명 검증 (ALL_TABLES 조회 권한 내에서 확인)
+            using var checkCmd = connection.CreateCommand();
+            checkCmd.CommandText = "SELECT COUNT(*) FROM ALL_TABLES WHERE TABLE_NAME = :t";
+            var p = checkCmd.CreateParameter();
+            p.ParameterName = "t";
+            p.Value = tableName.ToUpper();
+            checkCmd.Parameters.Add(p);
+            
+            if (Convert.ToInt32(checkCmd.ExecuteScalar()) == 0)
+                throw new ArgumentException("유효하지 않은 테이블명입니다.");
+
+            using var command = connection.CreateCommand();
+            command.CommandText = $"SELECT * FROM {tableName.ToUpper()} FETCH FIRST 100 ROWS ONLY"; // 최대 100건만 제한
+            
+            using var reader = command.ExecuteReader();
+            dt.Load(reader);
+            
+            return dt;
+        }
+
         [Log("DB 현재 시간 조회")]
         public (bool Success, string? Sysdate, string? Error) GetSysdate()
         {

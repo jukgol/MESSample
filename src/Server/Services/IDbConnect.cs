@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace Server.Services
@@ -11,5 +13,6 @@ namespace Server.Services
         Task<List<string>> GetSchemasAsync();
         Task<List<(string Type, string Name)>> GetSchemaPrivilegesAsync(string schemaName);
         Task<string> GetCurrentUserIdAsync();
+        Task<DataTable> GetTableDataAsync(string tableName);
     }
 }
