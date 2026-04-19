@@ -9,11 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchTables() {
         btnFetch.disabled = true;
         btnFetch.textContent = '조회 중...';
-        tableBody.innerHTML = '<tr><td colspan="2" class="empty-message">데이터를 불러오는 중입니다...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="3" class="empty-message">데이터를 불러오는 중입니다...</td></tr>';
 
         try {
-            const response = await fetch('/api/DbTest/tables');
+            const response = await fetch('/api/Navigator/tables');
             if (!response.ok) throw new Error('데이터 요청 실패');
+
 
             const tables = await response.json();
             displayTables(tables);

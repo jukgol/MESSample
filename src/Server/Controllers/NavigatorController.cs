@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
+using Server.Models;
 
 namespace Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DbTestController : ControllerBase
+    public class NavigatorController : ControllerBase
     {
         private readonly IDbConnect _dbConnect;
 
-        public DbTestController(IDbConnect dbConnect)
+        public NavigatorController(IDbConnect dbConnect)
         {
             _dbConnect = dbConnect;
         }
@@ -71,38 +72,6 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("schemas")]
-        public async Task<IActionResult> GetSchemas()
-        {
-            try
-            {
-                var schemas = await _dbConnect.GetSchemasAsync();
-                return Ok(schemas);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"스키마 조회 실패: {ex.Message}" });
-            }
-        }
-
-        [HttpGet("schemas/{schemaName}/privileges")]
-        public async Task<IActionResult> GetSchemaPrivileges([FromRoute] string schemaName)
-        {
-            if (string.IsNullOrEmpty(schemaName)) return BadRequest();
-            
-            try
-            {
-                // URL 디코딩은 ASP.NET Core가 자동으로 수행하지만 명시적으로 처리 로직 확인 가능
-                var privs = await _dbConnect.GetSchemaPrivilegesAsync(schemaName);
-                var result = privs.Select(p => new { p.Type, p.Name });
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"권한 조회 실패: {ex.Message}" });
-            }
-        }
-
         [HttpPost("test-custom")]
         public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
         {
@@ -122,14 +91,5 @@ namespace Server.Controllers
                 return BadRequest(new { Message = "연결 실패. 입력 정보를 다시 확인해 주세요." });
             }
         }
-    }
-
-    public class OracleConnRequest
-    {
-        public string Host { get; set; } = "localhost";
-        public int Port { get; set; } = 1521;
-        public string ServiceName { get; set; } = "FREE";
-        public string UserId { get; set; } = "system";
-        public string Password { get; set; } = "oracle";
     }
 }

@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schemaBody.innerHTML = '<tr><td colspan="3" class="empty-message">데이터를 불러오는 중입니다...</td></tr>';
 
         try {
-            const response = await fetch('/api/DbTest/schemas');
+            const response = await fetch('/api/Schemas');
             if (!response.ok) throw new Error('데이터 요청 실패');
 
             const schemas = await response.json();

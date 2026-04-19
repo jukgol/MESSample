@@ -23,6 +23,7 @@ namespace Server.Extensions
             });
 
             services.AddScoped<ProcedureRegistration>();
+            services.AddScoped<IScriptExecutor, ScriptExecutor>();
 
             return services;
         }

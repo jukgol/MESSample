@@ -13,16 +13,18 @@ namespace Server.Proxies
 
         public static T Create(T target, ILogger logger)
         {
-            object proxy = Create<T, LoggingProxy<T>>();
-            var loggingProxy = (LoggingProxy<T>)proxy;
-            loggingProxy._target = target;
-            loggingProxy._logger = logger;
-            return (T)proxy;
+            var proxy = Create<T, LoggingProxy<T>>() as LoggingProxy<T>;
+            if (proxy == null) throw new InvalidOperationException("Failed to create proxy.");
+            
+            proxy._target = target ?? throw new ArgumentNullException(nameof(target));
+            proxy._logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            
+            return (T)(object)proxy;
         }
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
-            if (targetMethod == null || _logger == null || _target == null) return null;
+            if (targetMethod == null) return null;
 
             var logAttr = targetMethod.GetCustomAttribute<LogAttribute>();
             string message = logAttr?.Message ?? targetMethod.Name;
@@ -48,7 +50,10 @@ namespace Server.Proxies
                 // 일반 Task 비동기 처리
                 if (result is Task task)
                 {
-                    return HandleAsync(task, message);
+                    if (targetMethod.ReturnType == typeof(Task))
+                    {
+                        return HandleAsync(task, message);
+                    }
                 }
 
                 _logger.LogInformation("--- [AOP 완료] {Message} ---", message);
