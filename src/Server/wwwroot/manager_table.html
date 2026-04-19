@@ -6,7 +6,7 @@
     <title>MES Table Manager - Oracle DB</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/manager_table.css"> <!-- 분리된 스타일 -->
+    <link rel="stylesheet" href="css/manager_table.css">
     <script src="js/logger-service.js"></script>
 </head>
 <body>
@@ -30,16 +30,24 @@
                 <p class="subtitle" id="current-table-subtitle">왼쪽 목록에서 데이터를 조회할 테이블을 클릭하세요.</p>
             </div>
 
-            <div class="table-scroll-area" id="table-scroll-container">
-                <table class="table-list" id="data-table">
-                    <thead id="data-table-head"></thead>
-                    <tbody id="data-table-body">
-                        <tr><td class="empty-message">데이터가 없습니다.</td></tr>
-                    </tbody>
-                </table>
+            <!-- [수정] 테이블 영역을 헤더와 본문으로 분리 -->
+            <div class="table-container-wrapper">
+                <!-- 고정 헤더 영역 (스크롤바 없음) -->
+                <div class="table-header-area">
+                    <table class="table-list" style="margin-bottom: 0; border-bottom: none;">
+                        <thead id="data-table-head"></thead>
+                    </table>
+                </div>
+                <!-- 스크롤 본문 영역 (스크롤바가 여기서만 발생) -->
+                <div class="table-scroll-area" id="table-scroll-container">
+                    <table class="table-list" id="data-table" style="border-top: none;">
+                        <tbody id="data-table-body">
+                            <tr><td class="empty-message">데이터가 없습니다.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- 선택 액션 바 -->
             <div id="selection-bar" class="selection-bar">
                 <div class="selection-info">
                     <span id="selected-count">0</span>개 항목 선택됨
@@ -47,7 +55,6 @@
                 <button class="btn-delete" onclick="handleDeleteSelected()">선택 삭제 (Delete)</button>
             </div>
 
-            <!-- 동적으로 로드될 영역 -->
             <div id="insert-form-placeholder"></div>
         </main>
     </div>

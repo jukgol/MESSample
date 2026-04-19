@@ -8,8 +8,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectionBar = document.getElementById('selection-bar');
     const selectedCountSpan = document.getElementById('selected-count');
     const formPlaceholder = document.getElementById('insert-form-placeholder');
+    const scrollContainer = document.getElementById('table-scroll-container');
+    const headerArea = document.querySelector('.table-header-area');
 
     let currentTableName = '';
+
+    // 가로 스크롤 동기화
+    if (scrollContainer && headerArea) {
+        scrollContainer.addEventListener('scroll', () => {
+            headerArea.scrollLeft = scrollContainer.scrollLeft;
+        });
+    }
 
     // 1. 초기 실행
     fetchTables();
@@ -29,14 +38,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchTables() {
         try {
-            const response = await fetch('/api/Navigator/tables');
-            if (!response.ok) throw new Error('테이블 목록 요청 실패');
+            const response = await fetch('/api/Tables');
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`서버 응답 오류 (${response.status}): ${errorText}`);
+            }
             const tables = await response.json();
             displayTableList(tables);
         } catch (error) {
+            console.error('FetchTables Error Detail:', error);
             if (tableListMenu) tableListMenu.innerHTML = `<p style="padding:20px; color:#ff6b6b; font-size:0.8rem;">오류: ${error.message}</p>`;
         }
     }
+
 
     function displayTableList(tables) {
         if (!tableListMenu) return;
