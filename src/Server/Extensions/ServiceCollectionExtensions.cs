@@ -13,14 +13,15 @@ namespace Server.Extensions
             // Singleton 서비스 등록
             services.AddSingleton<DbProvider>();
 
-            // Scoped 서비스 및 인터페이스 등록
+            // Scoped 서비스 및 인터페이스 등록 (AOP 로깅 적용)
             services.AddScoped<DbConnect>();
-            services.AddScoped<IDbConnect>(sp => 
-            {
-                var target = sp.GetRequiredService<DbConnect>();
-                var logger = sp.GetRequiredService<ILogger<DbConnect>>();
-                return LoggingProxy<IDbConnect>.Create(target, logger);
-            });
+            services.AddScoped<IDbConnect>(sp => LoggingProxy<IDbConnect>.Create(sp.GetRequiredService<DbConnect>(), sp.GetRequiredService<ILogger<DbConnect>>()));
+
+            services.AddScoped<TableService>();
+            services.AddScoped<ITableService>(sp => LoggingProxy<ITableService>.Create(sp.GetRequiredService<TableService>(), sp.GetRequiredService<ILogger<TableService>>()));
+
+            services.AddScoped<SchemaService>();
+            services.AddScoped<ISchemaService>(sp => LoggingProxy<ISchemaService>.Create(sp.GetRequiredService<SchemaService>(), sp.GetRequiredService<ILogger<SchemaService>>()));
 
             services.AddScoped<ProcedureRegistration>();
             services.AddScoped<IScriptExecutor, ScriptExecutor>();

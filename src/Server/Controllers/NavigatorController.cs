@@ -11,10 +11,14 @@ namespace Server.Controllers
     public class NavigatorController : ControllerBase
     {
         private readonly IDbConnect _dbConnect;
+        private readonly ISchemaService _schemaService;
+        private readonly ITableService _tableService;
 
-        public NavigatorController(IDbConnect dbConnect)
+        public NavigatorController(IDbConnect dbConnect, ISchemaService schemaService, ITableService tableService)
         {
             _dbConnect = dbConnect;
+            _schemaService = schemaService;
+            _tableService = tableService;
         }
 
         [HttpGet("test")]
@@ -37,7 +41,7 @@ namespace Server.Controllers
         {
             try
             {
-                var userId = await _dbConnect.GetCurrentUserIdAsync();
+                var userId = await _schemaService.GetCurrentUserIdAsync();
                 return Ok(new { UserId = userId });
             }
             catch (Exception ex)
@@ -65,7 +69,7 @@ namespace Server.Controllers
         {
             try
             {
-                var tables = await _dbConnect.GetTablesAsync();
+                var tables = await _tableService.GetTablesAsync();
                 return Ok(tables);
             }
             catch (Exception ex)
@@ -93,6 +97,7 @@ namespace Server.Controllers
                 return BadRequest(new { Message = "연결 실패. 입력 정보를 다시 확인해 주세요." });
             }
         }
+
         [HttpGet("tables/{tableName}/data")]
         public async Task<IActionResult> GetTableData([FromRoute] string tableName)
         {
@@ -100,7 +105,7 @@ namespace Server.Controllers
 
             try
             {
-                var dt = await _dbConnect.GetTableDataAsync(tableName);
+                var dt = await _tableService.GetTableDataAsync(tableName);
                 
                 // DataTable을 List<Dictionary> 형태로 변환 (JSON 직렬화 가능하도록)
                 var columns = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();

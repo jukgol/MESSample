@@ -7,11 +7,11 @@ namespace Server.Controllers
     [Route("api/[controller]")]
     public class SchemasController : ControllerBase
     {
-        private readonly IDbConnect _dbConnect;
+        private readonly ISchemaService _schemaService;
 
-        public SchemasController(IDbConnect dbConnect)
+        public SchemasController(ISchemaService schemaService)
         {
-            _dbConnect = dbConnect;
+            _schemaService = schemaService;
         }
 
         [HttpGet]
@@ -19,7 +19,7 @@ namespace Server.Controllers
         {
             try
             {
-                var schemas = await _dbConnect.GetSchemasAsync();
+                var schemas = await _schemaService.GetSchemasAsync();
                 return Ok(schemas);
             }
             catch (Exception ex)
@@ -35,7 +35,7 @@ namespace Server.Controllers
             
             try
             {
-                var privs = await _dbConnect.GetSchemaPrivilegesAsync(schemaName);
+                var privs = await _schemaService.GetSchemaPrivilegesAsync(schemaName);
                 var result = privs.Select(p => new { p.Type, p.Name });
                 return Ok(result);
             }
