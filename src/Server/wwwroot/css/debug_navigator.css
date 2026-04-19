@@ -1,0 +1,48 @@
+/* Debug Navigator 전용 스타일 */
+body { align-items: center; justify-content: center; height: 100vh; overflow: auto; padding: 20px; }
+.nav-card { max-width: 600px; width: 100%; margin: auto; }
+.nav-group { margin-bottom: 1.5rem; }
+.nav-group h2 { font-size: 1.1rem; color: var(--text-dim); margin-bottom: 1rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; }
+.nav-links { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.nav-btn { 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid var(--glass-border); 
+    padding: 18px; 
+    border-radius: 16px; 
+    color: white; 
+    text-decoration: none; 
+    text-align: left; 
+    transition: all 0.2s;
+    font-size: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav-btn:hover { background: rgba(99, 102, 241, 0.15); border-color: var(--primary); transform: translateX(8px); }
+.nav-btn .info { display: flex; flex-direction: column; gap: 4px; }
+.nav-btn .info span { font-size: 0.8rem; color: var(--text-dim); }
+.nav-btn .arrow { font-size: 1.2rem; opacity: 0.5; }
+
+/* Status Bar Style */
+.status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 14px;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--glass-border);
+}
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #94a3b8; 
+    box-shadow: 0 0 10px rgba(148, 163, 184, 0.3);
+}
+.status-dot.online { background: #10b981; box-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
+.status-dot.offline { background: #ef4444; box-shadow: 0 0 12px rgba(239, 68, 68, 0.6); }
+.status-text { color: var(--text-dim); flex: 1; }
+.status-text strong { color: var(--text-main); font-weight: 600; }

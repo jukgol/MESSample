@@ -8,5 +8,6 @@ namespace Server.Services
     {
         Task<List<string>> GetTablesAsync();
         Task<DataTable> GetTableDataAsync(string tableName);
+        Task<(bool Success, string Message)> InsertRowAsync(string tableName, Dictionary<string, object> rowData);
     }
 }

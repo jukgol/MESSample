@@ -12,13 +12,11 @@ namespace Server.Controllers
     {
         private readonly IDbConnect _dbConnect;
         private readonly ISchemaService _schemaService;
-        private readonly ITableService _tableService;
 
-        public NavigatorController(IDbConnect dbConnect, ISchemaService schemaService, ITableService tableService)
+        public NavigatorController(IDbConnect dbConnect, ISchemaService schemaService)
         {
             _dbConnect = dbConnect;
             _schemaService = schemaService;
-            _tableService = tableService;
         }
 
         [HttpGet("test")]
@@ -64,20 +62,6 @@ namespace Server.Controllers
             }
         }
 
-        [HttpGet("tables")]
-        public async Task<IActionResult> GetTables()
-        {
-            try
-            {
-                var tables = await _tableService.GetTablesAsync();
-                return Ok(tables);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"테이블 조회 실패: {ex.Message}" });
-            }
-        }
-
         [HttpPost("test-custom")]
         public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
         {
@@ -95,29 +79,6 @@ namespace Server.Controllers
             else
             {
                 return BadRequest(new { Message = "연결 실패. 입력 정보를 다시 확인해 주세요." });
-            }
-        }
-
-        [HttpGet("tables/{tableName}/data")]
-        public async Task<IActionResult> GetTableData([FromRoute] string tableName)
-        {
-            if (string.IsNullOrEmpty(tableName)) return BadRequest();
-
-            try
-            {
-                var dt = await _tableService.GetTableDataAsync(tableName);
-                
-                // DataTable을 List<Dictionary> 형태로 변환 (JSON 직렬화 가능하도록)
-                var columns = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                var data = dt.AsEnumerable().Select(row => 
-                    columns.ToDictionary(col => col, col => row[col] == DBNull.Value ? null : row[col])
-                ).ToList();
-
-                return Ok(new { Columns = columns, Rows = data });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"데이터 조회 실패: {ex.Message}" });
             }
         }
     }

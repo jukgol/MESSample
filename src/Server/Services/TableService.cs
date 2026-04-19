@@ -51,5 +51,38 @@ namespace Server.Services
             dt.Load(reader);
             return dt;
         }
+
+        [Log("테이블 데이터 추가")]
+        public async Task<(bool Success, string Message)> InsertRowAsync(string tableName, Dictionary<string, object> rowData)
+        {
+            try
+            {
+                using var connection = _db.CreateConnection();
+                if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
+                else connection.Open();
+
+                var columns = string.Join(", ", rowData.Keys);
+                var parameters = string.Join(", ", rowData.Keys.Select(k => ":" + k));
+                var sql = $"INSERT INTO {tableName.ToUpper()} ({columns}) VALUES ({parameters})";
+
+                using var command = connection.CreateCommand();
+                command.CommandText = sql;
+
+                foreach (var kvp in rowData)
+                {
+                    var p = command.CreateParameter();
+                    p.ParameterName = kvp.Key;
+                    p.Value = kvp.Value ?? DBNull.Value;
+                    command.Parameters.Add(p);
+                }
+
+                await (command as System.Data.Common.DbCommand)?.ExecuteNonQueryAsync()!;
+                return (true, "데이터가 성공적으로 추가되었습니다.");
+            }
+            catch (Exception ex)
+            {
+                return (false, $"데이터 추가 실패: {ex.Message}");
+            }
+        }
     }
 }
