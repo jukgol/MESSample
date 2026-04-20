@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MES Table Schema - Oracle DB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/global.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="../shared/logger.js"></script>
+</head>
+<body>
+    <div class="decoration blob-1"></div>
+    <div class="decoration blob-2"></div>
+
+    <div id="manager-container" class="dashboard-container">
+        <aside class="sidebar glass-card">
+            <div class="sidebar-header"><h3>Table Schema</h3></div>
+            <nav class="menu" id="table-list-menu">
+                <p style="padding: 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; font-style: italic;">조회 중...</p>
+            </nav>
+            <div class="sidebar-footer">
+                <button class="btn-outline-sm" onclick="location.href='../navigator/index.html'">뒤로 가기 (Back)</button>
+            </div>
+        </aside>
+
+        <main class="main-content glass-card">
+            <div class="content-header">
+                <h2 id="current-table-title">테이블 구조 관리</h2>
+                <p class="subtitle" id="current-table-subtitle">왼쪽 목록에서 구조를 조회할 테이블을 클릭하세요.</p>
+            </div>
+
+            <div class="schema-grid">
+                <div class="attributes-area">
+                    <table class="table-list">
+                        <thead>
+                            <tr>
+                                <th>컬럼명 (Name)</th>
+                                <th>데이터 타입 (Type)</th>
+                                <th>Null 허용</th>
+                                <th>상태 (Meta)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schema-body">
+                            <tr><td colspan="4" class="empty-message">테이블을 선택해 주세요.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="query-guide-area">
+                    <div class="guide-header">
+                        <span>🛠️ Schema Modification Query Guide</span>
+                    </div>
+                    <div class="query-list" id="query-list-container">
+                        <p style="text-align: center; color: rgba(255,255,255,0.1); padding-top: 50px;">선택한 컬럼에 대한 수정 쿼리가 여기에 표시됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="component.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

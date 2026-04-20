@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 프로젝트 서비스 일괄 등록 (Extensions/ServiceCollectionExtensions.cs 호출)
 builder.Services.AddControllers();
-builder.Services.AddProjectServices();
+builder.Services.AddOracleDbServices(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

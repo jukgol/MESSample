@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MES Table Manager - Oracle DB</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/manager_table.css">
-    <script src="js/logger-service.js"></script>
+    <link rel="stylesheet" href="../shared/global.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="../shared/logger.js"></script>
 </head>
 <body>
     <div class="decoration blob-1"></div>
@@ -20,7 +20,7 @@
                 <p style="padding: 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; font-style: italic;">조회 중...</p>
             </nav>
             <div class="sidebar-footer">
-                <button class="btn-outline-sm" onclick="location.href='debug_navigator.html'">뒤로 가기 (Back)</button>
+                <button class="btn-outline-sm" onclick="location.href='../navigator/index.html'">뒤로 가기 (Back)</button>
             </div>
         </aside>
 
@@ -30,15 +30,12 @@
                 <p class="subtitle" id="current-table-subtitle">왼쪽 목록에서 데이터를 조회할 테이블을 클릭하세요.</p>
             </div>
 
-            <!-- [수정] 테이블 영역을 헤더와 본문으로 분리 -->
             <div class="table-container-wrapper">
-                <!-- 고정 헤더 영역 (스크롤바 없음) -->
                 <div class="table-header-area">
                     <table class="table-list" style="margin-bottom: 0; border-bottom: none;">
                         <thead id="data-table-head"></thead>
                     </table>
                 </div>
-                <!-- 스크롤 본문 영역 (스크롤바가 여기서만 발생) -->
                 <div class="table-scroll-area" id="table-scroll-container">
                     <table class="table-list" id="data-table" style="border-top: none;">
                         <tbody id="data-table-body">
@@ -59,6 +56,6 @@
         </main>
     </div>
 
-    <script src="js/manager_table_data.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

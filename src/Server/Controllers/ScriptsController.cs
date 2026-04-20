@@ -1,5 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Server.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Server.Controllers
 {
@@ -8,42 +14,39 @@ namespace Server.Controllers
     public class ScriptsController : ControllerBase
     {
         private readonly IScriptExecutor _scriptExecutor;
+        private readonly ILogger<ScriptsController> _logger;
 
-        public ScriptsController(IScriptExecutor scriptExecutor)
+        public ScriptsController(IScriptExecutor scriptExecutor, ILogger<ScriptsController> logger)
         {
             _scriptExecutor = scriptExecutor;
+            _logger = logger;
         }
 
         [HttpGet("setup")]
         public IActionResult GetSetupScripts()
         {
-            // ... (기존 로직 동일)
+            return GetScriptsFromPath("Setup");
+        }
+
+        private IActionResult GetScriptsFromPath(string subFolder)
+        {
             try
             {
                 string baseDir = Directory.GetCurrentDirectory();
-                string setupPath = Path.Combine(baseDir, "Data", "Scripts", "Setup");
+                string path = Path.Combine(baseDir, "Data", "Scripts", "Queries", subFolder);
+                if (subFolder == "Setup") path = Path.Combine(baseDir, "Data", "Scripts", "Setup");
 
-                if (!Directory.Exists(setupPath))
-                {
-                    setupPath = Path.Combine(baseDir, "src", "Server", "Data", "Scripts", "Setup");
-                }
+                if (!Directory.Exists(path)) path = Path.Combine(baseDir, "src", "Server", "Data", "Scripts", subFolder == "Setup" ? "Setup" : $"Queries/{subFolder}");
+                if (!Directory.Exists(path)) path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Scripts", subFolder == "Setup" ? "Setup" : $"Queries/{subFolder}");
 
-                if (!Directory.Exists(setupPath)) 
-                {
-                    setupPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Scripts", "Setup");
-                }
+                if (!Directory.Exists(path)) return NotFound(new { Message = $"{subFolder} 디렉토리를 찾을 수 없습니다." });
 
-                if (!Directory.Exists(setupPath))
-                    return NotFound(new { Message = $"Setup 디렉토리를 찾을 수 없습니다." });
-
-                var files = Directory.GetFiles(setupPath, "*.sql")
-                                     .Select(Path.GetFileName)
-                                     .ToList();
+                var files = Directory.GetFiles(path, "*.sql").Select(Path.GetFileName).ToList();
                 return Ok(files);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"스크립트 목록 조회 실패: {ex.Message}" });
+                return StatusCode(500, new { Message = $"목록 조회 실패: {ex.Message}" });
             }
         }
 
@@ -65,8 +68,6 @@ namespace Server.Controllers
 
                 string sql = await System.IO.File.ReadAllTextAsync(filePath);
 
-                // 플레이스홀더 치환 (대소문자 구분 없이 처리)
-                // GRANT_USER_PRIVILEGES.sql에 사용된 관습적인 이름들을 요청된 스키마명으로 교체
                 sql = sql.Replace("C##MYUSER", request.SchemaName, StringComparison.OrdinalIgnoreCase);
 
                 var result = await _scriptExecutor.ExecuteSqlAsync(sql);

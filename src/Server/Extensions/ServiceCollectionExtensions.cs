@@ -21,6 +21,9 @@ namespace Server.Extensions
             services.AddScoped<TableDataService>();
             services.AddScoped<ITableDataService>(sp => LoggingProxy<ITableDataService>.Create(sp.GetRequiredService<TableDataService>(), sp.GetRequiredService<ILogger<TableDataService>>()));
 
+            services.AddScoped<TableAttributeService>();
+            services.AddScoped<ITableAttributeService>(sp => LoggingProxy<ITableAttributeService>.Create(sp.GetRequiredService<TableAttributeService>(), sp.GetRequiredService<ILogger<TableAttributeService>>()));
+
             services.AddScoped<SchemaService>();
             services.AddScoped<ISchemaService>(sp => LoggingProxy<ISchemaService>.Create(sp.GetRequiredService<SchemaService>(), sp.GetRequiredService<ILogger<SchemaService>>()));
 

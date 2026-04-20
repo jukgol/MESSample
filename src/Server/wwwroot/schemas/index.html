@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MES Schema Manager - Oracle DB</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/manager_schemas.css">
-    <script src="js/logger-service.js"></script>
+    <link rel="stylesheet" href="../shared/global.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="../shared/logger.js"></script>
 </head>
 <body>
     <div class="decoration blob-1"></div>
@@ -17,7 +17,7 @@
         <aside class="sidebar glass-card">
             <div class="sidebar-header"><h3>Schema Manager</h3></div>
             <nav class="menu"><button class="menu-item active"><span class="icon">🆔</span><span>스키마 목록</span></button></nav>
-            <div class="sidebar-footer"><button class="btn-outline-sm" onclick="location.href='debug_navigator.html'">뒤로 가기 (Back)</button></div>
+            <div class="sidebar-footer"><button class="btn-outline-sm" onclick="location.href='../navigator/index.html'">뒤로 가기 (Back)</button></div>
         </aside>
 
         <main class="main-content glass-card">
@@ -52,10 +52,9 @@
         </main>
     </div>
 
-    <!-- 외부 모달이 삽입될 위치 -->
     <div id="modal-placeholder"></div>
 
-    <script src="js/modal_edit_schema.js"></script>
-    <script src="js/manager_schemas.js"></script>
+    <script src="modal_edit_schema.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
