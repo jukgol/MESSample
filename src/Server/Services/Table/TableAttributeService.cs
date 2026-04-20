@@ -34,7 +34,15 @@ namespace Server.Services.Table
         }
 
         [Log("테이블 속성 스크립트 실행")]
-        public async Task<(bool Success, string Message, string ExecutedSql)> ExecuteAttribScriptAsync(string fileName, string tableName, string columnName)
+        public async Task<(bool Success, string Message, string ExecutedSql)> ExecuteAttribScriptAsync(
+            string fileName, 
+            string tableName, 
+            string columnName,
+            string? newColName = null,
+            string? dataType = null,
+            bool isNotNull = false,
+            bool isUnique = false
+        )
         {
             try
             {
@@ -47,11 +55,23 @@ namespace Server.Services.Table
                 if (!System.IO.File.Exists(filePath)) return (false, "속성 스크립트 파일을 찾을 수 없습니다.", "");
 
                 string sql = await System.IO.File.ReadAllTextAsync(filePath);
+                
+                // 기본 치환
                 sql = sql.Replace("{TABLE}", tableName, StringComparison.OrdinalIgnoreCase)
                          .Replace("{COLUMN}", columnName, StringComparison.OrdinalIgnoreCase);
 
-                _logger.LogInformation("--- [속성 스크립트 실행 시도] 파일: {FileName}, 대상: {Table}.{Column} ---", 
-                    fileName, tableName, columnName);
+                // 추가 치환 (새 컬럼 추가용)
+                if (!string.IsNullOrEmpty(newColName))
+                    sql = sql.Replace("{NEW_COL}", newColName, StringComparison.OrdinalIgnoreCase);
+                
+                if (!string.IsNullOrEmpty(dataType))
+                    sql = sql.Replace("{TYPE}", dataType, StringComparison.OrdinalIgnoreCase);
+
+                sql = sql.Replace("{NOTNULL}", isNotNull ? "1" : "0", StringComparison.OrdinalIgnoreCase)
+                         .Replace("{UNIQUE}", isUnique ? "1" : "0", StringComparison.OrdinalIgnoreCase);
+
+                _logger.LogInformation("--- [속성 스크립트 실행 시도] 파일: {FileName}, 대상: {Table} ---", 
+                    fileName, tableName);
 
                 var result = await _scriptExecutor.ExecuteSqlAsync(sql);
 

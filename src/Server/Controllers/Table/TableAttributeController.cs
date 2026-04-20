@@ -38,7 +38,15 @@ namespace Server.Controllers.Table
 
             try
             {
-                var result = await _tableAttributeService.ExecuteAttribScriptAsync(request.FileName, request.TableName, request.ColumnName);
+                var result = await _tableAttributeService.ExecuteAttribScriptAsync(
+                    request.FileName, 
+                    request.TableName, 
+                    request.ColumnName,
+                    request.NewColumnName,
+                    request.DataType,
+                    request.IsNotNull,
+                    request.IsUnique
+                );
                 if (result.Success) return Ok(new { Message = result.Message, ExecutedSql = result.ExecutedSql });
                 else return StatusCode(500, new { Message = result.Message, ExecutedSql = result.ExecutedSql });
             }
@@ -54,5 +62,11 @@ namespace Server.Controllers.Table
         public string FileName { get; set; } = string.Empty;
         public string TableName { get; set; } = string.Empty;
         public string ColumnName { get; set; } = string.Empty;
+        
+        // 추가 필드 (새 컬럼 추가 시 사용)
+        public string? NewColumnName { get; set; }
+        public string? DataType { get; set; }
+        public bool IsNotNull { get; set; }
+        public bool IsUnique { get; set; }
     }
 }

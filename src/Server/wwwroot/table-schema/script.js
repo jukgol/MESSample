@@ -71,28 +71,50 @@ const AttributeManager = {
         }
 
         const colOptions = metadata.map(col => `<option value="${col.name || col.Name}">${col.name || col.Name}</option>`).join('');
-        container.innerHTML = State.attribScripts.map(file => Components.attributeScriptItem(file, colOptions)).join('');
+        
+        // 1. 일반 스크립트 목록 (ADD_COLUMN.sql 제외)
+        const generalScripts = State.attribScripts
+            .filter(file => file !== 'ADD_COLUMN.sql')
+            .map(file => Components.attributeScriptItem(file, colOptions))
+            .join('');
+
+        // 2. 새 컬럼 추가 폼 (항상 또는 특정 조건에서 표시)
+        const addColumnForm = Components.addColumnForm();
+
+        container.innerHTML = generalScripts + addColumnForm;
     },
     syncColumn: function(colName) {
         document.querySelectorAll('.script-col-select').forEach(select => {
             select.value = colName;
         });
     },
-    execute: async function(filename) {
-        const selectEl = document.getElementById(`select-col-${filename}`);
-        const colName = selectEl.value;
+    execute: async function(filename, isNewColumn = false) {
+        let requestBody = {
+            fileName: filename,
+            tableName: State.currentTableName,
+            columnName: 'NONE' // 기본값
+        };
 
-        if (!confirm(`[${State.currentTableName}] 테이블의 [${colName}] 컬럼에 대해\n[${filename}] 스크립트를 실행하시겠습니까?`)) return;
+        if (isNewColumn) {
+            const newName = document.getElementById('new-col-name').value.trim();
+            if (!newName) { alert('추가할 컬럼명을 입력하세요.'); return; }
+            
+            requestBody.newColumnName = newName;
+            requestBody.dataType = document.getElementById('new-col-type').value;
+            requestBody.isNotNull = document.getElementById('new-col-notnull').checked;
+            requestBody.isUnique = document.getElementById('new-col-unique').checked;
+        } else {
+            const selectEl = document.getElementById(`select-col-${filename}`);
+            requestBody.columnName = selectEl.value;
+        }
+
+        if (!confirm(`[${State.currentTableName}] 테이블에 대해 스크립트를 실행하시겠습니까?`)) return;
 
         try {
             const response = await fetch('/api/TableAttribute/execute', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    fileName: filename,
-                    tableName: State.currentTableName,
-                    columnName: colName
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const result = await response.json();

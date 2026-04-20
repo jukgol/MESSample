@@ -52,6 +52,39 @@ const Components = {
                     Run
                 </button>
             </div>
+        </div>`,
+
+    // 새 컬럼 추가 전용 폼
+    addColumnForm: () => `
+        <div class="query-item" id="add-column-form" style="margin-top:20px; padding:15px; background:rgba(var(--accent-rgb), 0.05); border:1px solid var(--accent-color); border-radius:8px;">
+            <div style="font-size:0.8rem; font-weight:bold; color:var(--accent-color); margin-bottom:12px; display:flex; align-items:center; gap:5px;">
+                <span>➕</span> 새 컬럼 추가 (Add New Column)
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <input type="text" id="new-col-name" placeholder="컬럼명 (예: REMARK)" style="width:100%; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; padding:8px; border-radius:4px; font-size:0.8rem;">
+                
+                <select id="new-col-type" style="width:100%; background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.1); color:white; padding:8px; border-radius:4px; font-size:0.8rem;">
+                    <option value="VARCHAR2(100)">VARCHAR2(100)</option>
+                    <option value="VARCHAR2(4000)">VARCHAR2(4000)</option>
+                    <option value="NUMBER">NUMBER</option>
+                    <option value="NUMBER(10,2)">NUMBER(10,2)</option>
+                    <option value="DATE">DATE</option>
+                    <option value="TIMESTAMP">TIMESTAMP</option>
+                </select>
+
+                <div style="display:flex; gap:15px; padding:5px;">
+                    <label style="display:flex; align-items:center; gap:5px; font-size:0.75rem; cursor:pointer;">
+                        <input type="checkbox" id="new-col-notnull"> NOT NULL
+                    </label>
+                    <label style="display:flex; align-items:center; gap:5px; font-size:0.75rem; cursor:pointer;">
+                        <input type="checkbox" id="new-col-unique"> UNIQUE
+                    </label>
+                </div>
+
+                <button class="btn-primary" onclick="AttributeManager.execute('ADD_COLUMN.sql', true)" style="width:100%; padding:10px; font-weight:bold; margin-top:5px;">
+                    컬럼 추가 실행 (Add Column)
+                </button>
+            </div>
         </div>`
 };
 
