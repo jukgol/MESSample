@@ -1,0 +1,22 @@
+<div id="create-table-modal" class="modal-overlay">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h3>새 테이블 생성</h3>
+        </div>
+        <div class="modal-body">
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label for="new-table-name" style="display: block; margin-bottom: 8px; color: rgba(255,255,255,0.7); font-size: 0.9rem;">테이블 이름 (Table Name)</label>
+                <input type="text" id="new-table-name" placeholder="예: MY_NEW_TABLE" 
+                    style="width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s;">
+            </div>
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.4); line-height: 1.5;">
+                * 테이블 이름은 영문 대문자, 숫자, 언더바(_) 조합을 권장합니다.<br>
+                * 기본 PK 컬럼(ID)과 생성일시(CREATE_DATE) 컬럼이 포함된 상태로 생성됩니다.
+            </p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-outline-sm" style="width: auto; padding: 8px 25px;" onclick="closeCreateTableModal()">취소</button>
+            <button class="btn-primary" style="width: auto; padding: 8px 35px;" id="btn-do-create-table">생성하기</button>
+        </div>
+    </div>
+</div>

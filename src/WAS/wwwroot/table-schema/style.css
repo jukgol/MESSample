@@ -1,0 +1,125 @@
+/* Table Schema 전용 스타일 */
+body { align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+.dashboard-container { height: 85vh; width: 90vw; max-width: 1400px; display: flex; overflow: hidden; }
+
+.main-content { display: flex; flex-direction: column; flex: 1; height: 100%; overflow: hidden; padding: 0; }
+.content-header { padding: 30px 40px 10px 40px; flex-shrink: 0; }
+
+/* 레이아웃 분할 */
+.schema-grid {
+    display: grid;
+    grid-template-rows: 1fr 250px; /* 상단 속성표, 하단 쿼리목록 */
+    flex: 1;
+    overflow: hidden;
+    padding: 0 40px 30px 40px;
+    gap: 20px;
+}
+
+/* 속성 테이블 영역 (Fixed Header 적용) */
+.attributes-area {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.table-header-area {
+    flex-shrink: 0;
+    background: #1e293b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.table-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.table-scroll-area::-webkit-scrollbar { width: 6px; }
+.table-scroll-area::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+/* 쿼리 가이드 영역 */
+.query-guide-area {
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.guide-header {
+    padding: 12px 20px;
+    background: rgba(99, 102, 241, 0.1);
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a5b4fc;
+}
+.query-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+.query-list::-webkit-scrollbar { width: 4px; }
+.query-list::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+.query-item {
+    margin-bottom: 15px;
+}
+.query-item label { display: block; font-size: 0.75rem; color: rgba(255,255,255,0.4); margin-bottom: 5px; }
+.query-box {
+    background: #000;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'Consolas', monospace;
+    font-size: 0.8rem;
+    color: #10b981;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.btn-copy {
+    position: absolute; right: 10px; top: 10px;
+    background: rgba(255,255,255,0.1); border: none; color: #fff;
+    font-size: 0.7rem; padding: 3px 8px; border-radius: 4px; cursor: pointer;
+}
+.btn-copy:hover { background: var(--primary); }
+
+.table-list { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.table-list th { 
+    padding: 12px 15px; text-align: left; background: transparent; color: #818cf8; 
+    font-size: 0.75rem;
+}
+.table-list td { padding: 10px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; }
+.table-list tr.selected td { background: rgba(99, 102, 241, 0.15); color: #fff; }
+
+.badge { padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+.badge.identity { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.badge.default { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
+
+.menu-item { justify-content: flex-start; padding: 12px 20px; font-size: 0.85rem; }
+.menu { flex: 1; overflow-y: auto; padding-right: 5px; }
+.menu::-webkit-scrollbar { width: 4px; }
+.menu::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+.menu::-webkit-scrollbar-track { background: transparent; }
+
+/* [팝업 UI] 모달 스타일 */
+.modal-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px); 
+    display: none; justify-content: center; align-items: center; z-index: 1000;
+}
+.modal-overlay.active { display: flex; }
+.modal-content { 
+    background: rgba(30, 32, 50, 0.95); border: 1px solid rgba(255, 255, 255, 0.1); 
+    padding: 30px; border-radius: 24px; width: 600px; 
+    max-width: 95vw;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: modalFadeIn 0.3s ease-out;
+}
+@keyframes modalFadeIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.modal-header { margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+.modal-header h3 { margin: 0; font-size: 1.3rem; color: #fff; }
+.modal-body { color: rgba(255, 255, 255, 0.7); line-height: 1.6; margin-bottom: 25px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; }

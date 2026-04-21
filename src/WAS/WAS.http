@@ -1,0 +1,7 @@
+@WAS_HostAddress = http://localhost:5175
+
+GET {{WAS_HostAddress}}/api/DbTest/test
+Accept: application/json
+
+###
+

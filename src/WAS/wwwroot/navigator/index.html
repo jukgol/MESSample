@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Navigator - MES Development</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/global.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="decoration blob-1"></div>
+    <div class="decoration blob-2"></div>
+
+    <div class="nav-card glass-card">
+        <div id="connection-status" class="status-bar">
+            <span id="status-dot" class="status-dot"></span>
+            <span id="status-text" class="status-text">DB 연결 확인 중...</span>
+        </div>
+
+        <h1>🛠️ Debug Navigator</h1>
+        <p class="subtitle">클릭하면 새 창에서 페이지가 열립니다.</p>
+
+        <div class="nav-group">
+            <div class="nav-links">
+                <a href="../table-data/index.html" target="_blank" class="nav-btn">
+                    <div class="info">
+                        <strong>📊 Table Data</strong>
+                        <span>데이터베이스 테이블 내용 조회 및 관리</span>
+                    </div>
+                    <div class="arrow">↗</div>
+                </a>
+                <a href="../table-schema/index.html" target="_blank" class="nav-btn">
+                    <div class="info">
+                        <strong>🏗️ Table Schema</strong>
+                        <span>테이블 구조(컬럼/속성) 수정 및 관리</span>
+                    </div>
+                    <div class="arrow">↗</div>
+                </a>
+                <a href="../schemas/index.html" target="_blank" class="nav-btn">
+                    <div class="info">
+                        <strong>🆔 Schema Manager</strong>
+                        <span>데이터베이스 스키마(사용자) 목록 조회</span>
+                    </div>
+                    <div class="arrow">↗</div>
+                </a>
+                <a href="../monitor/index.html" target="_blank" class="nav-btn">
+                    <div class="info">
+                        <strong>📋 Log Monitoring</strong>
+                        <span>실시간 시스템 로그 확인</span>
+                    </div>
+                    <div class="arrow">↗</div>
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer" style="text-align: center; margin-top: 30px; border-top: 1px solid var(--glass-border); padding-top: 20px;">
+            <p style="font-size: 0.8rem; color: var(--text-dim);">F5 실행 시 이 대시보드가 브라우저의 첫 탭으로 유지됩니다.</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
