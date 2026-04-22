@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using WAS.Attributes;
 using System;
 using System.Reflection;
@@ -14,11 +14,11 @@ namespace WAS.Proxies
         public static T Create(T target, ILogger logger)
         {
             var proxy = Create<T, LoggingProxy<T>>() as LoggingProxy<T>;
-            if (proxy == null) throw new InvalidOperationException("Failed to create proxy.");
-            
+            if (proxy == null) throw new InvalidOperationException("프록시 생성 실패.");
+
             proxy._target = target ?? throw new ArgumentNullException(nameof(target));
             proxy._logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            
+
             return (T)(object)proxy;
         }
 
@@ -31,75 +31,35 @@ namespace WAS.Proxies
 
             try
             {
-                _logger.LogInformation("--- [AOP ?�작] {Message} ---", message);
-                
+                _logger.LogInformation($"--- [AOP 시작] {message} ---");
                 var result = targetMethod.Invoke(_target, args);
 
-                // Task<TResult> 비동�?처리
-                if (targetMethod.ReturnType.IsGenericType && targetMethod.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
-                {
-                    var resultType = targetMethod.ReturnType.GetGenericArguments()[0];
-                    var method = typeof(LoggingProxy<T>).GetMethod(nameof(HandleAsyncWithResult), BindingFlags.NonPublic | BindingFlags.Instance);
-                    if (method != null)
-                    {
-                        var genericMethod = method.MakeGenericMethod(resultType);
-                        return genericMethod.Invoke(this, new[] { result, message });
-                    }
-                }
-
-                // ?�반 Task 비동�?처리
                 if (result is Task task)
                 {
-                    if (targetMethod.ReturnType == typeof(Task))
-                    {
-                        return HandleAsync(task, message);
-                    }
+                    return HandleAsync(task, message);
                 }
 
-                _logger.LogInformation("--- [AOP ?�료] {Message} ---", message);
+                _logger.LogInformation($"--- [AOP 완료] {message} ---");
                 return result;
-            }
-            catch (TargetInvocationException ex)
-            {
-                var inner = ex.InnerException ?? ex;
-                _logger.LogError(inner, "--- [AOP ?�러] {Message} : {Error} ---", message, inner.Message);
-                throw inner;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "--- [AOP ?�러] {Message} : {Error} ---", message, ex.Message);
+                _logger.LogError(ex, $"--- [AOP 에러] {message}: {ex.Message} ---");
                 throw;
             }
         }
 
         private async Task HandleAsync(Task task, string message)
         {
-            try
-            {
-                await task;
-                _logger.LogInformation("--- [AOP ?�료] {Message} ---", message);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "--- [AOP ?�러] {Message} : {Error} ---", message, ex.Message);
-                throw;
-            }
+            await task;
+            _logger.LogInformation($"--- [AOP 완료] {message} ---");
         }
 
-        private async Task<TResult> HandleAsyncWithResult<TResult>(Task<TResult> task, string message)
+        private async Task<TResult> HandleAsync<TResult>(Task<TResult> task, string message)
         {
-            try
-            {
-                var result = await task;
-                _logger.LogInformation("--- [AOP ?�료] {Message} ---", message);
-                return result;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "--- [AOP ?�러] {Message} : {Error} ---", message, ex.Message);
-                throw;
-            }
+            var result = await task;
+            _logger.LogInformation($"--- [AOP 완료] {message} ---");
+            return result;
         }
     }
 }
-

@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 
 namespace WAS.Attributes
 {
+    // 메소드 실행 시 로깅을 남기기 위한 커스텀 어트리뷰트
     [AttributeUsage(AttributeTargets.Method)]
     public class LogAttribute : Attribute
     {
@@ -13,4 +14,3 @@ namespace WAS.Attributes
         }
     }
 }
-

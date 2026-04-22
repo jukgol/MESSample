@@ -1,8 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
-using WAS.Services;
-using WAS.Models;
-using System.Data;
-using System.Linq;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace WAS.Controllers
 {
@@ -10,77 +6,17 @@ namespace WAS.Controllers
     [Route("api/[controller]")]
     public class NavigatorController : ControllerBase
     {
-        private readonly IDbConnect _dbConnect;
-        private readonly ISchemaService _schemaService;
-
-        public NavigatorController(IDbConnect dbConnect, ISchemaService schemaService)
+        [HttpGet]
+        public IActionResult GetNavigation()
         {
-            _dbConnect = dbConnect;
-            _schemaService = schemaService;
-        }
-
-        [HttpGet("test")]
-        public async Task<IActionResult> TestConnection()
-        {
-            var isSuccess = await _dbConnect.TestDefaultConnectionAsync();
-
-            if (isSuccess)
+            var menu = new[]
             {
-                return Ok(new { Message = "Oracle DB ?�동 ?�공!", Timestamp = DateTime.Now });
-            }
-            else
-            {
-                return StatusCode(500, new { Message = "DB ?�결???�패?�습?�다." });
-            }
-        }
-
-        [HttpGet("current-user")]
-        public async Task<IActionResult> GetCurrentUser()
-        {
-            try
-            {
-                var userId = await _schemaService.GetCurrentUserIdAsync();
-                return Ok(new { UserId = userId });
-            }
-            catch (Exception ex)
-            {
-                return Ok(new { UserId = "Unknown", Error = ex.Message });
-            }
-        }
-
-        [HttpGet("query")]
-        public IActionResult RunSampleQuery()
-        {
-            var result = _dbConnect.GetSysdate();
-            if (result.Success)
-            {
-                return Ok(new { Message = "쿼리 ?�행 ?�공", Sysdate = result.Sysdate });
-            }
-            else
-            {
-                return StatusCode(500, new { Message = $"쿼리 ?�행 �??�류 발생: {result.Error}" });
-            }
-        }
-
-        [HttpPost("test-custom")]
-        public async Task<IActionResult> TestCustomConnection([FromBody] OracleConnRequest request)
-        {
-            var isSuccess = await _dbConnect.TestCustomConnectionAsync(
-                request.Host, 
-                request.Port, 
-                request.ServiceName, 
-                request.UserId, 
-                request.Password);
-
-            if (isSuccess)
-            {
-                return Ok(new { Message = "?�결 ?�공!", Details = $"Connected to {request.Host}:{request.Port}/{request.ServiceName}" });
-            }
-            else
-            {
-                return BadRequest(new { Message = "?�결 ?�패. ?�력 ?�보�??�시 ?�인??주세??" });
-            }
+                new { Title = "공정 모니터링", Icon = "monitor", Path = "/monitor" },
+                new { Title = "자재 현황", Icon = "inventory", Path = "/items" },
+                new { Title = "품질 검사", Icon = "check_circle", Path = "/qc" },
+                new { Title = "시스템 관리", Icon = "settings", Path = "/admin" }
+            };
+            return Ok(menu);
         }
     }
 }
-

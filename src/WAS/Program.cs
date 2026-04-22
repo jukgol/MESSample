@@ -1,9 +1,9 @@
-using WAS.Data;
+﻿using WAS.Data;
 using WAS.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ?�로?�트 ?�비???�괄 ?�록 (Extensions/ServiceCollectionExtensions.cs ?�출)
+// ?꾨줈?앺듃 ?쒕퉬???쇨큵 ?깅줉 (Extensions/ServiceCollectionExtensions.cs ?몄텧)
 builder.Services.AddControllers();
 builder.Services.AddOracleDbServices(builder.Configuration);
 
@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// DB 마이그레?�션 ?�행 (DatabaseMigrator ?�출)
+// DB 留덉씠洹몃젅?댁뀡 ?ㅽ뻾 (DatabaseMigrator ?몄텧)
 DatabaseMigrator.Run(app.Configuration, app.Services);
 
 // Configure the HTTP request pipeline.
@@ -29,25 +29,24 @@ app.UseStaticFiles();
 
 app.MapControllers();
 
-// ?�버 ?�작 ??DB ?�로?��? ?�동 ?�록
+// ?쒕쾭 ?쒖옉 ??DB ?꾨줈?쒖? ?먮룞 ?깅줉
 using (var scope = app.Services.CreateScope())
 {
     var registration = scope.ServiceProvider.GetRequiredService<WAS.Services.ProcedureRegistration>();
     await registration.DeployProceduresAsync();
 }
 
-// ?�플리�??�션 종료 ???�벤???�들???�록
+// ?좏뵆由ъ??댁뀡 醫낅즺 ???대깽???몃뱾???깅줉
 var lifetime = app.Services.GetRequiredService<IHostApplicationLifetime>();
 lifetime.ApplicationStopping.Register(() => 
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogInformation("--- [?�버 종료 �? 모든 리소?��? ?�리?�고 ?�켓???�습?�다... ---");
+    logger.LogInformation("--- [?쒕쾭 醫낅즺 以? 紐⑤뱺 由ъ냼?ㅻ? ?뺣━?섍퀬 ?뚯폆???レ뒿?덈떎... ---");
 });
 
 lifetime.ApplicationStopped.Register(() => 
 {
-    Console.WriteLine("--- [?�버 종료 ?�료] ?�버가 ?�전?�게 중단?�었?�니?? ---");
+    Console.WriteLine("--- [?쒕쾭 醫낅즺 ?꾨즺] ?쒕쾭媛 ?덉쟾?섍쾶 以묐떒?섏뿀?듬땲?? ---");
 });
 
 app.Run();
-

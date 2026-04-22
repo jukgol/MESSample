@@ -1,4 +1,4 @@
-using WAS.Attributes;
+﻿using WAS.Attributes;
 using WAS.Data;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace WAS.Services
             _db = db;
         }
 
-        [Log("기본 DB ?�결 ?�스??)]
+        [Log("기본 DB 연결 테스트")]
         public async Task<bool> TestDefaultConnectionAsync()
         {
             using var connection = _db.CreateConnection();
@@ -25,7 +25,7 @@ namespace WAS.Services
             return true;
         }
 
-        [Log("커스?� DB ?�결 ?�스??)]
+        [Log("커스텀 DB 연결 테스트")]
         public async Task<bool> TestCustomConnectionAsync(string host, int port, string serviceName, string userId, string password)
         {
             using var connection = _db.CreateCustomConnection(host, port, serviceName, userId, password);
@@ -33,17 +33,5 @@ namespace WAS.Services
             else connection.Open();
             return true;
         }
-
-        [Log("DB ?�재 ?�간 조회")]
-        public (bool Success, string? Sysdate, string? Error) GetSysdate()
-        {
-            using var connection = _db.CreateConnection();
-            connection.Open();
-            using var command = connection.CreateCommand();
-            command.CommandText = "SELECT TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS') FROM DUAL";
-            var result = command.ExecuteScalar();
-            return (true, result?.ToString(), null);
-        }
     }
 }
-

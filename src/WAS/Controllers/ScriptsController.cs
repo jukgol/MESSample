@@ -1,11 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WAS.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace WAS.Controllers
 {
@@ -14,78 +8,27 @@ namespace WAS.Controllers
     public class ScriptsController : ControllerBase
     {
         private readonly IScriptExecutor _scriptExecutor;
-        private readonly ILogger<ScriptsController> _logger;
 
-        public ScriptsController(IScriptExecutor scriptExecutor, ILogger<ScriptsController> logger)
+        public ScriptsController(IScriptExecutor scriptExecutor)
         {
             _scriptExecutor = scriptExecutor;
-            _logger = logger;
-        }
-
-        [HttpGet("setup")]
-        public IActionResult GetSetupScripts()
-        {
-            return GetScriptsFromPath("Setup");
-        }
-
-        private IActionResult GetScriptsFromPath(string subFolder)
-        {
-            try
-            {
-                string baseDir = Directory.GetCurrentDirectory();
-                string path = Path.Combine(baseDir, "Data", "Scripts", "Queries", subFolder);
-                if (subFolder == "Setup") path = Path.Combine(baseDir, "Data", "Scripts", "Setup");
-
-                if (!Directory.Exists(path)) path = Path.Combine(baseDir, "src", "WAS", "Data", "Scripts", subFolder == "Setup" ? "Setup" : $"Queries/{subFolder}");
-                if (!Directory.Exists(path)) path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Scripts", subFolder == "Setup" ? "Setup" : $"Queries/{subFolder}");
-
-                if (!Directory.Exists(path)) return NotFound(new { Message = $"{subFolder} ?�렉?�리�?찾을 ???�습?�다." });
-
-                var files = Directory.GetFiles(path, "*.sql").Select(Path.GetFileName).ToList();
-                return Ok(files);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"목록 조회 ?�패: {ex.Message}" });
-            }
         }
 
         [HttpPost("execute")]
-        public async Task<IActionResult> ExecuteScript([FromBody] ExecuteScriptRequest request)
+        public async Task<IActionResult> ExecuteSql([FromBody] string sql)
         {
-            if (string.IsNullOrEmpty(request.FileName) || string.IsNullOrEmpty(request.SchemaName))
-                return BadRequest(new { Message = "?�일명과 ?�키마명?� ?�수?�니??" });
-
             try
             {
-                string baseDir = Directory.GetCurrentDirectory();
-                string setupPath = Path.Combine(baseDir, "Data", "Scripts", "Setup");
-                if (!Directory.Exists(setupPath)) setupPath = Path.Combine(baseDir, "src", "WAS", "Data", "Scripts", "Setup");
-                if (!Directory.Exists(setupPath)) setupPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Scripts", "Setup");
-
-                string filePath = Path.Combine(setupPath, request.FileName);
-                if (!System.IO.File.Exists(filePath)) return NotFound(new { Message = "?�크립트 ?�일??찾을 ???�습?�다." });
-
-                string sql = await System.IO.File.ReadAllTextAsync(filePath);
-
-                sql = sql.Replace("C##MYUSER", request.SchemaName, StringComparison.OrdinalIgnoreCase);
-
                 var result = await _scriptExecutor.ExecuteSqlAsync(sql);
-
-                if (result.Success) return Ok(new { Message = result.Message });
-                else return StatusCode(500, new { Message = result.Message });
+                if (result.Success)
+                    return Ok(new { Message = result.Message });
+                else
+                    return BadRequest(new { Message = result.Message });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"?�크립트 ?�행 �??�버 ?�류: {ex.Message}" });
+                return StatusCode(500, new { Message = $"SQL 실행 중 오류 발생: {ex.Message}" });
             }
         }
     }
-
-    public class ExecuteScriptRequest
-    {
-        public string FileName { get; set; } = string.Empty;
-        public string SchemaName { get; set; } = string.Empty;
-    }
 }
-

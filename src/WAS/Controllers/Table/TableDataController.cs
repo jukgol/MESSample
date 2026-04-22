@@ -1,15 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Table;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace WAS.Controllers.Table
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/table/data")]
     public class TableDataController : ControllerBase
     {
         private readonly ITableDataService _tableDataService;
@@ -19,69 +14,46 @@ namespace WAS.Controllers.Table
             _tableDataService = tableDataService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetTables()
+        [HttpGet("{schemaName}/{tableName}")]
+        public async Task<IActionResult> GetTableData(string schemaName, string tableName)
         {
             try
             {
-                var tables = await _tableDataService.GetTablesAsync();
-                return Ok(tables);
+                var data = await _tableDataService.GetTableDataAsync(schemaName, tableName);
+                return Ok(data);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"?�이�?조회 ?�패: {ex.Message}" });
+                return StatusCode(500, new { Message = $"테이블 데이터 조회 실패: {ex.Message}" });
             }
         }
 
-        [HttpGet("{tableName}/data")]
-        public async Task<IActionResult> GetTableData([FromRoute] string tableName)
+        [HttpGet("{schemaName}/{tableName}/metadata")]
+        public async Task<IActionResult> GetTableMetadata(string schemaName, string tableName)
         {
-            if (string.IsNullOrEmpty(tableName)) return BadRequest();
-
             try
             {
-                var dtTask = _tableDataService.GetTableDataAsync(tableName);
-                var metaTask = _tableDataService.GetTableMetadataAsync(tableName);
-                
-                await Task.WhenAll(dtTask, metaTask);
-                
-                var dt = dtTask.Result;
-                var meta = metaTask.Result;
-
-                var columns = dt.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-                var data = dt.AsEnumerable().Select(row => 
-                    columns.ToDictionary(col => col, col => row[col] == DBNull.Value ? null : row[col])
-                ).ToList();
-
-                return Ok(new { 
-                    columns = columns, 
-                    rows = data, 
-                    metadata = meta 
-                });
+                var metadata = await _tableDataService.GetTableMetadataAsync(schemaName, tableName);
+                return Ok(metadata);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"?�이??조회 ?�패: {ex.Message}" });
+                return StatusCode(500, new { Message = $"테이블 메타데이터 조회 실패: {ex.Message}" });
             }
         }
 
-        [HttpPost("{tableName}/row")]
-        public async Task<IActionResult> InsertRow([FromRoute] string tableName, [FromBody] Dictionary<string, object> rowData)
+        [HttpPost("{schemaName}/{tableName}")]
+        public async Task<IActionResult> InsertRow(string schemaName, string tableName, [FromBody] Dictionary<string, object> data)
         {
-            if (string.IsNullOrEmpty(tableName) || rowData == null || rowData.Count == 0)
-                return BadRequest(new { Message = "?�효?��? ?��? ?�청 ?�이?�입?�다." });
-
             try
             {
-                var result = await _tableDataService.InsertRowAsync(tableName, rowData);
-                if (result.Success) return Ok(new { Message = result.Message });
-                else return BadRequest(new { Message = result.Message });
+                await _tableDataService.InsertRowAsync(schemaName, tableName, data);
+                return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"?�버 ?�류: {ex.Message}" });
+                return StatusCode(500, new { Message = $"행 추가 실패: {ex.Message}" });
             }
         }
     }
 }
-

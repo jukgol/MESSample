@@ -1,7 +1,10 @@
-using WAS.Data;
+﻿using WAS.Data;
 using System;
 using System.Data;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Oracle.ManagedDataAccess.Client;
+using Dapper;
 
 namespace WAS.Services
 {
@@ -22,55 +25,40 @@ namespace WAS.Services
                 if (connection is System.Data.Common.DbConnection dbConn) await dbConn.OpenAsync();
                 else connection.Open();
 
-                // 1. ?��?콜론 기�??�로 명령 분리
+                // 1. 세미콜론 기준으로 명령 분리
                 var rawStatements = sql.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                
+
                 int executedCount = 0;
                 foreach (var rawStmt in rawStatements)
                 {
-                    // 2. �?명령 ?��???주석 �?불필?�한 공백 ?�거
-                    var lines = rawStmt.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                    var cleanLines = lines
-                        .Select(l => l.Trim())
-                        .Where(l => !l.StartsWith("--") && !string.IsNullOrWhiteSpace(l))
-                        .ToList();
-                    
-                    var trimmedStmt = string.Join(" ", cleanLines).Trim();
-                    
-                    if (string.IsNullOrWhiteSpace(trimmedStmt)) continue;
+                    var stmt = rawStmt.Trim();
+                    if (string.IsNullOrWhiteSpace(stmt)) continue;
 
-                    // 3. SELECT 문�? NonQuery?�서 ?�외
-                    if (trimmedStmt.StartsWith("SELECT", StringComparison.OrdinalIgnoreCase)) continue;
-
-                    try 
-                    {
-                        using var command = connection.CreateCommand();
-                        command.CommandText = trimmedStmt;
-                        
-                        if (command is System.Data.Common.DbCommand cmd)
-                        {
-                            await cmd.ExecuteNonQueryAsync();
-                        }
-                        else
-                        {
-                            command.ExecuteNonQuery();
-                        }
-                        executedCount++;
-                    }
-                    catch (Exception ex)
-                    {
-                        // ?�떤 쿼리?�서 ?�패?�는지 ?�세???�림
-                        return (false, $"SQL ?�행 ?�패 (쿼리: {trimmedStmt}) : {ex.Message}");
-                    }
+                    using var command = connection.CreateCommand();
+                    command.CommandText = stmt;
+                    await (command as System.Data.Common.DbCommand)!.ExecuteNonQueryAsync();
+                    executedCount++;
                 }
 
-                return (true, $"{executedCount}개의 명령???�공?�으�??�행?�었?�니??");
+                return (true, $"{executedCount}개의 SQL 문이 성공적으로 실행되었습니다.");
             }
             catch (Exception ex)
             {
-                return (false, $"?�스???�류 발생: {ex.Message}");
+                return (false, $"SQL 실행 오류: {ex.Message}");
             }
+        }
+
+        public async Task<IEnumerable<T>> ExecuteQueryAsync<T>(string queryName, object? parameters = null)
+        {
+            // TODO: 실제 쿼리 파일을 읽어오는 로직 필요
+            using var connection = _db.CreateConnection();
+            return await connection.QueryAsync<T>(queryName, parameters);
+        }
+
+        public async Task ExecuteNonQueryAsync(string sql, object? parameters = null)
+        {
+            using var connection = _db.CreateConnection();
+            await connection.ExecuteAsync(sql, parameters);
         }
     }
 }
-

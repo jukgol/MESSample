@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WAS.Services;
 
 namespace WAS.Controllers
@@ -24,26 +24,22 @@ namespace WAS.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"?�키�?조회 ?�패: {ex.Message}" });
+                return StatusCode(500, new { Message = $"스키마 조회 실패: {ex.Message}" });
             }
         }
 
         [HttpGet("{schemaName}/privileges")]
-        public async Task<IActionResult> GetSchemaPrivileges([FromRoute] string schemaName)
+        public async Task<IActionResult> GetSchemaPrivileges(string schemaName)
         {
-            if (string.IsNullOrEmpty(schemaName)) return BadRequest();
-            
             try
             {
-                var privs = await _schemaService.GetSchemaPrivilegesAsync(schemaName);
-                var result = privs.Select(p => new { p.Type, p.Name });
-                return Ok(result);
+                var privileges = await _schemaService.GetSchemaPrivilegesAsync(schemaName);
+                return Ok(privileges);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"권한 조회 ?�패: {ex.Message}" });
+                return StatusCode(500, new { Message = $"스키마 권한 조회 실패: {ex.Message}" });
             }
         }
     }
 }
-

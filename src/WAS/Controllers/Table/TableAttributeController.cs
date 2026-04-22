@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Table;
 using System;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ namespace WAS.Controllers.Table
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"?�성 ?�크립트 조회 ?�패: {ex.Message}" });
+                return StatusCode(500, new { message = $"속성 스크립트 조회 실패: {ex.Message}" });
             }
         }
 
@@ -34,7 +34,7 @@ namespace WAS.Controllers.Table
         public async Task<IActionResult> ExecuteAttribScript([FromBody] ExecuteAttributeRequest request)
         {
             if (string.IsNullOrEmpty(request.FileName) || string.IsNullOrEmpty(request.TableName) || string.IsNullOrEmpty(request.ColumnName))
-                return BadRequest(new { Message = "?�일�? ?�이블명, 컬럼명�? ?�수?�니??" });
+                return BadRequest(new { Message = "파일명, 테이블명, 컬럼명은 필수입니다." });
 
             try
             {
@@ -52,7 +52,7 @@ namespace WAS.Controllers.Table
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"?�성 ?�크립트 ?�행 �??�버 ?�류: {ex.Message}" });
+                return StatusCode(500, new { Message = $"속성 스크립트 실행 중 서버 오류: {ex.Message}" });
             }
         }
 
@@ -60,7 +60,7 @@ namespace WAS.Controllers.Table
         public async Task<IActionResult> CreateTable([FromBody] CreateTableRequest request)
         {
             if (string.IsNullOrEmpty(request.TableName) || string.IsNullOrEmpty(request.Sql))
-                return BadRequest(new { Message = "?�이블명�?SQL 문장?� ?�수?�니??" });
+                return BadRequest(new { Message = "테이블명과 SQL 문장은 필수입니다." });
 
             try
             {
@@ -70,7 +70,7 @@ namespace WAS.Controllers.Table
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"?�이�??�성 �??�버 ?�류: {ex.Message}" });
+                return StatusCode(500, new { Message = $"테이블 생성 중 서버 오류: {ex.Message}" });
             }
         }
     }
@@ -87,11 +87,10 @@ namespace WAS.Controllers.Table
         public string TableName { get; set; } = string.Empty;
         public string ColumnName { get; set; } = string.Empty;
         
-        // 추�? ?�드 (??컬럼 추�? ???�용)
+        // 추가 필드 (새 컬럼 추가 시 사용)
         public string? NewColumnName { get; set; }
         public string? DataType { get; set; }
         public bool IsNotNull { get; set; }
         public bool IsUnique { get; set; }
     }
 }
-

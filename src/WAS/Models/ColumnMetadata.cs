@@ -1,4 +1,4 @@
-namespace WAS.Models
+﻿namespace WAS.Models
 {
     public class ColumnMetadata
     {

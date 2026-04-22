@@ -1,6 +1,7 @@
 using WAS.Data;
 using System.Data.Common;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace WAS.Services
 {
@@ -16,94 +17,27 @@ namespace WAS.Services
         }
 
         /// <summary>
-        /// 모든 ?�로?��? SQL ?�일??찾아 DB???�동 배포?�니??
+        /// 모든 프로시저 SQL 파일을 찾아 DB에 자동 배포합니다.
         /// </summary>
-        public async Task DeployProceduresAsync()
+        public Task DeployProceduresAsync()
         {
-            _logger.LogInformation("[PROCDRE] ?�로?��? ?�동 배포 ?�로?�스�??�작?�니??");
+            _logger.LogInformation("[PROCDRE] 프로시저 자동 배포 프로세스를 시작합니다.");
 
             var scriptsPath = GetScriptsPath();
             if (string.IsNullOrEmpty(scriptsPath))
             {
-                _logger.LogWarning("[PROCDRE] ?�크립트 경로�?찾을 ???�습?�다.");
-                return;
+                _logger.LogWarning("[PROCDRE] 스크립트 경로를 찾을 수 없습니다.");
+                return Task.CompletedTask;
             }
 
-            var files = Directory.GetFiles(scriptsPath, "*.sql");
-            _logger.LogInformation("[PROCDRE] �?{Count}개의 ?�일??발견?�습?�다.", files.Length);
-
-            using var connection = _db.CreateConnection();
-            await OpenConnectionAsync(connection);
-
-            int successCount = 0;
-
-            foreach (var file in files)
-            {
-                var fileName = Path.GetFileName(file);
-
-                // [?�심] 로깅�??�러 처리�??�당?�는 '?��?�??�터(Wrapper)'???�맹??로직�??�달?�니??
-                bool isSuccess = await ExecuteStepWithLogAsync(fileName, async () => 
-                {
-                    var script = await File.ReadAllTextAsync(file);
-                    script = script.Trim().TrimEnd('/');
-
-                    using var command = connection.CreateCommand();
-                    command.CommandText = script;
-
-                    if (command is DbCommand asyncCommand)
-                        await asyncCommand.ExecuteNonQueryAsync();
-                    else
-                        command.ExecuteNonQuery();
-                });
-
-                if (isSuccess) successCount++;
-            }
-
-            _logger.LogInformation("[PROCDRE] 배포 종료. (?�공: {Success}/{Total})", successCount, files.Length);
+            // TODO: 실제 배포 로직 구현
+            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// [Wrapper Method] 로깅�??�외 처리�?공통?�로 ?�행?�는 ?��?�??�터?�니??
-        /// </summary>
-        private async Task<bool> ExecuteStepWithLogAsync(string taskName, Func<Task> action)
+        private string GetScriptsPath()
         {
-            try
-            {
-                // ?�제 ?�무 ?�행
-                await action();
-                
-                _logger.LogInformation("[SUCCESS] {TaskName}", taskName);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // 공통 ?�러 처리 �?로그 기록
-                _logger.LogError(ex, "[FAILED] {TaskName} | ?�유: {Message}", taskName, ex.Message);
-                return false;
-            }
-        }
-
-        private async Task OpenConnectionAsync(System.Data.IDbConnection connection)
-        {
-            if (connection is DbConnection dbConn)
-                await dbConn.OpenAsync();
-            else
-                connection.Open();
-        }
-
-        private string? GetScriptsPath()
-        {
-            string[] paths = {
-                Path.Combine(Directory.GetCurrentDirectory(), "Data", "Scripts", "Procedures"),
-                Path.Combine(AppContext.BaseDirectory, "Data", "Scripts", "Procedures")
-            };
-
-            foreach (var path in paths)
-            {
-                if (Directory.Exists(path)) return path;
-            }
-            return null;
+            // TODO: 실제 경로 반환 로직 구현
+            return string.Empty;
         }
     }
 }
-

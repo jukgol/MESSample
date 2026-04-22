@@ -1,4 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using WAS.Data;
 using WAS.Proxies;
@@ -11,10 +11,10 @@ namespace WAS.Extensions
     {
         public static IServiceCollection AddOracleDbServices(this IServiceCollection services, IConfiguration configuration)
         {
-            // DB ?�결???�심??DbProvider ?�록
+            // DB 연결의 핵심인 DbProvider 등록
             services.AddSingleton<DbProvider>();
 
-            // Scoped ?�비??�??�터?�이???�록 (AOP 로깅 ?�용)
+            // Scoped 서비스 및 인터페이스 등록 (AOP 로깅 적용)
             services.AddScoped<DbConnect>();
             services.AddScoped<IDbConnect>(sp => LoggingProxy<IDbConnect>.Create(sp.GetRequiredService<DbConnect>(), sp.GetRequiredService<ILogger<DbConnect>>()));
 
@@ -27,12 +27,12 @@ namespace WAS.Extensions
             services.AddScoped<SchemaService>();
             services.AddScoped<ISchemaService>(sp => LoggingProxy<ISchemaService>.Create(sp.GetRequiredService<SchemaService>(), sp.GetRequiredService<ILogger<SchemaService>>()));
 
+            services.AddScoped<ScriptExecutor>();
+            services.AddScoped<IScriptExecutor>(sp => LoggingProxy<IScriptExecutor>.Create(sp.GetRequiredService<ScriptExecutor>(), sp.GetRequiredService<ILogger<ScriptExecutor>>()));
 
             services.AddScoped<ProcedureRegistration>();
-            services.AddScoped<IScriptExecutor, ScriptExecutor>();
 
             return services;
         }
     }
 }
-
