@@ -30,15 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('Insert form HTML loaded successfully.');
             } else {
                 console.error('Failed to load section_insert_row.html:', response.status);
-                // 실패 시 내장 템플릿이라도 삽입
-                formPlaceholder.innerHTML = `
-                    <div id="insert-container" class="insert-container">
-                        <div class="insert-header"><span class="icon">➕</span> 데이터 추가</div>
-                        <div id="insert-fields" class="insert-fields"></div>
-                        <div style="display: flex; justify-content: flex-end;">
-                            <button class="btn-primary" onclick="handleInsertRow()" style="width: auto; padding: 10px 30px;">추가하기</button>
-                        </div>
-                    </div>`;
+                formPlaceholder.innerHTML = `<div id="insert-container" class="insert-container"><div class="insert-header">➕ 데이터 추가</div><div id="insert-fields" class="insert-fields"></div></div>`;
             }
         } catch (error) {
             console.error('Error loading insert form:', error);
@@ -48,11 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchTables() {
         try {
             const response = await fetch('/api/TableData');
-            if (!response.ok) throw new Error(`오류: ${response.status}`);
-            const tables = await response.json();
-            displayTableList(tables);
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.Message || result.message || `HTTP ${response.status}`);
+            }
+            displayTableList(result);
         } catch (error) {
-            if (tableListMenu) tableListMenu.innerHTML = `<p style="padding:20px; color:#ff6b6b;">${error.message}</p>`;
+            if (tableListMenu) tableListMenu.innerHTML = `<p style="padding:20px; color:#ff6b6b; font-size:0.8rem;">목록 조회 실패: <br>${error.message}</p>`;
         }
     }
 
@@ -81,25 +75,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await fetch(`/api/TableData/${tableName}/data`);
-            if (!response.ok) throw new Error('데이터 요청 실패');
-            const result = await response.json();
+            const rawText = await response.text(); // 일단 텍스트로 읽음
             
-            console.log('Table Data Result:', result);
+            let result;
+            try {
+                result = JSON.parse(rawText);
+            } catch (e) {
+                throw new Error(`서버 응답이 JSON 형식이 아닙니다: ${rawText.substring(0, 100)}...`);
+            }
 
+            if (!response.ok) {
+                throw new Error(result.Message || result.message || `HTTP ${response.status}: ${rawText}`);
+            }
+            
             displayData(result);
             
-            // 메타데이터가 있으면 상세 폼, 없으면 기본 컬럼 기반 폼 생성
             const meta = result.metadata || [];
             if (meta.length > 0) {
                 setupInsertForm(meta); 
             } else {
-                // 메타데이터가 없을 경우 컬럼 이름만으로라도 폼 생성 (하위 호환성)
                 const fallbackMeta = (result.columns || []).map(c => ({ name: c, isIdentity: false, hasDefault: false }));
                 setupInsertForm(fallbackMeta);
             }
         } catch (error) {
             console.error('Fetch Error:', error);
-            tableSubtitle.textContent = '조회 실패';
+            tableSubtitle.innerHTML = `<span style="color:#ff6b6b; font-size:0.85rem; background:rgba(255,107,107,0.1); padding:4px 10px; border-radius:4px;">❌ ${error.message}</span>`;
+            dataBody.innerHTML = `<tr><td colspan="100" class="empty-message" style="color:#ff6b6b; padding:40px;">${error.message}</td></tr>`;
         }
     };
 
@@ -109,14 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dataHead.innerHTML = `<tr><th class="col-check"><input type="checkbox" id="check-all"></th>${columns.map(col => `<th>${col}</th>`).join('')}</tr>`;
         
-        const checkAll = document.getElementById('check-all');
-        if (checkAll) {
-            checkAll.addEventListener('change', (e) => {
-                document.querySelectorAll('.row-check').forEach(cb => cb.checked = e.target.checked);
-                updateSelectionState();
-            });
-        }
-
         if (!rows || rows.length === 0) {
             dataBody.innerHTML = `<tr><td colspan="${columns.length + 1}" class="empty-message">데이터 없음</td></tr>`;
             return;
@@ -129,8 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ${columns.map(col => `<td>${row[col] === null ? '' : row[col]}</td>`).join('')}
             </tr>
         `).join('');
-
-        document.querySelectorAll('.row-check').forEach(cb => cb.addEventListener('change', updateSelectionState));
     }
 
     async function setupInsertForm(metadata, retry = 0) {
@@ -138,18 +129,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const fields = document.getElementById('insert-fields');
 
         if ((!container || !fields) && retry < 10) {
-            console.log('Form container not ready, retrying...', retry);
             setTimeout(() => setupInsertForm(metadata, retry + 1), 100);
             return;
         }
 
-        if (!container || !fields) {
-            console.error('Could not find insert-fields even after retries.');
-            return;
-        }
+        if (!container || !fields) return;
         
-        console.log('Rendering fields for metadata:', metadata);
-
         if (!metadata || metadata.length === 0) {
             container.style.display = 'none';
             return;
@@ -159,13 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
         fields.innerHTML = metadata.map(col => {
             const isAuto = col.isIdentity || col.hasDefault || col.IsIdentity || col.HasDefault;
             const colName = col.name || col.Name;
-            const placeholder = isAuto ? `자동 입력` : `입력하세요`;
-            const disabledAttr = isAuto ? 'disabled style="opacity: 0.4;"' : '';
-            
             return `
                 <div class="field-group">
                     <label>${colName}${isAuto ? ' <small>(AUTO)</small>' : ''}</label>
-                    <input type="text" class="insert-input" data-column="${colName}" placeholder="${placeholder}" ${disabledAttr}>
+                    <input type="text" class="insert-input" data-column="${colName}" ${isAuto ? 'disabled style="opacity: 0.4;"' : ''}>
                 </div>`;
         }).join('');
     }
@@ -173,14 +155,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.handleInsertRow = async () => {
         const inputs = document.querySelectorAll('.insert-input:not([disabled])');
         const rowData = {};
-        let hasValue = false;
-
         inputs.forEach(input => {
             const val = input.value.trim();
-            if (val) { rowData[input.dataset.column] = val; hasValue = true; }
+            if (val) rowData[input.dataset.column] = val;
         });
-
-        if (!hasValue) { alert('데이터를 입력해 주세요.'); return; }
 
         try {
             const response = await fetch(`/api/TableData/${currentTableName}/row`, {
@@ -190,23 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const result = await response.json();
             if (response.ok) {
-                alert(result.message);
-                document.querySelectorAll('.insert-input').forEach(i => i.value = '');
+                alert(result.message || '추가 완료');
                 window.fetchTableData(currentTableName, document.querySelector('.menu-item.active'));
-            } else { alert('오류: ' + result.message); }
+            } else { alert('오류: ' + (result.Message || result.message)); }
         } catch (error) { alert('통신 오류'); }
-    };
-
-    function updateSelectionState() {
-        const checkedCount = document.querySelectorAll('.row-check:checked').length;
-        if (selectedCountSpan) selectedCountSpan.textContent = checkedCount;
-        if (selectionBar) selectionBar.style.display = checkedCount > 0 ? 'flex' : 'none';
-    }
-
-    window.handleDeleteSelected = () => {
-        const checkedCount = document.querySelectorAll('.row-check:checked').length;
-        if (confirm(`${checkedCount}개 행을 삭제하시겠습니까?`)) {
-            alert('삭제 기능 준비 중');
-        }
     };
 });

@@ -5,6 +5,7 @@ using System.Data;
 using System.Threading.Tasks;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using Oracle.ManagedDataAccess.Client;
 using Dapper;
@@ -42,9 +43,13 @@ namespace WAS.Services
                 }
                 return (true, $"{executedCount}개의 명령이 성공적으로 실행되었습니다.");
             }
+            catch (OracleException oex)
+            {
+                return (false, $"[DB-ERR] Oracle 오류 (코드: {oex.Number}): {oex.Message}");
+            }
             catch (Exception ex)
             {
-                return (false, $"SQL 실행 오류: {ex.Message}");
+                return (false, $"[SYS-ERR] 시스템 오류: {ex.Message}");
             }
         }
 
@@ -53,54 +58,103 @@ namespace WAS.Services
             using var connection = _db.CreateConnection();
             string sql = await GetQuerySqlAsync(queryName);
             
-            // 파라미터가 Dictionary 형태인 경우 (SchemaName, TableName 등 치환용)
-            if (parameters is IEnumerable<KeyValuePair<string, object>> dict)
+            var dapperParams = new DynamicParameters();
+            var paramDict = new Dictionary<string, string>();
+
+            if (parameters != null)
             {
-                foreach (var kv in dict)
+                // 1. OracleParameter 배열/컬렉션인 경우
+                if (parameters is IEnumerable<OracleParameter> oraParams)
                 {
-                    sql = sql.Replace($"{{{kv.Key}}}", kv.Value?.ToString() ?? "");
-                    // 대소문자 대응
-                    sql = sql.Replace($":{kv.Key}", kv.Value?.ToString() ?? "");
+                    foreach (var p in oraParams)
+                    {
+                        var name = p.ParameterName.TrimStart(':');
+                        paramDict[name] = p.Value?.ToString() ?? "";
+                        dapperParams.Add(name, p.Value);
+                    }
+                }
+                // 2. 익명 객체인 경우
+                else if (parameters is not DynamicParameters)
+                {
+                    var props = parameters.GetType().GetProperties();
+                    foreach (var prop in props)
+                    {
+                        var val = prop.GetValue(parameters);
+                        paramDict[prop.Name] = val?.ToString() ?? "";
+                        dapperParams.Add(prop.Name, val);
+                    }
+                }
+                else
+                {
+                    dapperParams = (DynamicParameters)parameters;
                 }
             }
 
-            return await connection.QueryAsync<T>(sql, parameters);
+            // SQL 내의 {Key} 형식 치환 (테이블명/스키마명 등 물리적 식별자용)
+            foreach (var kv in paramDict)
+            {
+                sql = Regex.Replace(sql, $"\\{{{kv.Key}\\}}", kv.Value, RegexOptions.IgnoreCase);
+            }
+
+            // 최종 SQL에 미치환된 중괄호 체크
+            if (Regex.IsMatch(sql, @"\{.+\}"))
+            {
+                throw new InvalidOperationException($"[SQL-501] 필수 매개변수가 치환되지 않았습니다. SQL: {sql}");
+            }
+
+            // 오라클 드라이버는 SQL 끝에 ';' 또는 '/'가 있으면 오류를 냅니다. 이를 제거합니다.
+            sql = sql.Trim().TrimEnd(';').TrimEnd('/').Trim();
+
+            try 
+            {
+                return await connection.QueryAsync<T>(sql, dapperParams);
+            }
+            catch (OracleException oex)
+            {
+                throw new Exception($"[DB-ERR] 쿼리 실행 실패 (코드: {oex.Number}): {oex.Message}\n실행된 SQL: {sql}");
+            }
         }
 
         public async Task ExecuteNonQueryAsync(string sql, object? parameters = null)
         {
             using var connection = _db.CreateConnection();
-            await connection.ExecuteAsync(sql, parameters);
+            
+            object? finalParams = parameters;
+            if (parameters is IEnumerable<OracleParameter> oraParams)
+            {
+                var dapperParams = new DynamicParameters();
+                foreach (var p in oraParams)
+                {
+                    dapperParams.Add(p.ParameterName.TrimStart(':'), p.Value);
+                }
+                finalParams = dapperParams;
+            }
+            
+            await connection.ExecuteAsync(sql, finalParams);
         }
 
         private async Task<string> GetQuerySqlAsync(string queryName)
         {
-            // 1. 하드코딩된 기본 쿼리 처리 (파일이 없을 경우 대비)
-            if (queryName == "GET_TABLE_DATA")
-                return "SELECT * FROM {SchemaName}.{TableName} WHERE ROWNUM <= 100";
-            
-            if (queryName == "GET_TABLE_METADATA")
-                return @"SELECT COLUMN_NAME as Name, DATA_TYPE as DataType, NULLABLE as IsNullable, 
-                         IDENTITY_COLUMN as IsIdentity, DATA_DEFAULT as HasDefault
-                         FROM ALL_TAB_COLUMNS 
-                         WHERE OWNER = :SchemaName AND TABLE_NAME = :TableName
-                         ORDER BY COLUMN_ID";
+            // 1. 기본 경로 설정 (애플리케이션 실행 디렉토리 기준)
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            string path = Path.Combine(baseDir, "Data", "Scripts", "Queries", $"{queryName}.sql");
 
-            // 2. 파일에서 읽기 시도
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Scripts", "Queries", $"{queryName}.sql");
+            // 2. 개발 환경을 고려한 대체 경로 확인 (현재 작업 디렉토리 기준)
             if (!File.Exists(path))
             {
-                string projectRoot = Directory.GetCurrentDirectory();
-                path = Path.Combine(projectRoot, "Data", "Scripts", "Queries", $"{queryName}.sql");
+                path = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Scripts", "Queries", $"{queryName}.sql");
                 if (!File.Exists(path))
-                    path = Path.Combine(projectRoot, "src", "WAS", "Data", "Scripts", "Queries", $"{queryName}.sql");
+                {
+                    // 더 이상 찾을 수 없는 경우, 입력된 queryName 자체가 SQL인 경우(SELECT 포함)를 제외하고 예외 발생
+                    if (!queryName.Contains("SELECT", StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new FileNotFoundException($"[SQL-404] '{queryName}' 쿼리 파일을 찾을 수 없습니다. (확인된 경로: {path})");
+                    }
+                    return queryName;
+                }
             }
 
-            if (File.Exists(path))
-                return await File.ReadAllTextAsync(path);
-
-            // 3. 파일도 없고 하드코딩도 없으면 이름을 그대로 SQL로 간주
-            return queryName;
+            return await File.ReadAllTextAsync(path);
         }
 
         private IEnumerable<string> ParseStatements(string sql)
