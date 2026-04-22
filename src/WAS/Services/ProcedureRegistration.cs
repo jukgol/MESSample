@@ -2,6 +2,9 @@ using WAS.Data;
 using System.Data.Common;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using System.IO;
+using System;
+using System.Linq;
 
 namespace WAS.Services
 {
@@ -9,17 +12,19 @@ namespace WAS.Services
     {
         private readonly DbProvider _db;
         private readonly ILogger<ProcedureRegistration> _logger;
+        private readonly IScriptExecutor _scriptExecutor;
 
-        public ProcedureRegistration(DbProvider db, ILogger<ProcedureRegistration> logger)
+        public ProcedureRegistration(DbProvider db, ILogger<ProcedureRegistration> logger, IScriptExecutor scriptExecutor)
         {
             _db = db;
             _logger = logger;
+            _scriptExecutor = scriptExecutor;
         }
 
         /// <summary>
         /// 모든 프로시저 SQL 파일을 찾아 DB에 자동 배포합니다.
         /// </summary>
-        public Task DeployProceduresAsync()
+        public async Task DeployProceduresAsync()
         {
             _logger.LogInformation("[PROCDRE] 프로시저 자동 배포 프로세스를 시작합니다.");
 
@@ -27,16 +32,47 @@ namespace WAS.Services
             if (string.IsNullOrEmpty(scriptsPath))
             {
                 _logger.LogWarning("[PROCDRE] 스크립트 경로를 찾을 수 없습니다.");
-                return Task.CompletedTask;
+                return;
             }
 
-            // TODO: 실제 배포 로직 구현
-            return Task.CompletedTask;
+            try
+            {
+                var sqlFiles = Directory.GetFiles(scriptsPath, "*.sql");
+                foreach (var file in sqlFiles)
+                {
+                    var sql = await File.ReadAllTextAsync(file);
+                    var result = await _scriptExecutor.ExecuteSqlAsync(sql);
+                    
+                    if (result.Success)
+                        _logger.LogInformation($"[PROCDRE] {Path.GetFileName(file)} 배포 성공.");
+                    else
+                        _logger.LogError($"[PROCDRE] {Path.GetFileName(file)} 배포 실패: {result.Message}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[PROCDRE] 프로시저 배포 중 예상치 못한 오류 발생.");
+            }
         }
 
         private string GetScriptsPath()
         {
-            // TODO: 실제 경로 반환 로직 구현
+            // 실행 환경에 따른 경로 탐색
+            string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            
+            // 1. 실행 경로 기준 (bin/Debug/net8.0/Data/Scripts/Procedures)
+            string path = Path.Combine(baseDir, "Data", "Scripts", "Procedures");
+            if (Directory.Exists(path)) return path;
+
+            // 2. 프로젝트 소스 경로 기준 (개발 시)
+            string projectRoot = Directory.GetCurrentDirectory();
+            path = Path.Combine(projectRoot, "Data", "Scripts", "Procedures");
+            if (Directory.Exists(path)) return path;
+
+            // 3. src 폴더 포함 경로 기준 (특이 케이스)
+            path = Path.Combine(projectRoot, "src", "WAS", "Data", "Scripts", "Procedures");
+            if (Directory.Exists(path)) return path;
+
             return string.Empty;
         }
     }

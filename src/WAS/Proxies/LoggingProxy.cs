@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using WAS.Attributes;
 using System;
 using System.Reflection;
@@ -36,6 +36,16 @@ namespace WAS.Proxies
 
                 if (result is Task task)
                 {
+                    // 반환 타입이 Task<TResult> 인지 확인
+                    if (targetMethod.ReturnType.IsGenericType && targetMethod.ReturnType.GetGenericTypeDefinition() == typeof(Task<>))
+                    {
+                        var resultType = targetMethod.ReturnType.GetGenericArguments()[0];
+                        var method = typeof(LoggingProxy<T>).GetMethod(nameof(HandleAsyncWithResult), BindingFlags.NonPublic | BindingFlags.Instance);
+                        var genericMethod = method!.MakeGenericMethod(resultType);
+                        return genericMethod.Invoke(this, new object[] { task, message });
+                    }
+                    
+                    // 반환 타입이 일반 Task 인 경우
                     return HandleAsync(task, message);
                 }
 
@@ -44,8 +54,10 @@ namespace WAS.Proxies
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"--- [AOP 에러] {message}: {ex.Message} ---");
-                throw;
+                // 내부 예외(TargetInvocationException)인 경우 실제 원인 로그 남김
+                var realEx = ex is TargetInvocationException ? ex.InnerException ?? ex : ex;
+                _logger.LogError(realEx, $"--- [AOP 에러] {message}: {realEx.Message} ---");
+                throw realEx;
             }
         }
 
@@ -55,9 +67,9 @@ namespace WAS.Proxies
             _logger.LogInformation($"--- [AOP 완료] {message} ---");
         }
 
-        private async Task<TResult> HandleAsync<TResult>(Task<TResult> task, string message)
+        private async Task<TResult> HandleAsyncWithResult<TResult>(Task task, string message)
         {
-            var result = await task;
+            var result = await (Task<TResult>)task;
             _logger.LogInformation($"--- [AOP 완료] {message} ---");
             return result;
         }

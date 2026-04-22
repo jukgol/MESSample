@@ -9,3 +9,4 @@ CREATE TABLE LOT (
     
     CONSTRAINT FK_LOT_ITEM FOREIGN KEY (item_id) REFERENCES ITEM(item_id)
 );
+/

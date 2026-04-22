@@ -7,3 +7,4 @@ CREATE TABLE PROCESS_STEP (
     description CLOB,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+/
