@@ -6,6 +6,9 @@ namespace WAS.Services.Table
 {
     public interface ITableDataService
     {
+        // 테이블 목록 조회
+        Task<IEnumerable<string>> GetTablesAsync(string schemaName);
+
         // 특정 테이블의 실제 데이터 조회
         Task<IEnumerable<dynamic>> GetTableDataAsync(string schemaName, string tableName);
 

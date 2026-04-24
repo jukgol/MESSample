@@ -23,9 +23,8 @@ namespace WAS.Controllers.Table
         {
             try
             {
-                var schemaName = GetCurrentSchema().ToUpper(); // 대문자 변환
-                // TODO: 실제 테이블 목록 조회 서비스 호출 필요
-                var tables = new[] { "ITEM", "LOT", "PROCESS_STEP", "PROCESS_LOG", "USER_INFO", "USER_ROLE" };
+                var schemaName = GetCurrentSchema().ToUpper();
+                var tables = await _tableDataService.GetTablesAsync(schemaName);
                 return Ok(tables);
             }
             catch (Exception ex)
