@@ -24,8 +24,7 @@ namespace WAS.Controllers
         {
             try
             {
-                var query = "SELECT U.*, R.ROLE_NAME FROM USER_INFO U JOIN USER_ROLE R ON U.ROLE_CODE = R.ROLE_CODE ORDER BY U.USER_ID DESC";
-                var users = await _scriptExecutor.ExecuteQueryAsync<dynamic>(query, null);
+                var users = await _scriptExecutor.ExecuteQueryAsync<dynamic>("User/GET_USER_LIST", null);
                 return Ok(users);
             }
             catch (Exception ex)
@@ -39,8 +38,7 @@ namespace WAS.Controllers
         {
             try
             {
-                var query = "SELECT ROLE_CODE, ROLE_NAME FROM USER_ROLE ORDER BY ROLE_CODE";
-                var roles = await _scriptExecutor.ExecuteQueryAsync<dynamic>(query, null);
+                var roles = await _scriptExecutor.ExecuteQueryAsync<dynamic>("User/GET_ROLE_LIST", null);
                 return Ok(roles);
             }
             catch (Exception ex)
@@ -54,19 +52,13 @@ namespace WAS.Controllers
         {
             try
             {
-                // USER_ID는 시퀀스(IDENTITY)이므로 제외하고 삽입
-                var columns = string.Join(", ", userData.Keys);
-                var values = string.Join(", ", userData.Keys.Select(k => ":" + k));
-                var query = $"INSERT INTO USER_INFO ({columns}) VALUES ({values})";
-
-                var parameters = userData.Select(kv => new OracleParameter(kv.Key, kv.Value ?? DBNull.Value)).ToArray();
-                await _scriptExecutor.ExecuteNonQueryAsync(query, parameters);
-                
+                await _scriptExecutor.ExecuteNonQueryAsync("User/CREATE_USER", userData);
                 return Ok(new { Message = "사용자가 생성되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"사용자 생성 실패: {ex.Message}" });
+                var debugInfo = string.Join(", ", userData.Select(kv => $"{kv.Key}='{kv.Value}'"));
+                return StatusCode(500, new { Message = $"사용자 생성 실패: {ex.Message} | 데이터: {debugInfo}" });
             }
         }
 
@@ -75,19 +67,16 @@ namespace WAS.Controllers
         {
             try
             {
-                var setClause = string.Join(", ", userData.Keys.Select(k => $"{k} = :{k}"));
-                var query = $"UPDATE USER_INFO SET {setClause}, UPDATED_AT = CURRENT_TIMESTAMP WHERE USER_ID = :UserId";
+                var parameters = new Dictionary<string, object>(userData);
+                parameters["UserId"] = userId;
 
-                var parameters = userData.Select(kv => new OracleParameter(kv.Key, kv.Value ?? DBNull.Value)).ToList();
-                parameters.Add(new OracleParameter("UserId", userId));
-
-                await _scriptExecutor.ExecuteNonQueryAsync(query, parameters.ToArray());
-                
+                await _scriptExecutor.ExecuteNonQueryAsync("User/UPDATE_USER", parameters);
                 return Ok(new { Message = "사용자 정보가 수정되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"사용자 수정 실패: {ex.Message}" });
+                var debugInfo = string.Join(", ", userData.Select(kv => $"{kv.Key}='{kv.Value}'"));
+                return StatusCode(500, new { Message = $"사용자 수정 실패: {ex.Message} | 데이터: {debugInfo}" });
             }
         }
 
@@ -96,9 +85,8 @@ namespace WAS.Controllers
         {
             try
             {
-                var query = "DELETE FROM USER_INFO WHERE USER_ID = :UserId";
-                var parameters = new[] { new OracleParameter("UserId", userId) };
-                await _scriptExecutor.ExecuteNonQueryAsync(query, parameters);
+                var parameters = new Dictionary<string, object> { { "UserId", userId } };
+                await _scriptExecutor.ExecuteNonQueryAsync("User/DELETE_USER", parameters);
                 return Ok(new { Message = "사용자가 삭제되었습니다." });
             }
             catch (Exception ex)

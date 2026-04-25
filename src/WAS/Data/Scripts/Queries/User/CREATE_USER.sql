@@ -1,0 +1,13 @@
+INSERT INTO USER_INFO (
+    LOGIN_ID, 
+    PASSWORD, 
+    USER_NAME, 
+    ROLE_CODE, 
+    IS_ACTIVE
+) VALUES (
+    :LOGIN_ID, 
+    :PASSWORD, 
+    :USER_NAME, 
+    :ROLE_CODE, 
+    :IS_ACTIVE
+)

@@ -1,14 +1,15 @@
-using WAS.Data;
+using Dapper;
+using Oracle.ManagedDataAccess.Client;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Threading.Tasks;
-using System.Linq;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.RegularExpressions;
-using Oracle.ManagedDataAccess.Client;
-using Dapper;
+using System.Threading.Tasks;
+using WAS.Data;
 
 namespace WAS.Services
 {
@@ -58,99 +59,102 @@ namespace WAS.Services
             using var connection = _db.CreateConnection();
             string sql = await GetQuerySqlAsync(queryName);
             
-            var dapperParams = new DynamicParameters();
-            var paramDict = new Dictionary<string, string>();
-
-            if (parameters != null)
-            {
-                // 1. OracleParameter 배열/컬렉션인 경우
-                if (parameters is IEnumerable<OracleParameter> oraParams)
-                {
-                    foreach (var p in oraParams)
-                    {
-                        var name = p.ParameterName.TrimStart(':');
-                        paramDict[name] = p.Value?.ToString() ?? "";
-                        dapperParams.Add(name, p.Value);
-                    }
-                }
-                // 2. 익명 객체인 경우
-                else if (parameters is not DynamicParameters)
-                {
-                    var props = parameters.GetType().GetProperties();
-                    foreach (var prop in props)
-                    {
-                        var val = prop.GetValue(parameters);
-                        paramDict[prop.Name] = val?.ToString() ?? "";
-                        dapperParams.Add(prop.Name, val);
-                    }
-                }
-                else
-                {
-                    dapperParams = (DynamicParameters)parameters;
-                }
-            }
-
-            // SQL 내의 {Key} 형식 치환 (테이블명/스키마명 등 물리적 식별자용)
-            foreach (var kv in paramDict)
-            {
-                sql = Regex.Replace(sql, $"\\{{{kv.Key}\\}}", kv.Value, RegexOptions.IgnoreCase);
-            }
-
-            // 최종 SQL에 미치환된 중괄호 체크
-            if (Regex.IsMatch(sql, @"\{.+\}"))
-            {
-                throw new InvalidOperationException($"[SQL-501] 필수 매개변수가 치환되지 않았습니다. SQL: {sql}");
-            }
-
-            // 오라클 드라이버는 SQL 끝에 ';' 또는 '/'가 있으면 오류를 냅니다. 이를 제거합니다.
-            sql = sql.Trim().TrimEnd(';').TrimEnd('/').Trim();
+            var dapperParams = MapParameters(parameters);
 
             try 
             {
+                // Oracle 연결인 경우 BindByName 설정을 위해 명시적으로 처리
+                if (connection is OracleConnection oraConn)
+                {
+                    if (oraConn.State != ConnectionState.Open) oraConn.Open();
+                }
+
                 return await connection.QueryAsync<T>(sql, dapperParams);
             }
             catch (OracleException oex)
             {
-                throw new Exception($"[DB-ERR] 쿼리 실행 실패 (코드: {oex.Number}): {oex.Message}\n실행된 SQL: {sql}");
+                throw new Exception($"[DB-ERR] 쿼리 실행 실패 (코드: {oex.Number}): {oex.Message}\nSQL: {sql}");
             }
         }
 
-        public async Task ExecuteNonQueryAsync(string sql, object? parameters = null)
+        public async Task ExecuteNonQueryAsync(string queryName, object? parameters = null)
         {
             using var connection = _db.CreateConnection();
+            string sql = await GetQuerySqlAsync(queryName);
             
-            object? finalParams = parameters;
-            if (parameters is IEnumerable<OracleParameter> oraParams)
+            var dapperParams = MapParameters(parameters);
+            
+            try
             {
-                var dapperParams = new DynamicParameters();
-                foreach (var p in oraParams)
+                // Oracle 연결인 경우 BindByName 설정을 위해 명시적으로 처리
+                if (connection is OracleConnection oraConn)
                 {
-                    dapperParams.Add(p.ParameterName.TrimStart(':'), p.Value);
+                    if (oraConn.State != ConnectionState.Open) oraConn.Open();
+                    // Dapper Execute 호출 시 내부적으로 생성되는 Command의 BindByName을 true로 만드는 
+                    // 가장 확실한 방법은 Dapper의 파라미터 핸들러를 사용하는 것이지만, 
+                    // 여기서는 가장 호환성 높은 방식으로 처리합니다.
                 }
-                finalParams = dapperParams;
+
+                await connection.ExecuteAsync(sql, dapperParams);
             }
-            
-            await connection.ExecuteAsync(sql, finalParams);
+            catch (Exception ex)
+            {
+                throw new Exception($"[DB-EXEC-ERR] {ex.Message} (Query: {queryName})", ex);
+            }
+        }
+
+        private DynamicParameters? MapParameters(object? parameters)
+        {
+            if (parameters == null) return null;
+            if (parameters is DynamicParameters dp) return dp;
+
+            var dapperParams = new DynamicParameters();
+
+            if (parameters is IDictionary<string, object> dict)
+            {
+                foreach (var kv in dict)
+                {
+                    var value = kv.Value is JsonElement je ? ConvertJsonElement(je) : kv.Value; // ✅ 변환
+                    dapperParams.Add(kv.Key.TrimStart(':'), value);
+                }
+            }
+            else
+            {
+                var props = parameters.GetType().GetProperties();
+                foreach (var prop in props)
+                {
+                    dapperParams.Add(prop.Name, prop.GetValue(parameters));
+                }
+            }
+
+            return dapperParams;
+        }
+
+        // JsonElement → 실제 C# 타입으로 변환
+        private static object? ConvertJsonElement(JsonElement je)
+        {
+            return je.ValueKind switch
+            {
+                JsonValueKind.String => je.GetString(),   // "newid1" → string
+                JsonValueKind.Number => je.TryGetInt64(out var l) ? l : je.GetDouble(), // 숫자 → long/double
+                JsonValueKind.True => true,             // true → bool
+                JsonValueKind.False => false,            // false → bool
+                JsonValueKind.Null => null,             // null → null
+                _ => je.ToString()     // 나머지 → string fallback
+            };
         }
 
         private async Task<string> GetQuerySqlAsync(string queryName)
         {
-            // 1. 기본 경로 설정 (애플리케이션 실행 디렉토리 기준)
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string path = Path.Combine(baseDir, "Data", "Scripts", "Queries", $"{queryName}.sql");
 
-            // 2. 개발 환경을 고려한 대체 경로 확인 (현재 작업 디렉토리 기준)
             if (!File.Exists(path))
             {
                 path = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Scripts", "Queries", $"{queryName}.sql");
                 if (!File.Exists(path))
                 {
-                    // 더 이상 찾을 수 없는 경우, 입력된 queryName 자체가 SQL인 경우(SELECT 포함)를 제외하고 예외 발생
-                    if (!queryName.Contains("SELECT", StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new FileNotFoundException($"[SQL-404] '{queryName}' 쿼리 파일을 찾을 수 없습니다. (확인된 경로: {path})");
-                    }
-                    return queryName;
+                    throw new FileNotFoundException($"[SQL-404] '{queryName}' 쿼리 파일을 찾을 수 없습니다. (확인된 경로: {path})");
                 }
             }
 

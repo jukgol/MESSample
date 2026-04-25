@@ -8,11 +8,37 @@ async function init() {
     setupEventListeners();
 }
 
+function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.innerHTML = `
+        <span class="toast-message">${message}</span>
+        <button class="toast-close">&times;</button>
+    `;
+    
+    toast.style.backgroundColor = isError ? 'rgba(239, 68, 68, 0.95)' : 'rgba(15, 23, 42, 0.95)';
+    toast.classList.add('show');
+    
+    // 자동 삭제 타이머
+    let timeoutId = setTimeout(() => {
+        toast.classList.remove('show');
+    }, 5000); // 버튼이 생겼으므로 시간을 조금 더 늘림
+
+    // 닫기 버튼 클릭 이벤트
+    toast.querySelector('.toast-close').onclick = () => {
+        clearTimeout(timeoutId);
+        toast.classList.remove('show');
+    };
+}
+
 async function loadRoles() {
     try {
         const response = await fetch('/api/Users/roles');
-        roles = await response.json();
+        const data = await response.json();
+        console.log('Roles loaded:', data);
+        roles = data;
+        
         const roleSelect = document.getElementById('role-code');
+        roleSelect.innerHTML = '<option value="">Select Role</option>';
         
         roles.forEach(role => {
             const option = document.createElement('option');
@@ -28,7 +54,10 @@ async function loadRoles() {
 async function loadUsers() {
     try {
         const response = await fetch('/api/Users');
-        allUsers = await response.json();
+        const data = await response.json();
+        console.log('Users loaded:', data);
+        allUsers = data;
+        
         const userList = document.getElementById('user-list');
         userList.innerHTML = '';
 
@@ -50,7 +79,15 @@ async function loadUsers() {
 function selectUser(user) {
     currentUser = user;
     document.querySelectorAll('.user-item').forEach(el => el.classList.remove('active'));
-    // event.currentTarget를 사용하기 위해 onclick 핸들러 수정 필요할 수 있으나 div.onclick에서 처리됨
+    
+    // 선택된 아이템 강조 표시 찾기
+    const items = document.querySelectorAll('.user-item');
+    items.forEach(item => {
+        if (item.textContent.includes(`(${user.LOGIN_ID})`)) {
+            item.classList.add('active');
+        }
+    });
+
     showForm('edit', user);
 }
 
@@ -83,7 +120,7 @@ function showForm(mode, data = null) {
         
         document.getElementById('user-id').value = data.USER_ID;
         document.getElementById('login-id').value = data.LOGIN_ID;
-        document.getElementById('password').value = data.PASSWORD; // 가리지 않고 보여줌
+        document.getElementById('password').value = data.PASSWORD; 
         document.getElementById('user-name').value = data.USER_NAME;
         document.getElementById('role-code').value = data.ROLE_CODE;
         document.getElementById('is-active').value = data.IS_ACTIVE;
@@ -94,7 +131,7 @@ function generateRandomUser() {
     // 1. Login ID: newid1, newid2 ... 순차적으로 없는 번호 찾기
     let num = 1;
     let newId = `newid${num}`;
-    while (allUsers.some(u => u.LOGIN_ID.toLowerCase() === newId.toLowerCase())) {
+    while (allUsers.some(u => u.LOGIN_ID && u.LOGIN_ID.toLowerCase() === newId.toLowerCase())) {
         num++;
         newId = `newid${num}`;
     }
@@ -110,6 +147,7 @@ function generateRandomUser() {
     document.getElementById('login-id').value = newId;
     document.getElementById('password').value = '1';
     document.getElementById('user-name').value = randomName;
+    document.getElementById('is-active').value = 'Y';
     
     // 기본값 설정 (있으면)
     if (roles.length > 0) {
@@ -142,7 +180,7 @@ async function handleSave(e) {
         });
 
         if (response.ok) {
-            alert(isEdit ? 'Updated successfully' : 'Created successfully');
+            showToast(isEdit ? 'Updated successfully' : 'Created successfully');
             await loadUsers();
             if (!isEdit) {
                 document.getElementById('empty-state').style.display = 'flex';
@@ -150,10 +188,13 @@ async function handleSave(e) {
             }
         } else {
             const err = await response.json();
-            alert('Error: ' + err.Message);
+            const msg = err.message || err.Message || 'Unknown error occurred';
+            console.error('Save failed:', err);
+            showToast('Error: ' + msg, true);
         }
     } catch (err) {
-        alert('Failed to save: ' + err.message);
+        console.error('Fetch error:', err);
+        showToast('Failed to save: ' + err.message, true);
     }
 }
 
@@ -166,16 +207,19 @@ async function handleDelete() {
         });
 
         if (response.ok) {
-            alert('Deleted successfully');
+            showToast('Deleted successfully');
             await loadUsers();
             document.getElementById('empty-state').style.display = 'flex';
             document.getElementById('form-container').style.display = 'none';
         } else {
             const err = await response.json();
-            alert('Error: ' + err.Message);
+            const msg = err.message || err.Message || 'Unknown error occurred';
+            console.error('Delete failed:', err);
+            showToast('Error: ' + msg, true);
         }
     } catch (err) {
-        alert('Failed to delete: ' + err.message);
+        console.error('Fetch error:', err);
+        showToast('Failed to delete: ' + err.message, true);
     }
 }
 
