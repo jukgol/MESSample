@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './layouts/Layout';
-import ItemList from './pages/items/ItemList';
+import ItemList from './features/items/pages/ItemList';
+import LoginPage from './features/auth/pages/LoginPage';
 
 // Placeholder components for other routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -14,6 +15,8 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        
         <Route element={<Layout />}>
           {/* Dashboard / Root */}
           <Route path="/" element={<Placeholder title="메시 대시보드" />} />
