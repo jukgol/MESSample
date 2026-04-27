@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import { User, IdCard, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../../store/useAuthStore';
 
 const LoginPage = () => {
   const [name, setName] = useState('');
   const [id, setId] = useState('');
   const navigate = useNavigate();
+  const login = useAuthStore((state) => state.login);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login attempt:', { name, id });
-    // For now, just redirect to dashboard
+    
+    // 글로벌 상태에 로그인 정보 저장
+    login(name, id);
+    
+    // 대시보드로 이동
     navigate('/');
   };
 
