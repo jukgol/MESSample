@@ -3,6 +3,8 @@ using WAS.Services.Admin;
 using WAS.Services.Admin.Table;
 using WAS.Services.Auth;
 using WAS.Services.App;
+using WAS.Data;
+using WAS.Proxies;
 
 namespace WAS.Extensions
 {
