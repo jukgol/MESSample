@@ -1,9 +1,9 @@
-﻿using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using WAS.Data;
 using WAS.Models;
 
-namespace WAS.Services.Table
+namespace WAS.Services.Admin.Table
 {
     public class TableDataService : ITableDataService
     {

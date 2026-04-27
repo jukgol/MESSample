@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
-namespace WAS.Controllers.System
+namespace WAS.Controllers.Admin
 {
     [ApiController]
-    [Route("api/system/[controller]")]
+    [Route("api/admin/[controller]")]
     public class NavigatorController : ControllerBase
     {
         private readonly IDbConnect _dbConnect;

@@ -19,24 +19,26 @@ namespace WAS.Services.Auth
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
-            // 1. DB에서 사용자 조회 (현재는 평문 비교)
-            // USER_INFO와 USER_ROLE을 조인하여 정보 가져오기
-            var sql = @"
-                SELECT u.LOGIN_ID as UserId, u.USER_NAME as UserName, u.PASSWORD, 
-                       u.ROLE_CODE as RoleCode, r.ROLE_NAME as RoleName
-                FROM USER_INFO u
-                JOIN USER_ROLE r ON u.ROLE_CODE = r.ROLE_CODE
-                WHERE u.LOGIN_ID = :UserId AND u.IS_ACTIVE = 'Y'";
-
-            var users = await _scriptExecutor.ExecuteQueryAsync<dynamic>(sql, new { UserId = request.UserId }, isRawSql: true);
+            // 1. 프로시저를 통해 사용자 정보 조회
+            var users = await _scriptExecutor.ExecuteQueryAsync<dynamic>(
+                "LOGIN_USER", 
+                new { I_USER_ID = request.UserId }
+            );
+            
             var user = users.FirstOrDefault();
 
+            // 2. 검증: 사용자가 없거나, 비밀번호가 틀렸거나, 비활성 상태인 경우
             if (user == null || user.PASSWORD != request.Password)
             {
                 return new LoginResponse { Success = false, Message = "아이디 또는 비밀번호가 올바르지 않습니다." };
             }
 
-            // 2. JWT 토큰 생성
+            if (user.ISACTIVE != "Y")
+            {
+                return new LoginResponse { Success = false, Message = "비활성화된 계정입니다. 관리자에게 문의하세요." };
+            }
+
+            // 3. JWT 토큰 생성
             var token = GenerateJwtToken(user);
 
             return new LoginResponse

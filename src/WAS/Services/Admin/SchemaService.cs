@@ -1,8 +1,8 @@
-﻿using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Client;
 using System.Data;
 using WAS.Data;
 
-namespace WAS.Services
+namespace WAS.Services.Admin
 {
     public class SchemaService : ISchemaService
     {

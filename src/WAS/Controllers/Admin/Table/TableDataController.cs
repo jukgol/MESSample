@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using WAS.Services.Table;
+using WAS.Services.Admin.Table;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
-namespace WAS.Controllers.System.Table
+namespace WAS.Controllers.Admin.Table
 {
     [ApiController]
-    [Route("api/system/[controller]")]
+    [Route("api/admin/[controller]")]
     public class TableDataController : ControllerBase
     {
         private readonly ITableDataService _tableDataService;

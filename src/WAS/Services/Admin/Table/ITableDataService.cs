@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WAS.Models;
 
-namespace WAS.Services.Table
+namespace WAS.Services.Admin.Table
 {
     public interface ITableDataService
     {

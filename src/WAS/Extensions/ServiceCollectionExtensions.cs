@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using WAS.Data;
-using WAS.Proxies;
-using WAS.Services;
-using WAS.Services.Table;
+﻿using WAS.Services;
+using WAS.Services.Admin;
+using WAS.Services.Admin.Table;
 using WAS.Services.Auth;
+using WAS.Services.App;
 
 namespace WAS.Extensions
 {
@@ -33,6 +31,10 @@ namespace WAS.Extensions
 
             services.AddScoped<AuthService>();
             services.AddScoped<IAuthService>(sp => LoggingProxy<IAuthService>.Create(sp.GetRequiredService<AuthService>(), sp.GetRequiredService<ILogger<AuthService>>()));
+
+            // App 관련 서비스 등록
+            services.AddScoped<ItemService>();
+            services.AddScoped<IItemService>(sp => LoggingProxy<IItemService>.Create(sp.GetRequiredService<ItemService>(), sp.GetRequiredService<ILogger<ItemService>>()));
 
             services.AddScoped<ProcedureRegistration>();
 

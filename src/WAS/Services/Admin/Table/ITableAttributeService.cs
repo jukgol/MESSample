@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace WAS.Services.Table
+namespace WAS.Services.Admin.Table
 {
     public interface ITableAttributeService
     {

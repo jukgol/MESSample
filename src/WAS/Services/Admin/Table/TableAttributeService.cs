@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WAS.Data;
 
-namespace WAS.Services.Table
+namespace WAS.Services.Admin.Table
 {
     public class TableAttributeService : ITableAttributeService
     {

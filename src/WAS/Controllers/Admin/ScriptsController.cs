@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using WAS.Services;
 
-namespace WAS.Controllers.System
+namespace WAS.Controllers.Admin
 {
     [ApiController]
-    [Route("api/system/[controller]")]
+    [Route("api/admin/[controller]")]
     public class ScriptsController : ControllerBase
     {
         private readonly IScriptExecutor _scriptExecutor;

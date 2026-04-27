@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
-using WAS.Services.Table;
+using WAS.Services.Admin.Table;
 using System;
 using System.Threading.Tasks;
 
-namespace WAS.Controllers.System.Table
+namespace WAS.Controllers.Admin.Table
 {
     [ApiController]
-    [Route("api/system/[controller]")]
+    [Route("api/admin/[controller]")]
     public class TableAttributeController : ControllerBase
     {
         private readonly ITableAttributeService _tableAttributeService;

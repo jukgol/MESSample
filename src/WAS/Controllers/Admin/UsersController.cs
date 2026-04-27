@@ -4,10 +4,10 @@ using System.Text.RegularExpressions;
 using WAS.Data;
 using WAS.Services;
 
-namespace WAS.Controllers.System
+namespace WAS.Controllers.Admin
 {
     [ApiController]
-    [Route("api/system/[controller]")]
+    [Route("api/admin/[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly IScriptExecutor _scriptExecutor;

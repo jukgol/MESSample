@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-using WAS.Services;
+using WAS.Services.Admin;
 
-namespace WAS.Controllers.System
+namespace WAS.Controllers.Admin
 {
     [ApiController]
-    [Route("api/system/[controller]")]
+    [Route("api/admin/[controller]")]
     public class SchemasController : ControllerBase
     {
         private readonly ISchemaService _schemaService;
