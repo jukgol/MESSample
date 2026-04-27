@@ -8,15 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedCountSpan = document.getElementById('selected-count');
     const formPlaceholder = document.getElementById('insert-form-placeholder');
     const scrollContainer = document.getElementById('table-scroll-container');
-    const headerArea = document.querySelector('.table-header-area');
 
     let currentTableName = '';
-
-    if (scrollContainer && headerArea) {
-        scrollContainer.addEventListener('scroll', () => {
-            headerArea.scrollLeft = scrollContainer.scrollLeft;
-        });
-    }
 
     fetchTables();
     loadInsertForm();

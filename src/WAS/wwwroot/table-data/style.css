@@ -20,30 +20,36 @@ body { align-items: center; justify-content: center; height: 100vh; overflow: hi
 }
 
 /* 고정 헤더 영역 */
-.table-header-area {
-    flex-shrink: 0;
-    overflow-x: hidden; /* 가로 스크롤 방지 (본문과 동기화 위해) */
-    background: #1e293b;
-}
-
-/* 스크롤 본문 영역 */
 .table-scroll-area { 
     flex: 1; 
     overflow: auto; /* 가로세로 스크롤 허용 */
+    position: relative;
 }
 
-.table-list { width: 100%; border-collapse: collapse; table-layout: fixed; } /* 고정 레이아웃으로 헤더-본문 정렬 일치 */
+.table-list { width: 100%; border-collapse: collapse; table-layout: auto; min-width: 100%; } /* auto 레이아웃으로 내용에 맞게 확장 */
+.table-list thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #1e293b;
+}
 .table-list th { 
     padding: 12px 15px; 
     text-align: left; 
-    background: transparent; 
     color: #818cf8; 
     font-size: 0.75rem; 
     text-transform: uppercase; 
     letter-spacing: 1px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    white-space: nowrap; /* 제목 줄바꿈 방지 */
 }
-.table-list td { padding: 10px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.03); color: rgba(255, 255, 255, 0.7); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.table-list td { 
+    padding: 10px 15px; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
+    color: rgba(255, 255, 255, 0.7); 
+    font-size: 0.85rem; 
+    white-space: nowrap; /* 내용 줄바꿈 방지 */
+}
 .table-list tr:hover td { background: rgba(255, 255, 255, 0.04); color: #fff; }
 
 .col-check { width: 50px !important; text-align: center !important; }

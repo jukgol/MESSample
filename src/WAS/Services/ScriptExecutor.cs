@@ -59,6 +59,12 @@ namespace WAS.Services
             using var connection = _db.CreateConnection();
             string sql = await GetQuerySqlAsync(queryName);
             
+            // {Key} 형태의 템플릿 치환 처리
+            sql = ProcessTemplate(sql, parameters);
+            
+            // SQL 구문 정리 (슬래시나 세미콜론 등 구분자 제거)
+            sql = ParseStatements(sql).FirstOrDefault() ?? sql;
+            
             var dapperParams = MapParameters(parameters);
 
             try 
@@ -82,6 +88,12 @@ namespace WAS.Services
             using var connection = _db.CreateConnection();
             string sql = await GetQuerySqlAsync(queryName);
             
+            // {Key} 형태의 템플릿 치환 처리
+            sql = ProcessTemplate(sql, parameters);
+
+            // SQL 구문 정리 (슬래시나 세미콜론 등 구분자 제거)
+            sql = ParseStatements(sql).FirstOrDefault() ?? sql;
+            
             var dapperParams = MapParameters(parameters);
             
             try
@@ -90,9 +102,6 @@ namespace WAS.Services
                 if (connection is OracleConnection oraConn)
                 {
                     if (oraConn.State != ConnectionState.Open) oraConn.Open();
-                    // Dapper Execute 호출 시 내부적으로 생성되는 Command의 BindByName을 true로 만드는 
-                    // 가장 확실한 방법은 Dapper의 파라미터 핸들러를 사용하는 것이지만, 
-                    // 여기서는 가장 호환성 높은 방식으로 처리합니다.
                 }
 
                 await connection.ExecuteAsync(sql, dapperParams);
@@ -103,6 +112,38 @@ namespace WAS.Services
             }
         }
 
+        private string ProcessTemplate(string sql, object? parameters)
+        {
+            if (parameters == null) return sql;
+
+            var result = sql;
+            if (parameters is IEnumerable<OracleParameter> oracleParams)
+            {
+                foreach (var p in oracleParams)
+                {
+                    result = result.Replace($"{{{p.ParameterName.TrimStart(':')}}}", p.Value?.ToString(), StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            else if (parameters is IDictionary<string, object> dict)
+            {
+                foreach (var kv in dict)
+                {
+                    result = result.Replace($"{{{kv.Key.TrimStart(':')}}}", kv.Value?.ToString(), StringComparison.OrdinalIgnoreCase);
+                }
+            }
+            else
+            {
+                var props = parameters.GetType().GetProperties();
+                foreach (var prop in props)
+                {
+                    var val = prop.GetValue(parameters);
+                    result = result.Replace($"{{{prop.Name}}}", val?.ToString(), StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
+            return result;
+        }
+
         private DynamicParameters? MapParameters(object? parameters)
         {
             if (parameters == null) return null;
@@ -110,11 +151,23 @@ namespace WAS.Services
 
             var dapperParams = new DynamicParameters();
 
+            // OracleParameter 컬렉션 처리 추가
+            if (parameters is IEnumerable<OracleParameter> oracleParams)
+            {
+                foreach (var p in oracleParams)
+                {
+                    // 파라미터 이름에서 ':' 제거 (Dapper가 내부적으로 처리하지만 명시적으로 제거)
+                    var name = p.ParameterName.TrimStart(':');
+                    dapperParams.Add(name, p.Value, p.DbType, p.Direction, p.Size);
+                }
+                return dapperParams;
+            }
+
             if (parameters is IDictionary<string, object> dict)
             {
                 foreach (var kv in dict)
                 {
-                    var value = kv.Value is JsonElement je ? ConvertJsonElement(je) : kv.Value; // ✅ 변환
+                    var value = kv.Value is JsonElement je ? ConvertJsonElement(je) : kv.Value;
                     dapperParams.Add(kv.Key.TrimStart(':'), value);
                 }
             }
@@ -123,7 +176,16 @@ namespace WAS.Services
                 var props = parameters.GetType().GetProperties();
                 foreach (var prop in props)
                 {
-                    dapperParams.Add(prop.Name, prop.GetValue(parameters));
+                    var val = prop.GetValue(parameters);
+                    // 만약 속성 값 자체가 OracleParameter인 경우에 대한 방어 코드
+                    if (val is OracleParameter op)
+                    {
+                        dapperParams.Add(op.ParameterName.TrimStart(':'), op.Value, op.DbType, op.Direction, op.Size);
+                    }
+                    else
+                    {
+                        dapperParams.Add(prop.Name, val);
+                    }
                 }
             }
 
