@@ -4,6 +4,7 @@ using WAS.Data;
 using WAS.Proxies;
 using WAS.Services;
 using WAS.Services.Table;
+using WAS.Services.Auth;
 
 namespace WAS.Extensions
 {
@@ -29,6 +30,9 @@ namespace WAS.Extensions
 
             services.AddScoped<ScriptExecutor>();
             services.AddScoped<IScriptExecutor>(sp => LoggingProxy<IScriptExecutor>.Create(sp.GetRequiredService<ScriptExecutor>(), sp.GetRequiredService<ILogger<ScriptExecutor>>()));
+
+            services.AddScoped<AuthService>();
+            services.AddScoped<IAuthService>(sp => LoggingProxy<IAuthService>.Create(sp.GetRequiredService<AuthService>(), sp.GetRequiredService<ILogger<AuthService>>()));
 
             services.AddScoped<ProcedureRegistration>();
 
