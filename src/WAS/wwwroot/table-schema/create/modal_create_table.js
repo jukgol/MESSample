@@ -41,7 +41,7 @@
         if (!confirm(`[${tableName}] 테이블을 생성하시겠습니까?`)) return;
 
         try {
-            const response = await fetch('/api/TableAttribute/create-table', {
+            const response = await fetch('/api/system/TableAttribute/create-table', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tableName: tableName })

@@ -15,7 +15,7 @@ window.openEditModal = async (schemaName) => {
         modal.style.display = 'flex';
         
         // 권한 목록 초기화 및 로딩 표시
-        privsBody.innerHTML = '<tr><td colspan="2" class="empty-message">권한 로딩 중...</td></tr>';
+        privsBody.innerHTML = '<tr><td colspan="2" class="empty-message">권한 로딩 중..</td></tr>';
         
         // 시스템 섹션 기본 숨김 (권한 확인 전까지)
         if (systemSection) systemSection.style.display = 'none';
@@ -25,8 +25,8 @@ window.openEditModal = async (schemaName) => {
             
             // 1. 권한 조회 및 현재 유저 정보 병렬 요청
             const [privsRes, userRes] = await Promise.all([
-                fetch(`/api/Schemas/${encodedName}/privileges`),
-                fetch('/api/Navigator/current-user')
+                fetch(`/api/system/Schemas/${encodedName}/privileges`),
+                fetch('/api/system/Navigator/current-user')
             ]);
 
             // 2. 권한 목록 처리
@@ -46,16 +46,16 @@ window.openEditModal = async (schemaName) => {
                 throw new Error('권한 조회 실패');
             }
 
-            // 3. 사용자 권한에 따른 스크립트 목록 처리
+            // 3. 사용 권한에 따른 스크립트 목록 처리
             if (userRes.ok && systemSection && scriptsList) {
                 const userData = await userRes.json();
                 const isSystemUser = userData.userId && userData.userId.toUpperCase() === 'SYSTEM';
 
                 if (isSystemUser) {
                     systemSection.style.display = 'flex';
-                    scriptsList.innerHTML = '<li style="padding: 15px; text-align: center; color: rgba(255,255,255,0.2); font-style: italic;">스크립트 로딩 중...</li>';
+                    scriptsList.innerHTML = '<li style="padding: 15px; text-align: center; color: rgba(255,255,255,0.2); font-style: italic;">스크립트 로딩 중..</li>';
 
-                    const scriptsRes = await fetch('/api/Scripts/setup');
+                    const scriptsRes = await fetch('/api/system/Scripts/setup');
                     if (scriptsRes.ok) {
                         const scripts = await scriptsRes.json();
                         if (scripts.length === 0) {
@@ -64,7 +64,7 @@ window.openEditModal = async (schemaName) => {
                             scriptsList.innerHTML = scripts.map(filename => `
                                 <li class="script-item">
                                     <div class="script-info">
-                                        <span class="icon">📜</span>
+                                        <span class="icon">📄</span>
                                         <span class="name">${filename}</span>
                                     </div>
                                     <button class="btn-add-script" onclick="handleAddScript('${filename}')">추가</button>
@@ -101,14 +101,14 @@ window.handleAddScript = async (filename) => {
         return;
     }
 
-    const btn = event.target; // 클릭된 버튼
+    const btn = event.target; // 클릭한 버튼
     const originalText = btn.textContent;
     
     try {
         btn.disabled = true;
-        btn.textContent = '실행 중...';
+        btn.textContent = '실행 중..';
 
-        const response = await fetch('/api/Scripts/execute', {
+        const response = await fetch('/api/system/Scripts/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -7,14 +7,14 @@ const Components = {
     // 좌측 테이블 목록 아이템
     tableMenuItem: (name) => `
         <button class="menu-item" onclick="App.loadTableSchema('${name}', this)">
-            <span class="icon">🏗️</span>
+            <span class="icon">📄</span>
             <span class="name">${name}</span>
         </button>`,
 
-    // 중앙 스키마 테이블 행
+    // 중앙 스키마 테이블 로우
     schemaTableRow: (col) => {
         const isIdentity = col.isIdentity || col.IsIdentity;
-        const hasDefault = col.hasDefault || col.HasDefault;
+        const hasDefault = col.hasDefault || col.hasDefault; // lower case check
         const colName = col.name || col.Name;
         const dataType = col.dataType || col.DataType;
         const isNullable = col.isNullable || col.IsNullable;
@@ -26,7 +26,7 @@ const Components = {
                 <td>${isNullable ? 'Yes' : 'No'}</td>
                 <td>
                     ${isIdentity ? '<span class="badge identity">IDENTITY</span>' : ''}
-                    ${hasDefault ? '<span class="badge default">DEFAULT</span>' : ''}
+                    ${(hasDefault || col.HasDefault) ? '<span class="badge default">DEFAULT</span>' : ''}
                 </td>
             </tr>`;
     },

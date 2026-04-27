@@ -1,6 +1,6 @@
 /**
  * MES Real-time Logger Service
- * 창 간 통신(BroadcastChannel)을 통해 로그를 전송합니다.
+ * 브로드캐스트 채널(BroadcastChannel)을 통해 로그를 전송합니다.
  */
 const LogManager = (() => {
     const channel = new BroadcastChannel('mes_log_channel');
@@ -32,7 +32,7 @@ const LogManager = (() => {
             if (logWindow) {
                 logWindow.focus();
                 setTimeout(() => {
-                    send('연결됨: 모니터링 시스템이 활성화되었습니다.', 'system');
+                    send('연결됨: 모니터링 인스턴스가 활성화되었습니다.', 'system');
                 }, 1000);
             }
         }

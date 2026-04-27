@@ -8,8 +8,8 @@ async function checkConnectionStatus() {
     try {
         // 1. 연결 테스트 및 유저 정보 동시 요청 (또는 순차 요청)
         const [testRes, userRes] = await Promise.all([
-            fetch('/api/Navigator/test'),
-            fetch('/api/Navigator/current-user')
+            fetch('/api/system/Navigator/test'),
+            fetch('/api/system/Navigator/current-user')
         ]);
         
         const testData = await testRes.json();

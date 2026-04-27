@@ -32,7 +32,7 @@ function showToast(message, isError = false) {
 
 async function loadRoles() {
     try {
-        const response = await fetch('/api/Users/roles');
+        const response = await fetch('/api/system/Users/roles');
         const data = await response.json();
         console.log('Roles loaded:', data);
         roles = data;
@@ -53,7 +53,7 @@ async function loadRoles() {
 
 async function loadUsers() {
     try {
-        const response = await fetch('/api/Users');
+        const response = await fetch('/api/system/Users');
         const data = await response.json();
         console.log('Users loaded:', data);
         allUsers = data;
@@ -170,7 +170,7 @@ async function handleSave(e) {
     };
 
     try {
-        const url = isEdit ? `/api/Users/${userId}` : '/api/Users';
+        const url = isEdit ? `/api/system/Users/${userId}` : '/api/system/Users';
         const method = isEdit ? 'PUT' : 'POST';
         
         const response = await fetch(url, {
@@ -202,7 +202,7 @@ async function handleDelete() {
     if (!currentUser || !confirm('Are you sure you want to delete this user?')) return;
 
     try {
-        const response = await fetch(`/api/Users/${currentUser.USER_ID}`, {
+        const response = await fetch(`/api/system/Users/${currentUser.USER_ID}`, {
             method: 'DELETE'
         });
 

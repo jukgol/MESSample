@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadExternalModal() {
         try {
             const response = await fetch('modal_edit_schema.html');
-            if (!response.ok) throw new Error('모달 파일을 불러오는데 실패했습니다.');
+            if (!response.ok) throw new Error('모달 파일을 불러오는 데 실패했습니다.');
             const html = await response.text();
             document.getElementById('modal-placeholder').innerHTML = html;
             
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         schemaBody.innerHTML = '<tr><td colspan="3" class="empty-message">데이터를 불러오는 중입니다...</td></tr>';
 
         try {
-            const response = await fetch('/api/Schemas');
+            const response = await fetch('/api/system/Schemas');
             if (!response.ok) throw new Error('데이터 요청 실패');
 
             const schemas = await response.json();

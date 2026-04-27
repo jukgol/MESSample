@@ -3,10 +3,10 @@ using WAS.Services.Table;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 
-namespace WAS.Controllers.Table
+namespace WAS.Controllers.System.Table
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/system/[controller]")]
     public class TableDataController : ControllerBase
     {
         private readonly ITableDataService _tableDataService;
