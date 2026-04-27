@@ -1,26 +1,33 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 interface User {
-  name: string;
-  id: string;
+  userId: string;
 }
 
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
-  login: (name: string, id: string) => void;
+  login: (userId: string, password?: string) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  isAuthenticated: false,
-  user: null,
-  login: (name, id) => set({ 
-    isAuthenticated: true, 
-    user: { name, id } 
-  }),
-  logout: () => set({ 
-    isAuthenticated: false, 
-    user: null 
-  }),
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      isAuthenticated: false,
+      user: null,
+      login: (userId) => set({ 
+        isAuthenticated: true, 
+        user: { userId } 
+      }),
+      logout: () => set({ 
+        isAuthenticated: false, 
+        user: null 
+      }),
+    }),
+    {
+      name: 'mes-auth-storage', // 로컬 스토리지에 저장될 이름
+    }
+  )
+);

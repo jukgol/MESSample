@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { User, IdCard, ArrowRight } from 'lucide-react';
+import { User, Lock, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 const LoginPage = () => {
-  const [name, setName] = useState('');
-  const [id, setId] = useState('');
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempt:', { name, id });
+    console.log('Login attempt:', { userId, password });
     
     // 글로벌 상태에 로그인 정보 저장
-    login(name, id);
+    login(userId, password);
     
     // 대시보드로 이동
     navigate('/');
@@ -47,15 +47,15 @@ const LoginPage = () => {
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div style={{ textAlign: 'left' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              이름
+              아이디
             </label>
             <div style={{ position: 'relative' }}>
               <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
               <input
                 type="text"
-                placeholder="사용자 이름을 입력하세요"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                placeholder="아이디를 입력하세요"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
                 required
                 style={{
                   width: '100%',
@@ -74,15 +74,15 @@ const LoginPage = () => {
 
           <div style={{ textAlign: 'left' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              아이디
+              비밀번호
             </label>
             <div style={{ position: 'relative' }}>
-              <IdCard size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+              <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
               <input
-                type="text"
-                placeholder="사원 번호 또는 ID를 입력하세요"
-                value={id}
-                onChange={(e) => setId(e.target.value)}
+                type="password"
+                placeholder="비밀번호를 입력하세요"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 style={{
                   width: '100%',
