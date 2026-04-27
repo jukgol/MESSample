@@ -3,9 +3,20 @@ using WAS.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ?꾨줈?앺듃 ?쒕퉬???쇨큵 ?깅줉 (Extensions/ServiceCollectionExtensions.cs ?몄텧)
+// 프로젝트 서비스 일괄 등록 (Extensions/ServiceCollectionExtensions.cs 호출)
 builder.Services.AddControllers();
 builder.Services.AddOracleDbServices(builder.Configuration);
+
+// CORS 정책 추가: 프론트엔드 접속 허용
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .WithMethods("GET", "POST", "OPTIONS")
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -21,6 +32,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAll");
 
 app.UseAuthorization();
 
