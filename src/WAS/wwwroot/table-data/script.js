@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchTables() {
         try {
-            const response = await fetch('/api/system/TableData');
+            const response = await fetch('/api/admin/TableData');
             const result = await response.json();
             if (!response.ok) {
                 throw new Error(result.Message || result.message || `HTTP ${response.status}`);
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (insertContainer) insertContainer.style.display = 'none';
 
         try {
-            const response = await fetch(`/api/system/TableData/${tableName}/data`);
+            const response = await fetch(`/api/admin/TableData/${tableName}/data`);
             const rawText = await response.text(); // 일단 텍스트로 읽음
             
             let result;
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const response = await fetch(`/api/system/TableData/${currentTableName}/row`, {
+            const response = await fetch(`/api/admin/TableData/${currentTableName}/row`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(rowData)

@@ -25,8 +25,8 @@ window.openEditModal = async (schemaName) => {
             
             // 1. 권한 조회 및 현재 유저 정보 병렬 요청
             const [privsRes, userRes] = await Promise.all([
-                fetch(`/api/system/Schemas/${encodedName}/privileges`),
-                fetch('/api/system/Navigator/current-user')
+                fetch(`/api/admin/Schemas/${encodedName}/privileges`),
+                fetch('/api/admin/Navigator/current-user')
             ]);
 
             // 2. 권한 목록 처리
@@ -55,7 +55,7 @@ window.openEditModal = async (schemaName) => {
                     systemSection.style.display = 'flex';
                     scriptsList.innerHTML = '<li style="padding: 15px; text-align: center; color: rgba(255,255,255,0.2); font-style: italic;">스크립트 로딩 중..</li>';
 
-                    const scriptsRes = await fetch('/api/system/Scripts/setup');
+                    const scriptsRes = await fetch('/api/admin/Scripts/setup');
                     if (scriptsRes.ok) {
                         const scripts = await scriptsRes.json();
                         if (scripts.length === 0) {
@@ -108,7 +108,7 @@ window.handleAddScript = async (filename) => {
         btn.disabled = true;
         btn.textContent = '실행 중..';
 
-        const response = await fetch('/api/system/Scripts/execute', {
+        const response = await fetch('/api/admin/Scripts/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

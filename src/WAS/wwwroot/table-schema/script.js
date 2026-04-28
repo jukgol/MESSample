@@ -17,7 +17,7 @@ const State = {
 const TableNavigator = {
     init: async function() {
         try {
-            const response = await fetch('/api/system/TableData');
+            const response = await fetch('/api/admin/TableData');
             if (!response.ok) throw new Error('목록 조회 실패');
             const tables = await response.json();
             this.render(tables);
@@ -55,7 +55,7 @@ const SchemaViewer = {
 const AttributeManager = {
     init: async function() {
         try {
-            const response = await fetch('/api/system/TableAttribute/scripts');
+            const response = await fetch('/api/admin/TableAttribute/scripts');
             if (response.ok) {
                 State.attribScripts = await response.json();
             }
@@ -111,7 +111,7 @@ const AttributeManager = {
         if (!confirm(`[${State.currentTableName}] 테이블에 대해 스크립트를 실행하시겠습니까?`)) return;
 
         try {
-            const response = await fetch('/api/system/TableAttribute/execute', {
+            const response = await fetch('/api/admin/TableAttribute/execute', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(requestBody)
@@ -165,7 +165,7 @@ const App = {
         this._showLoadingStates(tableName);
 
         try {
-            const response = await fetch(`/api/system/TableData/${tableName}/data`);
+            const response = await fetch(`/api/admin/TableData/${tableName}/data`);
             if (!response.ok) throw new Error('조회 실패');
             const result = await response.json();
             
