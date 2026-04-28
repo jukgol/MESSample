@@ -13,3 +13,4 @@
 ## 기술적 특이사항
 *   **Lucide-react**: 아이콘 라이브러리 사용
 *   **React Router**: 라우팅 관리 및 기능별 라우트 모듈화 (DashboardRoutes)
+*   **swagger-typescript-api**: 백엔드 Swagger(OpenAPI) 기반 프론트엔드 API 클라이언트 및 타입 자동 생성

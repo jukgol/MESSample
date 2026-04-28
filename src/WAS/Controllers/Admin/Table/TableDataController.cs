@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Admin.Table;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
+using WAS.Models.Admin;
 
 namespace WAS.Controllers.Admin.Table
 {
@@ -19,7 +20,8 @@ namespace WAS.Controllers.Admin.Table
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTables()
+        [ProducesResponseType(typeof(IEnumerable<string>), 200)]
+        public async Task<ActionResult<IEnumerable<string>>> GetTables()
         {
             try
             {
@@ -29,48 +31,50 @@ namespace WAS.Controllers.Admin.Table
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"테이블 목록 조회 실패: {ex.Message}" });
+                return StatusCode(500, new ActionResponse { Message = $"테이블 목록 조회 실패: {ex.Message}" });
             }
         }
 
         [HttpGet("{tableName}/data")]
-        public async Task<IActionResult> GetTableData(string tableName)
+        [ProducesResponseType(typeof(TableDataResponse), 200)]
+        public async Task<ActionResult<TableDataResponse>> GetTableData(string tableName)
         {
             try
             {
-                var schemaName = GetCurrentSchema().ToUpper(); // 대문자 변환
-                var upperTableName = tableName.ToUpper();      // 대문자 변환
+                var schemaName = GetCurrentSchema().ToUpper(); 
+                var upperTableName = tableName.ToUpper();      
                 
                 var rows = await _tableDataService.GetTableDataAsync(schemaName, upperTableName);
                 var metadata = await _tableDataService.GetTableMetadataAsync(schemaName, upperTableName);
 
                 var columns = metadata.Select(m => m.Name).ToList();
 
-                return Ok(new 
+                return Ok(new TableDataResponse
                 { 
-                    columns = columns,
-                    rows = rows,
-                    metadata = metadata 
+                    Columns = columns,
+                    Rows = rows.ToList(),
+                    Metadata = metadata.ToList() 
                 });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"데이터 조회 실패: {ex.Message}" });
+                return StatusCode(500, new ActionResponse { Message = $"데이터 조회 실패: {ex.Message}" });
             }
         }
 
         [HttpPost("{tableName}/row")]
-        public async Task<IActionResult> InsertRow(string tableName, [FromBody] Dictionary<string, object> data)
+        [ProducesResponseType(typeof(ActionResponse), 200)]
+        public async Task<ActionResult<ActionResponse>> InsertRow(string tableName, [FromBody] Dictionary<string, object> data)
         {
             try
             {
                 var schemaName = GetCurrentSchema().ToUpper();
                 await _tableDataService.InsertRowAsync(schemaName, tableName.ToUpper(), data);
-                return Ok(new { Message = "데이터가 성공적으로 추가되었습니다." });
+                return Ok(new ActionResponse { Message = "데이터가 성공적으로 추가되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"행 추가 실패: {ex.Message}" });
+                return StatusCode(500, new ActionResponse { Message = $"행 추가 실패: {ex.Message}" });
             }
         }
 

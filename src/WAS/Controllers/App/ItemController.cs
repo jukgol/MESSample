@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WAS.Services.App;
+using WAS.Models.App;
 
 namespace WAS.Controllers.App
 {
@@ -17,7 +18,9 @@ namespace WAS.Controllers.App
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetItems()
+        [ProducesResponseType(typeof(IEnumerable<ItemDto>), 200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
         {
             try
             {

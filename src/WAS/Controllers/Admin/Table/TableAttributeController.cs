@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Admin.Table;
 using System;
 using System.Threading.Tasks;
+using WAS.Models.Admin;
 
 namespace WAS.Controllers.Admin.Table
 {
@@ -17,7 +18,8 @@ namespace WAS.Controllers.Admin.Table
         }
 
         [HttpGet("scripts")]
-        public async Task<IActionResult> GetAttribScripts()
+        [ProducesResponseType(typeof(IEnumerable<string>), 200)]
+        public async Task<ActionResult<IEnumerable<string>>> GetAttribScripts()
         {
             try
             {
@@ -26,15 +28,16 @@ namespace WAS.Controllers.Admin.Table
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = $"속성 스크립트 조회 실패: {ex.Message}" });
+                return StatusCode(500, new ActionResponse { Message = $"속성 스크립트 조회 실패: {ex.Message}" });
             }
         }
 
         [HttpPost("execute")]
-        public async Task<IActionResult> ExecuteAttribScript([FromBody] ExecuteAttributeRequest request)
+        [ProducesResponseType(typeof(ActionResponse), 200)]
+        public async Task<ActionResult<ActionResponse>> ExecuteAttribScript([FromBody] ExecuteAttributeRequest request)
         {
             if (string.IsNullOrEmpty(request.FileName) || string.IsNullOrEmpty(request.TableName) || string.IsNullOrEmpty(request.ColumnName))
-                return BadRequest(new { Message = "파일명, 테이블명, 컬럼명은 필수입니다." });
+                return BadRequest(new ActionResponse { Message = "파일명, 테이블명, 컬럼명은 필수입니다." });
 
             try
             {
@@ -47,30 +50,34 @@ namespace WAS.Controllers.Admin.Table
                     request.IsNotNull,
                     request.IsUnique
                 );
-                if (result.Success) return Ok(new { Message = result.Message, ExecutedSql = result.ExecutedSql });
-                else return StatusCode(500, new { Message = result.Message, ExecutedSql = result.ExecutedSql });
+                
+                var response = new ActionResponse { Message = result.Message, ExecutedSql = result.ExecutedSql };
+                if (result.Success) return Ok(response);
+                else return StatusCode(500, response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"속성 스크립트 실행 중 서버 오류: {ex.Message}" });
+                return StatusCode(500, new ActionResponse { Message = $"속성 스크립트 실행 중 서버 오류: {ex.Message}" });
             }
         }
 
         [HttpPost("create-table")]
-        public async Task<IActionResult> CreateTable([FromBody] CreateTableRequest request)
+        [ProducesResponseType(typeof(ActionResponse), 200)]
+        public async Task<ActionResult<ActionResponse>> CreateTable([FromBody] CreateTableRequest request)
         {
             if (string.IsNullOrEmpty(request.TableName) || string.IsNullOrEmpty(request.Sql))
-                return BadRequest(new { Message = "테이블명과 SQL 문장은 필수입니다." });
+                return BadRequest(new ActionResponse { Message = "테이블명과 SQL 문장은 필수입니다." });
 
             try
             {
                 var result = await _tableAttributeService.CreateTableAsync(request.TableName, request.Sql);
-                if (result.Success) return Ok(new { Message = result.Message, ExecutedSql = result.ExecutedSql });
-                else return StatusCode(500, new { Message = result.Message, ExecutedSql = result.ExecutedSql });
+                var response = new ActionResponse { Message = result.Message, ExecutedSql = result.ExecutedSql };
+                if (result.Success) return Ok(response);
+                else return StatusCode(500, response);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"테이블 생성 중 서버 오류: {ex.Message}" });
+                return StatusCode(500, new ActionResponse { Message = $"테이블 생성 중 서버 오류: {ex.Message}" });
             }
         }
     }

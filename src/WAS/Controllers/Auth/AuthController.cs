@@ -18,7 +18,10 @@ namespace WAS.Controllers.Auth
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        [ProducesResponseType(typeof(LoginResponse), 200)]
+        [ProducesResponseType(typeof(object), 400)]
+        [ProducesResponseType(typeof(object), 401)]
+        public async Task<ActionResult<LoginResponse>> Login([FromBody] LoginRequest request)
         {
             if (request == null || string.IsNullOrEmpty(request.UserId) || string.IsNullOrEmpty(request.Password))
             {

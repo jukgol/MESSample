@@ -46,3 +46,17 @@ body { align-items: center; justify-content: center; height: 100vh; overflow: au
 .status-dot.offline { background: #ef4444; box-shadow: 0 0 12px rgba(239, 68, 68, 0.6); }
 .status-text { color: var(--text-dim); flex: 1; }
 .status-text strong { color: var(--text-main); font-weight: 600; }
+
+/* Swagger 전용 하이라이트 스타일 */
+.nav-btn.swagger {
+    background: rgba(133, 234, 45, 0.05);
+    border-color: rgba(133, 234, 45, 0.2);
+    margin-top: 8px;
+}
+.nav-btn.swagger:hover {
+    background: rgba(133, 234, 45, 0.15);
+    border-color: #85ea2d;
+}
+.nav-btn.swagger strong {
+    color: #85ea2d;
+}

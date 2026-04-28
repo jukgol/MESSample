@@ -1,0 +1,618 @@
+/* eslint-disable */
+/* tslint:disable */
+// @ts-nocheck
+/*
+ * ---------------------------------------------------------------
+ * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
+ * ##                                                           ##
+ * ## AUTHOR: acacode                                           ##
+ * ## SOURCE: https://github.com/acacode/swagger-typescript-api ##
+ * ---------------------------------------------------------------
+ */
+
+export interface ActionResponse {
+  message?: string | null;
+  executedSql?: string | null;
+}
+
+export interface ColumnMetadata {
+  name?: string | null;
+  dataType?: string | null;
+  isNullable?: boolean;
+  isIdentity?: boolean;
+  hasDefault?: boolean;
+}
+
+export interface CreateTableRequest {
+  tableName?: string | null;
+  sql?: string | null;
+}
+
+export interface DbUserDto {
+  userId?: string | null;
+  userName?: string | null;
+}
+
+export interface ExecuteAttributeRequest {
+  fileName?: string | null;
+  tableName?: string | null;
+  columnName?: string | null;
+  newColumnName?: string | null;
+  dataType?: string | null;
+  isNotNull?: boolean;
+  isUnique?: boolean;
+}
+
+export interface ItemDto {
+  itemCode?: string | null;
+  itemName?: string | null;
+  itemType?: string | null;
+  unit?: string | null;
+  isActive?: string | null;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface LoginRequest {
+  userId?: string | null;
+  password?: string | null;
+}
+
+export interface LoginResponse {
+  success?: boolean;
+  message?: string | null;
+  token?: string | null;
+  user?: UserInfo;
+}
+
+export interface NavItemDto {
+  title?: string | null;
+  icon?: string | null;
+  path?: string | null;
+}
+
+export interface ProblemDetails {
+  type?: string | null;
+  title?: string | null;
+  /** @format int32 */
+  status?: number | null;
+  detail?: string | null;
+  instance?: string | null;
+  [key: string]: any;
+}
+
+export interface RoleDto {
+  rolE_CODE?: string | null;
+  rolE_NAME?: string | null;
+}
+
+export interface SchemaPrivilegeDto {
+  type?: string | null;
+  name?: string | null;
+}
+
+export interface TableDataResponse {
+  columns?: string[] | null;
+  rows?: any[] | null;
+  metadata?: ColumnMetadata[] | null;
+}
+
+export interface UserInfo {
+  userId?: string | null;
+  userName?: string | null;
+  roleCode?: string | null;
+  roleName?: string | null;
+}
+
+export interface UserListDto {
+  /** @format double */
+  useR_ID?: number;
+  logiN_ID?: string | null;
+  useR_NAME?: string | null;
+  rolE_NAME?: string | null;
+  iS_ACTIVE?: string | null;
+}
+
+import type {
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  HeadersDefaults,
+  ResponseType,
+} from "axios";
+import axios from "axios";
+
+export type QueryParamsType = Record<string | number, any>;
+
+export interface FullRequestParams
+  extends Omit<AxiosRequestConfig, "data" | "params" | "url" | "responseType"> {
+  /** set parameter to `true` for call `securityWorker` for this request */
+  secure?: boolean;
+  /** request path */
+  path: string;
+  /** content type of request body */
+  type?: ContentType;
+  /** query params */
+  query?: QueryParamsType;
+  /** format of response (i.e. response.json() -> format: "json") */
+  format?: ResponseType;
+  /** request body */
+  body?: unknown;
+}
+
+export type RequestParams = Omit<
+  FullRequestParams,
+  "body" | "method" | "query" | "path"
+>;
+
+export interface ApiConfig<SecurityDataType = unknown>
+  extends Omit<AxiosRequestConfig, "data" | "cancelToken"> {
+  securityWorker?: (
+    securityData: SecurityDataType | null,
+  ) => Promise<AxiosRequestConfig | void> | AxiosRequestConfig | void;
+  secure?: boolean;
+  format?: ResponseType;
+}
+
+export enum ContentType {
+  Json = "application/json",
+  JsonApi = "application/vnd.api+json",
+  FormData = "multipart/form-data",
+  UrlEncoded = "application/x-www-form-urlencoded",
+  Text = "text/plain",
+}
+
+export class HttpClient<SecurityDataType = unknown> {
+  public instance: AxiosInstance;
+  private securityData: SecurityDataType | null = null;
+  private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
+  private secure?: boolean;
+  private format?: ResponseType;
+
+  constructor({
+    securityWorker,
+    secure,
+    format,
+    ...axiosConfig
+  }: ApiConfig<SecurityDataType> = {}) {
+    this.instance = axios.create({
+      ...axiosConfig,
+      baseURL: axiosConfig.baseURL || "",
+    });
+    this.secure = secure;
+    this.format = format;
+    this.securityWorker = securityWorker;
+  }
+
+  public setSecurityData = (data: SecurityDataType | null) => {
+    this.securityData = data;
+  };
+
+  protected mergeRequestParams(
+    params1: AxiosRequestConfig,
+    params2?: AxiosRequestConfig,
+  ): AxiosRequestConfig {
+    const method = params1.method || (params2 && params2.method);
+
+    return {
+      ...this.instance.defaults,
+      ...params1,
+      ...(params2 || {}),
+      headers: {
+        ...((method &&
+          this.instance.defaults.headers[
+            method.toLowerCase() as keyof HeadersDefaults
+          ]) ||
+          {}),
+        ...(params1.headers || {}),
+        ...((params2 && params2.headers) || {}),
+      },
+    };
+  }
+
+  protected stringifyFormItem(formItem: unknown) {
+    if (typeof formItem === "object" && formItem !== null) {
+      return JSON.stringify(formItem);
+    } else {
+      return `${formItem}`;
+    }
+  }
+
+  protected createFormData(input: Record<string, unknown>): FormData {
+    if (input instanceof FormData) {
+      return input;
+    }
+    return Object.keys(input || {}).reduce((formData, key) => {
+      const property = input[key];
+      const propertyContent: any[] =
+        property instanceof Array ? property : [property];
+
+      for (const formItem of propertyContent) {
+        const isFileType = formItem instanceof Blob || formItem instanceof File;
+        formData.append(
+          key,
+          isFileType ? formItem : this.stringifyFormItem(formItem),
+        );
+      }
+
+      return formData;
+    }, new FormData());
+  }
+
+  public request = async <T = any, _E = any>({
+    secure,
+    path,
+    type,
+    query,
+    format,
+    body,
+    ...params
+  }: FullRequestParams): Promise<AxiosResponse<T>> => {
+    const secureParams =
+      ((typeof secure === "boolean" ? secure : this.secure) &&
+        this.securityWorker &&
+        (await this.securityWorker(this.securityData))) ||
+      {};
+    const requestParams = this.mergeRequestParams(params, secureParams);
+    const responseFormat = format || this.format || undefined;
+
+    if (
+      type === ContentType.FormData &&
+      body &&
+      body !== null &&
+      typeof body === "object"
+    ) {
+      body = this.createFormData(body as Record<string, unknown>);
+    }
+
+    if (
+      type === ContentType.Text &&
+      body &&
+      body !== null &&
+      typeof body !== "string"
+    ) {
+      body = JSON.stringify(body);
+    }
+
+    return this.instance.request({
+      ...requestParams,
+      headers: {
+        ...(requestParams.headers || {}),
+        ...(type ? { "Content-Type": type } : {}),
+      },
+      params: query,
+      responseType: responseFormat,
+      data: body,
+      url: path,
+    });
+  };
+}
+
+/**
+ * @title WAS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+ * @version 1.0
+ */
+export class Api<SecurityDataType extends unknown> {
+  http: HttpClient<SecurityDataType>;
+
+  constructor(http: HttpClient<SecurityDataType>) {
+    this.http = http;
+  }
+
+  api = {
+    /**
+     * No description
+     *
+     * @tags Auth
+     * @name AuthLoginCreate
+     * @request POST:/api/Auth/login
+     */
+    authLoginCreate: (data: LoginRequest, params: RequestParams = {}) =>
+      this.http.request<LoginResponse, any>({
+        path: `/api/Auth/login`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Item
+     * @name ItemList
+     * @request GET:/api/Item
+     */
+    itemList: (params: RequestParams = {}) =>
+      this.http.request<ItemDto[], ProblemDetails>({
+        path: `/api/Item`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Navigator
+     * @name AdminNavigatorList
+     * @request GET:/api/admin/Navigator
+     */
+    adminNavigatorList: (params: RequestParams = {}) =>
+      this.http.request<NavItemDto[], any>({
+        path: `/api/admin/Navigator`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Navigator
+     * @name AdminNavigatorTestList
+     * @request GET:/api/admin/Navigator/test
+     */
+    adminNavigatorTestList: (params: RequestParams = {}) =>
+      this.http.request<any, any>({
+        path: `/api/admin/Navigator/test`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Navigator
+     * @name AdminNavigatorCurrentUserList
+     * @request GET:/api/admin/Navigator/current-user
+     */
+    adminNavigatorCurrentUserList: (params: RequestParams = {}) =>
+      this.http.request<DbUserDto, any>({
+        path: `/api/admin/Navigator/current-user`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Schemas
+     * @name AdminSchemasList
+     * @request GET:/api/admin/Schemas
+     */
+    adminSchemasList: (params: RequestParams = {}) =>
+      this.http.request<string[], any>({
+        path: `/api/admin/Schemas`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Schemas
+     * @name AdminSchemasPrivilegesList
+     * @request GET:/api/admin/Schemas/{schemaName}/privileges
+     */
+    adminSchemasPrivilegesList: (
+      schemaName: string,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<SchemaPrivilegeDto[], any>({
+        path: `/api/admin/Schemas/${schemaName}/privileges`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Scripts
+     * @name AdminScriptsExecuteCreate
+     * @request POST:/api/admin/Scripts/execute
+     */
+    adminScriptsExecuteCreate: (data: string, params: RequestParams = {}) =>
+      this.http.request<void, any>({
+        path: `/api/admin/Scripts/execute`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableAttribute
+     * @name AdminTableAttributeScriptsList
+     * @request GET:/api/admin/TableAttribute/scripts
+     */
+    adminTableAttributeScriptsList: (params: RequestParams = {}) =>
+      this.http.request<string[], any>({
+        path: `/api/admin/TableAttribute/scripts`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableAttribute
+     * @name AdminTableAttributeExecuteCreate
+     * @request POST:/api/admin/TableAttribute/execute
+     */
+    adminTableAttributeExecuteCreate: (
+      data: ExecuteAttributeRequest,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/TableAttribute/execute`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableAttribute
+     * @name AdminTableAttributeCreateTableCreate
+     * @request POST:/api/admin/TableAttribute/create-table
+     */
+    adminTableAttributeCreateTableCreate: (
+      data: CreateTableRequest,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/TableAttribute/create-table`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableData
+     * @name AdminTableDataList
+     * @request GET:/api/admin/TableData
+     */
+    adminTableDataList: (params: RequestParams = {}) =>
+      this.http.request<string[], any>({
+        path: `/api/admin/TableData`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableData
+     * @name AdminTableDataDataList
+     * @request GET:/api/admin/TableData/{tableName}/data
+     */
+    adminTableDataDataList: (tableName: string, params: RequestParams = {}) =>
+      this.http.request<TableDataResponse, any>({
+        path: `/api/admin/TableData/${tableName}/data`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableData
+     * @name AdminTableDataRowCreate
+     * @request POST:/api/admin/TableData/{tableName}/row
+     */
+    adminTableDataRowCreate: (
+      tableName: string,
+      data: Record<string, any>,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/TableData/${tableName}/row`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name AdminUsersList
+     * @request GET:/api/admin/Users
+     */
+    adminUsersList: (params: RequestParams = {}) =>
+      this.http.request<UserListDto[], any>({
+        path: `/api/admin/Users`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name AdminUsersCreate
+     * @request POST:/api/admin/Users
+     */
+    adminUsersCreate: (data: Record<string, any>, params: RequestParams = {}) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/Users`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name AdminUsersRolesList
+     * @request GET:/api/admin/Users/roles
+     */
+    adminUsersRolesList: (params: RequestParams = {}) =>
+      this.http.request<RoleDto[], any>({
+        path: `/api/admin/Users/roles`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name AdminUsersUpdate
+     * @request PUT:/api/admin/Users/{userId}
+     */
+    adminUsersUpdate: (
+      userId: number,
+      data: Record<string, any>,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/Users/${userId}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Users
+     * @name AdminUsersDelete
+     * @request DELETE:/api/admin/Users/{userId}
+     */
+    adminUsersDelete: (userId: number, params: RequestParams = {}) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/Users/${userId}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+  };
+}
