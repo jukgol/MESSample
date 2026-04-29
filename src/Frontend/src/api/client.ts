@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { Api, HttpClient } from './generated-api';
+import { useAuthStore } from '../store/useAuthStore';
 
 /**
  * 백엔드 API 호출을 위한 기본 설정으로 HttpClient 인스턴스 생성
@@ -16,6 +16,15 @@ const httpClient = new HttpClient({
  * 기존 코드 호환성을 위해 axios 인스턴스 추출
  */
 const apiClient = httpClient.instance;
+
+// 요청 인터셉터 추가: 로컬 스토리지(Zustand)에서 토큰을 가져와 헤더에 추가
+apiClient.interceptors.request.use((config) => {
+  const token = useAuthStore.getState().token;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 /**
  * Swagger 기반으로 자동 생성된 API 클라이언트

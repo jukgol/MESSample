@@ -1,14 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-interface User {
-  userId: string;
-}
+import type { UserInfo } from '../api/generated-api';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: User | null;
-  login: (userId: string, password?: string) => void;
+  user: UserInfo | null;
+  token: string | null;
+  login: (token: string, user: UserInfo) => void;
   logout: () => void;
 }
 
@@ -17,13 +15,16 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       isAuthenticated: false,
       user: null,
-      login: (userId) => set({ 
+      token: null,
+      login: (token, user) => set({ 
         isAuthenticated: true, 
-        user: { userId } 
+        user,
+        token
       }),
       logout: () => set({ 
         isAuthenticated: false, 
-        user: null 
+        user: null,
+        token: null
       }),
     }),
     {

@@ -9,7 +9,7 @@ function App() {
       <Routes>
         {/* 누구나 접근 가능한 공용 라우트 */}
         <Route path="/login" element={<LoginPage />} />
-        
+
         {/* 인증이 필요한 대시보드 시스템 라우트 (검문소 통과 필수) */}
         <Route path="/*" element={
           <AuthGuard>

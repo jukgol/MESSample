@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../../../layouts/Layout';
-import ItemList from '../items/pages/ItemList';
+import ItemList from '../../items/pages/ItemList';
+import DashboardHome from '../pages/DashboardHome';
 
 // Placeholder components for other routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -15,7 +16,7 @@ const DashboardRoutes = () => {
     <Routes>
       <Route element={<Layout />}>
         {/* Dashboard / Root */}
-        <Route path="/" element={<Placeholder title="메시 대시보드" />} />
+        <Route path="/" element={<DashboardHome />} />
 
         {/* 물품 관리 */}
         <Route path="/items" element={<Navigate to="/items/list" replace />} />

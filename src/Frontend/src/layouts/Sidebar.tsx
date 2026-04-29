@@ -8,10 +8,13 @@ import {
   Database,
   Truck,
   ClipboardList,
-  ShieldCheck
+  ShieldCheck,
+  LogOut
 } from 'lucide-react';
+import { useAuthStore } from '../store/useAuthStore';
 
 const Sidebar = () => {
+  const { user, logout } = useAuthStore((state) => ({ user: state.user, logout: state.logout }));
   const menuItems = [
     { 
       title: 'Dashboard', 
@@ -50,8 +53,44 @@ const Sidebar = () => {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
+      <div className="sidebar-header" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
         <h2 className="gradient-text">MES TERMINAL</h2>
+        {user && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#10b981' }}></div>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                {user.userName || user.userId}님 접속중
+              </span>
+            </div>
+            <button 
+              onClick={logout}
+              style={{ 
+                background: 'transparent', 
+                border: 'none', 
+                color: 'var(--text-secondary)', 
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '6px',
+                transition: 'all 0.2s'
+              }}
+              title="로그아웃"
+              onMouseEnter={(e) => {
+                e.currentTarget.style.color = '#ef4444';
+                e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.background = 'transparent';
+              }}
+            >
+              <LogOut size={14} />
+            </button>
+          </div>
+        )}
       </div>
       
       <nav className="sidebar-nav">
