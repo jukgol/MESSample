@@ -3,12 +3,11 @@ using WAS.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Dapper 언더스코어(_) 자동 매핑 활성화
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
 // 프로젝트 서비스 일괄 등록
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = null;
-    });
+builder.Services.AddControllers();
 builder.Services.AddOracleDbServices(builder.Configuration); // DB 서비스 (기존)
 builder.Services.AddCorsServices();                        // CORS 정책 (분리됨)
 builder.Services.AddIdentityServices(builder.Configuration); // JWT 인증 (분리됨)

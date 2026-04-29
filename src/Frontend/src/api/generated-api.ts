@@ -82,8 +82,8 @@ export interface ProblemDetails {
 }
 
 export interface RoleDto {
-  rolE_CODE?: string | null;
-  rolE_NAME?: string | null;
+  roleCode?: string | null;
+  roleName?: string | null;
 }
 
 export interface SchemaPrivilegeDto {
@@ -106,11 +106,12 @@ export interface UserInfo {
 
 export interface UserListDto {
   /** @format double */
-  useR_ID?: number;
-  logiN_ID?: string | null;
-  useR_NAME?: string | null;
-  rolE_NAME?: string | null;
-  iS_ACTIVE?: string | null;
+  userId?: number;
+  loginId?: string | null;
+  password?: string | null;
+  userName?: string | null;
+  roleName?: string | null;
+  isActive?: string | null;
 }
 
 import type {

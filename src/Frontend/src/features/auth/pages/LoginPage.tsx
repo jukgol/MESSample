@@ -1,4 +1,3 @@
-import React from 'react';
 import { User, Lock, ArrowRight } from 'lucide-react';
 import { useLogin } from '../hooks/useLogin';
 import styles from './LoginPage.module.css';

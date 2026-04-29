@@ -19,3 +19,12 @@
 *   **Dapper**: JSON 파라미터 변환 및 동적 쿼리 실행기(ScriptExecutor) 구축
 *   **CORS**: 프론트엔드 및 외부 접속 허용을 위한 AllowAll 정책 적용
 *   **Logging**: 실시간 시스템 로그 및 로깅 프로시저 연동 기반 마련
+
+## 네이밍 및 데이터 매핑 규약
+*   **DB ↔ C# ↔ Frontend 매핑 파이프라인 확립**:
+    *   **DB**: 대문자 스네이크 케이스 사용 (예: `USER_ID`, `ROLE_CODE`)
+    *   **C# (WAS)**: C# 표준 파스칼 케이스 사용 (예: `UserId`, `RoleCode`). DTO 모델도 반드시 파스칼 케이스 유지.
+    *   **Frontend**: JS/TS 표준 카멜 케이스 사용 (예: `userId`, `roleCode`).
+*   **자동 매핑 구현**:
+    *   **Dapper**: `Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;`를 전역 적용하여 DB의 언더스코어(`_`) 표기법과 C#의 파스칼 케이스를 자동 매핑. (SQL에서 AS 별칭 사용 금지/불필요)
+    *   **JSON 직렬화**: ASP.NET Core 기본 직렬화 정책(camelCase)을 사용하여, 서버의 파스칼 케이스 속성이 프론트엔드로 전달될 때 자동으로 카멜 케이스로 변환되도록 처리.

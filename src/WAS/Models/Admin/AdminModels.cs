@@ -5,18 +5,18 @@ namespace WAS.Models.Admin
     // 1. 사용자 관련 모델
     public class UserListDto
     {
-        public decimal USER_ID { get; set; }
-        public string LOGIN_ID { get; set; } = string.Empty;
-        public string PASSWORD { get; set; } = string.Empty;
-        public string USER_NAME { get; set; } = string.Empty;
-        public string ROLE_NAME { get; set; } = string.Empty;
-        public string IS_ACTIVE { get; set; } = "Y";
+        public decimal UserId { get; set; }
+        public string LoginId { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string RoleName { get; set; } = string.Empty;
+        public string IsActive { get; set; } = "Y";
     }
 
     public class RoleDto
     {
-        public string ROLE_CODE { get; set; } = string.Empty;
-        public string ROLE_NAME { get; set; } = string.Empty;
+        public string RoleCode { get; set; } = string.Empty;
+        public string RoleName { get; set; } = string.Empty;
     }
 
     // 2. 테이블 데이터 관련 모델
