@@ -18,10 +18,10 @@ async function checkConnectionStatus() {
         if (testRes.ok) {
             statusDot.style.backgroundColor = '#10b981'; // 초록색
             statusDot.style.boxShadow = '0 0 12px rgba(16, 185, 129, 0.6)';
-            statusText.innerHTML = `User: <strong>${userData.userId}</strong> | Status: <strong>Connected</strong>`;
+            statusText.innerHTML = `User: <strong>${userData.UserId}</strong> | Status: <strong>Connected</strong>`;
         } else {
             statusDot.style.backgroundColor = '#ef4444'; // 빨간색
-            statusText.innerHTML = `User: <strong>${userData.userId}</strong> | Status: <strong style="color:#ff6b6b;">Disconnected</strong>`;
+            statusText.innerHTML = `User: <strong>${userData.UserId}</strong> | Status: <strong style="color:#ff6b6b;">Disconnected</strong>`;
         }
 
     } catch (err) {
