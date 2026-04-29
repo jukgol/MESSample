@@ -14,7 +14,8 @@ import {
 import { useAuthStore } from '../store/useAuthStore';
 
 const Sidebar = () => {
-  const { user, logout } = useAuthStore((state) => ({ user: state.user, logout: state.logout }));
+  const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const menuItems = [
     { 
       title: 'Dashboard', 
