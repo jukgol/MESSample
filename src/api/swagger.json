@@ -849,11 +849,11 @@
       "ActionResponse": {
         "type": "object",
         "properties": {
-          "message": {
+          "Message": {
             "type": "string",
             "nullable": true
           },
-          "executedSql": {
+          "ExecutedSql": {
             "type": "string",
             "nullable": true
           }
@@ -863,21 +863,21 @@
       "ColumnMetadata": {
         "type": "object",
         "properties": {
-          "name": {
+          "Name": {
             "type": "string",
             "nullable": true
           },
-          "dataType": {
+          "DataType": {
             "type": "string",
             "nullable": true
           },
-          "isNullable": {
+          "IsNullable": {
             "type": "boolean"
           },
-          "isIdentity": {
+          "IsIdentity": {
             "type": "boolean"
           },
-          "hasDefault": {
+          "HasDefault": {
             "type": "boolean"
           }
         },
@@ -886,11 +886,11 @@
       "CreateTableRequest": {
         "type": "object",
         "properties": {
-          "tableName": {
+          "TableName": {
             "type": "string",
             "nullable": true
           },
-          "sql": {
+          "Sql": {
             "type": "string",
             "nullable": true
           }
@@ -900,11 +900,11 @@
       "DbUserDto": {
         "type": "object",
         "properties": {
-          "userId": {
+          "UserId": {
             "type": "string",
             "nullable": true
           },
-          "userName": {
+          "UserName": {
             "type": "string",
             "nullable": true
           }
@@ -914,30 +914,30 @@
       "ExecuteAttributeRequest": {
         "type": "object",
         "properties": {
-          "fileName": {
+          "FileName": {
             "type": "string",
             "nullable": true
           },
-          "tableName": {
+          "TableName": {
             "type": "string",
             "nullable": true
           },
-          "columnName": {
+          "ColumnName": {
             "type": "string",
             "nullable": true
           },
-          "newColumnName": {
+          "NewColumnName": {
             "type": "string",
             "nullable": true
           },
-          "dataType": {
+          "DataType": {
             "type": "string",
             "nullable": true
           },
-          "isNotNull": {
+          "IsNotNull": {
             "type": "boolean"
           },
-          "isUnique": {
+          "IsUnique": {
             "type": "boolean"
           }
         },
@@ -946,27 +946,27 @@
       "ItemDto": {
         "type": "object",
         "properties": {
-          "itemCode": {
+          "ItemCode": {
             "type": "string",
             "nullable": true
           },
-          "itemName": {
+          "ItemName": {
             "type": "string",
             "nullable": true
           },
-          "itemType": {
+          "ItemType": {
             "type": "string",
             "nullable": true
           },
-          "unit": {
+          "Unit": {
             "type": "string",
             "nullable": true
           },
-          "isActive": {
+          "IsActive": {
             "type": "string",
             "nullable": true
           },
-          "createdAt": {
+          "CreatedAt": {
             "type": "string",
             "format": "date-time"
           }
@@ -976,11 +976,11 @@
       "LoginRequest": {
         "type": "object",
         "properties": {
-          "userId": {
+          "UserId": {
             "type": "string",
             "nullable": true
           },
-          "password": {
+          "Password": {
             "type": "string",
             "nullable": true
           }
@@ -990,18 +990,18 @@
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "success": {
+          "Success": {
             "type": "boolean"
           },
-          "message": {
+          "Message": {
             "type": "string",
             "nullable": true
           },
-          "token": {
+          "Token": {
             "type": "string",
             "nullable": true
           },
-          "user": {
+          "User": {
             "$ref": "#/components/schemas/UserInfo"
           }
         },
@@ -1010,15 +1010,15 @@
       "NavItemDto": {
         "type": "object",
         "properties": {
-          "title": {
+          "Title": {
             "type": "string",
             "nullable": true
           },
-          "icon": {
+          "Icon": {
             "type": "string",
             "nullable": true
           },
-          "path": {
+          "Path": {
             "type": "string",
             "nullable": true
           }
@@ -1055,11 +1055,11 @@
       "RoleDto": {
         "type": "object",
         "properties": {
-          "rolE_CODE": {
+          "ROLE_CODE": {
             "type": "string",
             "nullable": true
           },
-          "rolE_NAME": {
+          "ROLE_NAME": {
             "type": "string",
             "nullable": true
           }
@@ -1069,11 +1069,11 @@
       "SchemaPrivilegeDto": {
         "type": "object",
         "properties": {
-          "type": {
+          "Type": {
             "type": "string",
             "nullable": true
           },
-          "name": {
+          "Name": {
             "type": "string",
             "nullable": true
           }
@@ -1083,19 +1083,19 @@
       "TableDataResponse": {
         "type": "object",
         "properties": {
-          "columns": {
+          "Columns": {
             "type": "array",
             "items": {
               "type": "string"
             },
             "nullable": true
           },
-          "rows": {
+          "Rows": {
             "type": "array",
             "items": { },
             "nullable": true
           },
-          "metadata": {
+          "Metadata": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ColumnMetadata"
@@ -1108,19 +1108,19 @@
       "UserInfo": {
         "type": "object",
         "properties": {
-          "userId": {
+          "UserId": {
             "type": "string",
             "nullable": true
           },
-          "userName": {
+          "UserName": {
             "type": "string",
             "nullable": true
           },
-          "roleCode": {
+          "RoleCode": {
             "type": "string",
             "nullable": true
           },
-          "roleName": {
+          "RoleName": {
             "type": "string",
             "nullable": true
           }
@@ -1130,23 +1130,27 @@
       "UserListDto": {
         "type": "object",
         "properties": {
-          "useR_ID": {
+          "USER_ID": {
             "type": "number",
             "format": "double"
           },
-          "logiN_ID": {
+          "LOGIN_ID": {
             "type": "string",
             "nullable": true
           },
-          "useR_NAME": {
+          "PASSWORD": {
             "type": "string",
             "nullable": true
           },
-          "rolE_NAME": {
+          "USER_NAME": {
             "type": "string",
             "nullable": true
           },
-          "iS_ACTIVE": {
+          "ROLE_NAME": {
+            "type": "string",
+            "nullable": true
+          },
+          "IS_ACTIVE": {
             "type": "string",
             "nullable": true
           }

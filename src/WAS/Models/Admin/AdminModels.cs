@@ -7,6 +7,7 @@ namespace WAS.Models.Admin
     {
         public decimal USER_ID { get; set; }
         public string LOGIN_ID { get; set; } = string.Empty;
+        public string PASSWORD { get; set; } = string.Empty;
         public string USER_NAME { get; set; } = string.Empty;
         public string ROLE_NAME { get; set; } = string.Empty;
         public string IS_ACTIVE { get; set; } = "Y";

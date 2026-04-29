@@ -47,6 +47,29 @@ body { align-items: center; justify-content: center; height: 100vh; overflow: au
 .status-text { color: var(--text-dim); flex: 1; }
 .status-text strong { color: var(--text-main); font-weight: 600; }
 
+/* DB 연결 버튼 스타일 */
+.btn-db-connect {
+    background: rgba(99, 102, 241, 0.2);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: auto;
+    margin-top: 0;
+    white-space: nowrap;
+}
+.btn-db-connect:hover {
+    background: rgba(99, 102, 241, 0.3);
+    border-color: #818cf8;
+    color: white;
+    transform: translateY(-1px);
+}
+
+
 /* Swagger 전용 하이라이트 스타일 */
 .nav-btn.swagger {
     background: rgba(133, 234, 45, 0.05);

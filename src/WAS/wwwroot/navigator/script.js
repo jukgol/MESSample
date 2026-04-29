@@ -31,4 +31,16 @@ async function checkConnectionStatus() {
     }
 }
 
-window.addEventListener('load', checkConnectionStatus);
+window.addEventListener('load', () => {
+    checkConnectionStatus();
+    
+    // DB 연결 버튼 이벤트 리스너 추가
+    const btnDbConnect = document.getElementById('btn-db-connect');
+    if (btnDbConnect) {
+        btnDbConnect.addEventListener('click', () => {
+            const statusText = document.getElementById('status-text');
+            if (statusText) statusText.innerText = '재연결 확인 중...';
+            checkConnectionStatus();
+        });
+    }
+});
