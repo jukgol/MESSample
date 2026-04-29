@@ -42,8 +42,8 @@ async function loadRoles() {
         
         roles.forEach(role => {
             const option = document.createElement('option');
-            option.value = role.ROLE_CODE;
-            option.textContent = role.ROLE_NAME;
+            option.value = role.roleCode;
+            option.textContent = role.roleName;
             roleSelect.appendChild(option);
         });
     } catch (err) {
@@ -65,8 +65,8 @@ async function loadUsers() {
             const div = document.createElement('div');
             div.className = 'user-item';
             div.innerHTML = `
-                <span class="user-name">${user.USER_NAME} (${user.LOGIN_ID})</span>
-                <span class="user-role">${user.ROLE_NAME} | ${user.IS_ACTIVE === 'Y' ? 'Active' : 'Inactive'}</span>
+                <span class="user-name">${user.userName} (${user.loginId})</span>
+                <span class="user-role">${user.roleName} | ${user.isActive === 'Y' ? 'Active' : 'Inactive'}</span>
             `;
             div.onclick = () => selectUser(user);
             userList.appendChild(div);
@@ -83,7 +83,7 @@ function selectUser(user) {
     // 선택된 아이템 강조 표시 찾기
     const items = document.querySelectorAll('.user-item');
     items.forEach(item => {
-        if (item.textContent.includes(`(${user.LOGIN_ID})`)) {
+        if (item.textContent.includes(`(${user.loginId})`)) {
             item.classList.add('active');
         }
     });
@@ -118,12 +118,12 @@ function showForm(mode, data = null) {
         btnRandom.style.display = 'none';
         btnDelete.style.display = 'block';
         
-        document.getElementById('user-id').value = data.USER_ID;
-        document.getElementById('login-id').value = data.LOGIN_ID;
-        document.getElementById('password').value = data.PASSWORD; 
-        document.getElementById('user-name').value = data.USER_NAME;
-        document.getElementById('role-code').value = data.ROLE_CODE;
-        document.getElementById('is-active').value = data.IS_ACTIVE;
+        document.getElementById('user-id').value = data.userId;
+        document.getElementById('login-id').value = data.loginId;
+        document.getElementById('password').value = data.password || ''; 
+        document.getElementById('user-name').value = data.userName;
+        document.getElementById('role-code').value = data.roleCode;
+        document.getElementById('is-active').value = data.isActive;
     }
 }
 
@@ -131,7 +131,7 @@ function generateRandomUser() {
     // 1. Login ID: newid1, newid2 ... 순차적으로 없는 번호 찾기
     let num = 1;
     let newId = `newid${num}`;
-    while (allUsers.some(u => u.LOGIN_ID && u.LOGIN_ID.toLowerCase() === newId.toLowerCase())) {
+    while (allUsers.some(u => u.loginId && u.loginId.toLowerCase() === newId.toLowerCase())) {
         num++;
         newId = `newid${num}`;
     }
@@ -151,7 +151,7 @@ function generateRandomUser() {
     
     // 기본값 설정 (있으면)
     if (roles.length > 0) {
-        document.getElementById('role-code').value = roles[0].ROLE_CODE;
+        document.getElementById('role-code').value = roles[0].roleCode;
     }
 }
 
@@ -202,7 +202,7 @@ async function handleDelete() {
     if (!currentUser || !confirm('Are you sure you want to delete this user?')) return;
 
     try {
-        const response = await fetch(`/api/admin/Users/${currentUser.USER_ID}`, {
+        const response = await fetch(`/api/admin/Users/${currentUser.userId}`, {
             method: 'DELETE'
         });
 
