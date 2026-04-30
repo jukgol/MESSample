@@ -25,18 +25,18 @@ const ItemList = () => {
       setLoading(true);
       setError(null);
 
-      // TableDataController의 특정 테이블 데이터 조회 엔드포인트 호출
+      // 전용 ItemController를 통해 데이터 조회
       const response = await apiClient.get('/api/Item');
 
-      if (response.data && response.data.rows) {
-        // 백엔드의 대문자 필드명을 프론트엔드 형식으로 매핑
-        const mappedItems = response.data.rows.map((row: any) => ({
-          id: row.ITEM_ID || row.item_id,
-          name: row.ITEM_NAME || row.item_name,
-          spec: row.DESCRIPTION || row.description || '-',
-          category: row.CATEGORY || row.category || 'N/A',
+      if (Array.isArray(response.data)) {
+        // 백엔드의 camelCase 필드명을 프론트엔드 형식으로 매핑 (Dapper + camelCase Serialization 적용)
+        const mappedItems = response.data.map((item: any) => ({
+          id: item.itemId,
+          name: item.itemName,
+          spec: item.description || '-',
+          category: item.itemType || 'N/A',
           stock: 0, // 현재고 정보는 별도 연동 필요
-          unit: row.UNIT || row.unit || 'EA'
+          unit: item.unit || 'EA'
         }));
         setItems(mappedItems);
       }
