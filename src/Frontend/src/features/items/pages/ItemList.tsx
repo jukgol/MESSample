@@ -24,10 +24,10 @@ const ItemList = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // TableDataController의 특정 테이블 데이터 조회 엔드포인트 호출
-      const response = await apiClient.get('/TableData/ITEM/data');
-      
+      const response = await apiClient.get('/api/Item');
+
       if (response.data && response.data.rows) {
         // 백엔드의 대문자 필드명을 프론트엔드 형식으로 매핑
         const mappedItems = response.data.rows.map((row: any) => ({
@@ -55,7 +55,7 @@ const ItemList = () => {
           <h1 style={{ fontSize: '2rem', margin: 0 }}>품목 리스트</h1>
           <p style={{ color: 'var(--text-secondary)' }}>전체 등록된 품목 마스터 정보를 관리합니다. (백엔드 실시간 연동)</p>
         </div>
-        <button 
+        <button
           onClick={fetchItems}
           disabled={loading}
           style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
@@ -72,17 +72,17 @@ const ItemList = () => {
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
               <div style={{ flex: 1, position: 'relative' }}>
                 <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-                <input 
-                  type="text" 
-                  placeholder="품목명 또는 코드로 검색..." 
-                  style={{ 
-                    width: '100%', 
-                    padding: '0.8rem 1rem 0.8rem 2.5rem', 
-                    background: 'rgba(0,0,0,0.2)', 
+                <input
+                  type="text"
+                  placeholder="품목명 또는 코드로 검색..."
+                  style={{
+                    width: '100%',
+                    padding: '0.8rem 1rem 0.8rem 2.5rem',
+                    background: 'rgba(0,0,0,0.2)',
                     border: '1px solid var(--border-color)',
                     borderRadius: '10px',
                     color: 'white'
-                  }} 
+                  }}
                 />
               </div>
               <button style={{ background: 'rgba(255,255,255,0.05)', boxShadow: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -115,10 +115,10 @@ const ItemList = () => {
                           <td style={{ padding: '1rem' }}>{item.name}</td>
                           <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{item.spec}</td>
                           <td style={{ padding: '1rem' }}>
-                            <span style={{ 
-                              padding: '4px 10px', 
-                              background: 'rgba(99, 102, 241, 0.1)', 
-                              borderRadius: '20px', 
+                            <span style={{
+                              padding: '4px 10px',
+                              background: 'rgba(99, 102, 241, 0.1)',
+                              borderRadius: '20px',
                               fontSize: '0.8rem',
                               border: '1px solid rgba(99, 102, 241, 0.2)'
                             }}>

@@ -10,16 +10,19 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WAS.Data;
+using Microsoft.Extensions.Logging;
 
 namespace WAS.Services
 {
     public class ScriptExecutor : IScriptExecutor
     {
         private readonly DbProvider _db;
+        private readonly ILogger<ScriptExecutor> _logger;
 
-        public ScriptExecutor(DbProvider db)
+        public ScriptExecutor(DbProvider db,ILogger<ScriptExecutor> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         public async Task<(bool Success, string Message)> ExecuteSqlAsync(string sql)
@@ -79,7 +82,10 @@ namespace WAS.Services
             }
             catch (OracleException oex)
             {
-                throw new Exception($"[DB-ERR] 쿼리 실행 실패 (코드: {oex.Number}): {oex.Message}\nSQL: {sql}");
+                string temp = $"[DB-ERR] 쿼리 실행 실패 (코드: {oex.Number}): {oex.Message}\nSQL: {sql}";                
+                _logger.LogError(temp);
+                throw new Exception(temp);
+                
             }
         }
 

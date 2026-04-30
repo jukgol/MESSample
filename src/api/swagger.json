@@ -946,7 +946,7 @@
       "ItemDto": {
         "type": "object",
         "properties": {
-          "itemCode": {
+          "itemID": {
             "type": "string",
             "nullable": true
           },
@@ -962,7 +962,7 @@
             "type": "string",
             "nullable": true
           },
-          "isActive": {
+          "description": {
             "type": "string",
             "nullable": true
           },

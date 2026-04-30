@@ -33,7 +33,7 @@ namespace WAS.Services.Auth
                 return new LoginResponse { Success = false, Message = "아이디 또는 비밀번호가 올바르지 않습니다." };
             }
 
-            if (user.ISACTIVE != "Y")
+            if (user.IS_ACTIVE != "Y")
             {
                 return new LoginResponse { Success = false, Message = "비활성화된 계정입니다. 관리자에게 문의하세요." };
             }
@@ -48,10 +48,10 @@ namespace WAS.Services.Auth
                 Token = token,
                 User = new UserInfo
                 {
-                    UserId = user.USERID,
-                    UserName = user.USERNAME,
-                    RoleCode = user.ROLECODE,
-                    RoleName = user.ROLENAME
+                    UserId = user.LOGIN_ID,
+                    UserName = user.USER_NAME,
+                    RoleCode = user.ROLE_CODE,
+                    RoleName = user.ROLE_NAME
                 }
             };
         }
@@ -64,9 +64,9 @@ namespace WAS.Services.Auth
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, (string)user.USERID),
-                new Claim(ClaimTypes.Name, (string)user.USERNAME),
-                new Claim(ClaimTypes.Role, (string)user.ROLECODE)
+                new Claim(ClaimTypes.NameIdentifier, (string)user.LOGIN_ID),
+                new Claim(ClaimTypes.Name, (string)user.USER_NAME),
+                new Claim(ClaimTypes.Role, (string)user.ROLE_CODE)
             };
 
             var token = new JwtSecurityToken(

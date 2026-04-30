@@ -1,8 +1,8 @@
-SELECT ITEM_CODE as ItemCode, 
-       ITEM_NAME as ItemName, 
-       ITEM_TYPE as ItemType, 
-       UNIT, 
-       IS_ACTIVE as IsActive, 
-       CREATED_AT as CreatedAt
+SELECT ITEM_ID, 
+       ITEM_NAME, 
+       CATEGORY, 
+       UNIT,
+       Description,
+       CREATED_AT
 FROM ITEM
-ORDER BY ITEM_CODE ASC
+ORDER BY ITEM_ID ASC

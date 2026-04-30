@@ -44,11 +44,11 @@ export interface ExecuteAttributeRequest {
 }
 
 export interface ItemDto {
-  itemCode?: string | null;
+  itemID?: string | null;
   itemName?: string | null;
   itemType?: string | null;
   unit?: string | null;
-  isActive?: string | null;
+  description?: string | null;
   /** @format date-time */
   createdAt?: string;
 }
