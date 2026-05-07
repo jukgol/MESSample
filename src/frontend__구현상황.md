@@ -9,6 +9,7 @@
 *   품목 리스트 (ItemList) UI 구현 (Mock 데이터 기반)
 *   사용자 로그인 (LoginPage) UI 구현
 *   인증 체크 (Auth Check) 및 보호된 라우트 (AuthGuard) 구현
+*   로그인 방어로직 추가 (토큰 만료 감시 및 자동 리다이렉트)
 
 ## 기술적 특이사항
 *   **Lucide-react**: 아이콘 라이브러리 사용
