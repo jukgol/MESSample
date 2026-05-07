@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using WAS.Attributes;
 using System;
 using System.Reflection;
@@ -30,8 +30,8 @@ namespace WAS.Proxies
             string message = logAttr?.Message ?? targetMethod.Name;
 
             try
-            {
-                _logger.LogInformation($"--- [AOP 시작] {message} ---");
+            {                
+                //_logger.LogInformation($"--- [AOP 시작] {message} ---");
                 var result = targetMethod.Invoke(_target, args);
 
                 if (result is Task task)
@@ -47,9 +47,8 @@ namespace WAS.Proxies
                     
                     // 반환 타입이 일반 Task 인 경우
                     return HandleAsync(task, message);
-                }
-
-                _logger.LogInformation($"--- [AOP 완료] {message} ---");
+                }                
+                //_logger.LogInformation($"--- [AOP 완료] {message} ---");
                 return result;
             }
             catch (Exception ex)
@@ -63,14 +62,14 @@ namespace WAS.Proxies
 
         private async Task HandleAsync(Task task, string message)
         {
-            await task;
-            _logger.LogInformation($"--- [AOP 완료] {message} ---");
+            await task;            
+           // _logger.LogInformation($"--- [AOP 완료] {message} ---");
         }
 
         private async Task<TResult> HandleAsyncWithResult<TResult>(Task task, string message)
         {
             var result = await (Task<TResult>)task;
-            _logger.LogInformation($"--- [AOP 완료] {message} ---");
+           // _logger.LogInformation($"--- [AOP 완료] {message} ---");
             return result;
         }
     }
