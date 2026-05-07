@@ -3,7 +3,7 @@ using WAS.Services;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
-using WAS.Models.Admin;
+using Shared.Models.Admin;
 
 namespace WAS.Controllers.Admin
 {

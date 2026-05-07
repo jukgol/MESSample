@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Admin.Table;
 using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
-using WAS.Models.Admin;
+using Shared.Models.Admin;
 
 namespace WAS.Controllers.Admin.Table
 {

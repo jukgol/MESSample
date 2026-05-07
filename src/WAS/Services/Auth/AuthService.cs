@@ -2,7 +2,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using WAS.Models.Auth;
+using Shared.Models.Auth;
 
 namespace WAS.Services.Auth
 {

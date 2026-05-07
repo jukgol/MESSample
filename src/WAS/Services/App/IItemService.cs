@@ -1,4 +1,4 @@
-using WAS.Models.App;
+using Shared.Models.App;
 
 namespace WAS.Services.App
 {

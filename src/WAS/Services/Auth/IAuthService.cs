@@ -1,4 +1,4 @@
-using WAS.Models.Auth;
+using Shared.Models.Auth;
 
 namespace WAS.Services.Auth
 {

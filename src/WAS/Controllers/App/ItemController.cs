@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WAS.Services.App;
-using WAS.Models.App;
+using Shared.Models.App;
 
 namespace WAS.Controllers.App
 {

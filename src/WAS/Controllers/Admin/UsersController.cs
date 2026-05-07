@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using WAS.Models.Admin;
+using Shared.Models.Admin;
 using WAS.Services;
 
 namespace WAS.Controllers.Admin

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WAS.Models.Auth;
+using Shared.Models.Auth;
 using WAS.Services.Auth;
 
 namespace WAS.Controllers.Auth

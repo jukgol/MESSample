@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Admin;
-using WAS.Models.Admin;
+using Shared.Models.Admin;
 
 namespace WAS.Controllers.Admin
 {

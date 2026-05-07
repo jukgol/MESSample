@@ -1,7 +1,6 @@
 using Oracle.ManagedDataAccess.Client;
 using System.Data;
-using WAS.Data;
-using WAS.Models;
+using Shared.Models;
 
 namespace WAS.Services.Admin.Table
 {

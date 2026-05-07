@@ -1,4 +1,4 @@
-namespace WAS.Models.Auth
+namespace Shared.Models.Auth
 {
     public class LoginRequest
     {

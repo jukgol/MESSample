@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using WAS.Models;
+using Shared.Models;
 
 namespace WAS.Services.Admin.Table
 {

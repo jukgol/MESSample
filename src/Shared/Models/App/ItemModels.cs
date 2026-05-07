@@ -1,4 +1,4 @@
-namespace WAS.Models.App
+namespace Shared.Models.App
 {
     public class ItemDto
     {

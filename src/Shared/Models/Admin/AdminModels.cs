@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace WAS.Models.Admin
+namespace Shared.Models.Admin
 {
     // 1. 사용자 관련 모델
     public class UserListDto

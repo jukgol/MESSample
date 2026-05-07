@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using WAS.Services.Admin.Table;
 using System;
 using System.Threading.Tasks;
-using WAS.Models.Admin;
+using Shared.Models.Admin;
 
 namespace WAS.Controllers.Admin.Table
 {
