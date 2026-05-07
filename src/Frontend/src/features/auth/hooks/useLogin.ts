@@ -25,7 +25,7 @@ export const useLogin = () => {
         login(response.data.token, response.data.user);
         
         // 대시보드로 이동
-        navigate('/');
+        navigate('/dashboard');
       } else {
         setErrorMsg(response.data.message || '로그인에 실패했습니다.');
       }

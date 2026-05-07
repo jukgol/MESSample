@@ -20,34 +20,34 @@ const Sidebar = () => {
     { 
       title: 'Dashboard', 
       icon: <LayoutDashboard size={20} />, 
-      path: '/' 
+      path: '/dashboard' 
     },
     { 
       title: '물품 관리', 
       icon: <Package size={20} />, 
-      path: '/items',
+      path: '/dashboard/items',
       children: [
-        { title: '품목 리스트', path: '/items/list', icon: <Database size={16} /> },
-        { title: 'LOT 관리', path: '/items/lot', icon: <ClipboardList size={16} /> },
-        { title: '출하 관리', path: '/items/shipment', icon: <Truck size={16} /> },
+        { title: '품목 리스트', path: '/dashboard/items/list', icon: <Database size={16} /> },
+        { title: 'LOT 관리', path: '/dashboard/items/lot', icon: <ClipboardList size={16} /> },
+        { title: '출하 관리', path: '/dashboard/items/shipment', icon: <Truck size={16} /> },
       ]
     },
     { 
       title: '공정 관리', 
       icon: <Settings size={20} />, 
-      path: '/process',
+      path: '/dashboard/process',
       children: [
-        { title: '공정 단계 정의', path: '/process/steps', icon: <Settings size={16} /> },
-        { title: '작업 지시 (WO)', path: '/process/workorder', icon: <ClipboardList size={16} /> },
+        { title: '공정 단계 정의', path: '/dashboard/process/steps', icon: <Settings size={16} /> },
+        { title: '작업 지시 (WO)', path: '/dashboard/process/workorder', icon: <ClipboardList size={16} /> },
       ]
     },
     { 
       title: '로그 / 이력', 
       icon: <History size={20} />, 
-      path: '/log-monitor',
+      path: '/dashboard/log-monitor',
       children: [
-        { title: '공정 이력', path: '/log-monitor/process', icon: <History size={16} /> },
-        { title: '품질 검사 (QC)', path: '/log-monitor/qc', icon: <ShieldCheck size={16} /> },
+        { title: '공정 이력', path: '/dashboard/log-monitor/process', icon: <History size={16} /> },
+        { title: '품질 검사 (QC)', path: '/dashboard/log-monitor/qc', icon: <ShieldCheck size={16} /> },
       ]
     },
   ];

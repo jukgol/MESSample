@@ -1,5 +1,8 @@
-import { User, Lock, ArrowRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { useLogin } from '../hooks/useLogin';
+import { useAuthStore } from '../../../store/useAuthStore';
 import styles from './LoginPage.module.css';
 
 const LoginPage = () => {
@@ -12,6 +15,33 @@ const LoginPage = () => {
     isLoading, 
     handleLogin 
   } = useLogin();
+
+  const navigate = useNavigate();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    // 이미 로그인된 상태라면 1초 후 대시보드로 이동
+    if (isAuthenticated) {
+      setIsRedirecting(true);
+      const timer = setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (isRedirecting) {
+    return (
+      <div className={styles.container}>
+        <div className={`premium-card ${styles.card}`} style={{ textAlign: 'center', padding: '3rem' }}>
+          <Loader2 className="animate-spin" size={48} style={{ margin: '0 auto 1rem', color: 'var(--accent-primary)' }} />
+          <h2 className="gradient-text" style={{ marginBottom: '1rem' }}>이미 로그인되어 있습니다.</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>1초 후에 대시보드로 이동합니다...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>

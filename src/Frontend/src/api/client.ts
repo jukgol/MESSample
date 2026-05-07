@@ -26,6 +26,23 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+// 응답 인터셉터 추가: 401 에러(인증 만료) 발생 시 로그아웃 처리
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.warn('인증 세션이 만료되었습니다. 로그아웃 처리합니다.');
+      useAuthStore.getState().logout();
+      
+      // 페이지를 새로고침하며 로그인 화면으로 강제 이동
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 /**
  * Swagger 기반으로 자동 생성된 API 클라이언트
  * api.api.authLoginCreate(), api.api.itemList() 형태로 사용합니다.

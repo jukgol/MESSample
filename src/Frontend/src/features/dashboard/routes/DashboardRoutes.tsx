@@ -33,7 +33,7 @@ const DashboardRoutes = () => {
         <Route path="/log-monitor/qc" element={<Placeholder title="품질 검사 (QC)" />} />
 
         {/* 404 Redirect */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>
   );
