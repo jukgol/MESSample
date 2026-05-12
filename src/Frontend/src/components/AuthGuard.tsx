@@ -22,6 +22,7 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
         } catch (error) {
           // interceptor에서 처리되지만, 만약의 경우를 대비해 여기서도 처리
           console.error('Token verification failed', error);
+          logout(); // 검증 실패 시 로그아웃 처리하여 리다이렉트 유도
         }
       }
       setIsVerifying(false);
@@ -32,13 +33,13 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
 
   if (isVerifying) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        height: '100vh', 
-        width: '100vw', 
-        alignItems: 'center', 
+      <div style={{
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        alignItems: 'center',
         justifyContent: 'center',
-        background: 'var(--bg-dark)' 
+        background: 'var(--bg-dark)'
       }}>
         <Loader2 className="animate-spin" size={48} style={{ color: 'var(--accent-primary)' }} />
       </div>

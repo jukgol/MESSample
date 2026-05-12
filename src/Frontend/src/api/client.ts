@@ -26,16 +26,24 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-// 응답 인터셉터 추가: 401 에러(인증 만료) 발생 시 로그아웃 처리
+// 응답 인터셉터 추가: 401 에러(인증 만료) 또는 서버 연결 실패 시 로그아웃 처리
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      console.warn('인증 세션이 만료되었습니다. 로그아웃 처리합니다.');
-      useAuthStore.getState().logout();
-      
-      // 페이지를 새로고침하며 로그인 화면으로 강제 이동
-      if (!window.location.pathname.includes('/login')) {
+    // 401 에러(인증 만료) 또는 서버 연결 자체가 실패한 경우 (error.response가 없음)
+    if (error.response?.status === 401 || !error.response) {
+      const isLoginPath = window.location.pathname.includes('/login');
+
+      if (!isLoginPath) {
+        if (!error.response) {
+          console.error('서버에 연결할 수 없습니다. 로그아웃 처리합니다.');
+        } else {
+          console.warn('인증 세션이 만료되었습니다. 로그아웃 처리합니다.');
+        }
+
+        useAuthStore.getState().logout();
+
+        // 로그인 화면으로 강제 이동
         window.location.href = '/login';
       }
     }
