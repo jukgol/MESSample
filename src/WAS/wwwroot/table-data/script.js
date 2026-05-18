@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const insertContainer = document.getElementById('insert-container');
         if (insertContainer) insertContainer.style.display = 'none';
 
+        const btnPrint = document.getElementById('btn-print');
+        if (btnPrint) btnPrint.style.display = 'none';
+
         try {
             const response = await fetch(`/api/admin/TableData/${tableName}/data`);
             const rawText = await response.text(); // 일단 텍스트로 읽음
@@ -94,6 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Fetch Error:', error);
             tableSubtitle.innerHTML = `<span style="color:#ff6b6b; font-size:0.85rem; background:rgba(255,107,107,0.1); padding:4px 10px; border-radius:4px;">❌ ${error.message}</span>`;
             dataBody.innerHTML = `<tr><td colspan="100" class="empty-message" style="color:#ff6b6b; padding:40px;">${error.message}</td></tr>`;
+            
+            const btnPrint = document.getElementById('btn-print');
+            if (btnPrint) btnPrint.style.display = 'none';
         }
     };
 
@@ -103,12 +109,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         dataHead.innerHTML = `<tr><th class="col-check"><input type="checkbox" id="check-all"></th>${columns.map(col => `<th>${col}</th>`).join('')}</tr>`;
         
+        const btnPrint = document.getElementById('btn-print');
+
         if (!rows || rows.length === 0) {
             dataBody.innerHTML = `<tr><td colspan="${columns.length + 1}" class="empty-message">데이터 없음</td></tr>`;
+            tableSubtitle.textContent = `최근 데이터 0건`;
+            if (btnPrint) btnPrint.style.display = 'none';
             return;
         }
 
         tableSubtitle.textContent = `최근 데이터 ${rows.length}건`;
+        if (btnPrint) btnPrint.style.display = 'inline-block';
+
         dataBody.innerHTML = rows.map((row, i) => `
             <tr>
                 <td class="col-check"><input type="checkbox" class="row-check"></td>
