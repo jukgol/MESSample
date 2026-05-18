@@ -30,7 +30,7 @@
                     <h2 id="current-table-title">테이블을 선택해 주세요</h2>
                     <p class="subtitle" id="current-table-subtitle">왼쪽 목록에서 데이터를 조회할 테이블을 클릭하세요.</p>
                 </div>
-                <button id="btn-print" class="btn-outline-sm" style="display: none;" onclick="window.print()">🖨️ 출력</button>
+                <button id="btn-print" class="btn-outline-sm" style="display: none;">💾 CSV 저장</button>
             </div>
 
             <div class="table-container-wrapper">
@@ -48,13 +48,13 @@
                 <div class="selection-info">
                     <span id="selected-count">0</span>개 항목 선택됨
                 </div>
-                <button class="btn-delete" onclick="handleDeleteSelected()">선택 삭제 (Delete)</button>
+                <button id="btn-delete-selected" class="btn-delete">선택 삭제 (Delete)</button>
             </div>
 
             <div id="insert-form-placeholder"></div>
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
 </body>
 </html>

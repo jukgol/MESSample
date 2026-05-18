@@ -17,5 +17,8 @@ namespace WAS.Services.Admin.Table
 
         // 테이블에 신규 행 삽입
         Task InsertRowAsync(string schemaName, string tableName, Dictionary<string, object> data);
+
+        // 테이블 데이터를 CSV 파일로 서버 로컬 디렉토리에 저장
+        Task<string> SaveTableDataAsCsvAsync(string schemaName, string tableName);
     }
 }

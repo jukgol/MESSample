@@ -78,6 +78,23 @@ namespace WAS.Controllers.Admin.Table
             }
         }
 
+        [HttpPost("{tableName}/save-csv")]
+        [ProducesResponseType(typeof(ActionResponse), 200)]
+        public async Task<ActionResult<ActionResponse>> SaveTableDataAsCsv(string tableName)
+        {
+            try
+            {
+                var schemaName = GetCurrentSchema().ToUpper();
+                var fileName = await _tableDataService.SaveTableDataAsCsvAsync(schemaName, tableName.ToUpper());
+
+                return Ok(new ActionResponse { Message = $"CSV 파일이 성공적으로 저장되었습니다.\n파일명: {fileName}" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ActionResponse { Message = $"CSV 저장 실패: {ex.Message}" });
+            }
+        }
+
         private string GetCurrentSchema()
         {
             var connString = _configuration.GetConnectionString("OracleDb");
