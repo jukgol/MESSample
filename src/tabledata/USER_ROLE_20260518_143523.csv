@@ -1,5 +1,0 @@
-﻿﻿ROLE_CODE,ROLE_NAME,DESCRIPTION
-ADMIN,관리자,시스템 전체 관리 권한
-OPERATOR,작업자,공정 데이터 입력 및 조회 권한
-QC,품질검사,품질 검사 및 합격/불합격 판정 권한
-VIEWER,조회자,데이터 조회 전용 권한
