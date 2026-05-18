@@ -94,3 +94,6 @@ Thumbs.db
 
 # Project files (Excluded by user request - Not recommended for collaboration)
 *.sln
+
+# CSV Export data directory
+src/tabledata/
