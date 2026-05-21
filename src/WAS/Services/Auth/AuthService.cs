@@ -66,7 +66,7 @@ namespace WAS.Services.Auth
             {
                 new Claim(ClaimTypes.NameIdentifier, (string)user.LOGIN_ID),
                 new Claim(ClaimTypes.Name, (string)user.USER_NAME),
-                new Claim(ClaimTypes.Role, (string)user.ROLE_CODE)
+                new Claim(ClaimTypes.Role, (string)user.ROLE_CODE),                
             };
 
             var token = new JwtSecurityToken(
