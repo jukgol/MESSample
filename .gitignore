@@ -97,3 +97,6 @@ Thumbs.db
 
 # CSV Export data directory
 src/tabledata/
+
+# AI Agent History
+.aiinfo/
