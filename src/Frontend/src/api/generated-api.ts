@@ -43,14 +43,29 @@ export interface ExecuteAttributeRequest {
   isUnique?: boolean;
 }
 
+export interface ItemCreateDto {
+  itemName?: string | null;
+  itemType?: string | null;
+  unit?: string | null;
+  description?: string | null;
+}
+
 export interface ItemDto {
-  itemID?: string | null;
+  /** @format int32 */
+  itemID?: number;
   itemName?: string | null;
   itemType?: string | null;
   unit?: string | null;
   description?: string | null;
   /** @format date-time */
   createdAt?: string;
+}
+
+export interface ItemUpdateDto {
+  itemName?: string | null;
+  itemType?: string | null;
+  unit?: string | null;
+  description?: string | null;
 }
 
 export interface LoginRequest {
@@ -63,6 +78,35 @@ export interface LoginResponse {
   message?: string | null;
   token?: string | null;
   user?: UserInfo;
+}
+
+export interface LotCreateDto {
+  /** @format int32 */
+  itemID?: number;
+  lotNo?: string | null;
+  /** @format int32 */
+  qty?: number;
+  status?: string | null;
+}
+
+export interface LotDto {
+  /** @format int32 */
+  lotID?: number;
+  /** @format int32 */
+  itemID?: number;
+  itemName?: string | null;
+  lotNo?: string | null;
+  /** @format int32 */
+  qty?: number;
+  /** @format date-time */
+  receivedAt?: string;
+  status?: string | null;
+}
+
+export interface LotUpdateDto {
+  /** @format int32 */
+  qty?: number;
+  status?: string | null;
 }
 
 export interface NavItemDto {
@@ -336,6 +380,137 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
+     * @tags Item
+     * @name ItemCreate
+     * @request POST:/api/Item
+     */
+    itemCreate: (data: ItemCreateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Item`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Item
+     * @name ItemUpdate
+     * @request PUT:/api/Item/{id}
+     */
+    itemUpdate: (id: number, data: ItemUpdateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Item/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Item
+     * @name ItemDelete
+     * @request DELETE:/api/Item/{id}
+     */
+    itemDelete: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Item/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Lot
+     * @name GetApi
+     * @request GET:/api/Lot
+     */
+    getApi: (params: RequestParams = {}) =>
+      this.http.request<LotDto[], ProblemDetails>({
+        path: `/api/Lot`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Lot
+     * @name PostApi
+     * @request POST:/api/Lot
+     */
+    postApi: (data: LotCreateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Lot`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Lot
+     * @name PutApi
+     * @request PUT:/api/Lot/{id}
+     */
+    putApi: (id: number, data: LotUpdateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Lot/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Lot
+     * @name DeleteApi
+     * @request DELETE:/api/Lot/{id}
+     */
+    deleteApi: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Lot/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Lot
+     * @name LotDummyCreate
+     * @request POST:/api/Lot/dummy
+     */
+    lotDummyCreate: (
+      query?: {
+        /**
+         * @format int32
+         * @default 10
+         */
+        count?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Lot/dummy`,
+        method: "POST",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Navigator
      * @name AdminNavigatorList
      * @request GET:/api/admin/Navigator
@@ -529,6 +704,24 @@ export class Api<SecurityDataType extends unknown> {
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags TableData
+     * @name AdminTableDataSaveCsvCreate
+     * @request POST:/api/admin/TableData/{tableName}/save-csv
+     */
+    adminTableDataSaveCsvCreate: (
+      tableName: string,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<ActionResponse, any>({
+        path: `/api/admin/TableData/${tableName}/save-csv`,
+        method: "POST",
         format: "json",
         ...params,
       }),

@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Bogus" Version="35.6.5" />
     <PackageReference Include="Dapper" Version="2.1.72" />
     <PackageReference Include="dbup-oracle" Version="6.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.*" />
@@ -28,6 +29,6 @@
 
   <Target Name="GenerateSwagger" AfterTargets="Build">
     <MakeDir Directories="../api" Condition="!Exists('../api')" />
-    <Exec Command="chcp 65001 > nul &amp;&amp; dotnet tool run swagger tofile --output ../api/swagger.json $(OutputPath)$(AssemblyName).dll v1" />
+    <Exec Command="chcp 65001 &gt; nul &amp;&amp; dotnet tool run swagger tofile --output ../api/swagger.json $(OutputPath)$(AssemblyName).dll v1" />
   </Target>
 </Project>

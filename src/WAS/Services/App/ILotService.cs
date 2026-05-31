@@ -8,5 +8,6 @@ namespace WAS.Services.App
         Task CreateLotAsync(LotCreateDto dto);
         Task UpdateLotAsync(int id, LotUpdateDto dto);
         Task DeleteLotAsync(int id);
+        Task GenerateDummyLotsAsync(int count);
     }
 }

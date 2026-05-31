@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../../../layouts/Layout';
 import ItemList from '../../items/pages/ItemList';
+import LotList from '../../items/pages/LotList';
 import DashboardHome from '../pages/DashboardHome';
 import { useAuthStore } from '../../../store/useAuthStore';
 
@@ -31,7 +32,7 @@ const DashboardRoutes = () => {
           <>
             <Route path="/items" element={<Navigate to="/items/list" replace />} />
             <Route path="/items/list" element={<ItemList />} />
-            <Route path="/items/lot" element={<Placeholder title="LOT 관리" />} />
+            <Route path="/items/lot" element={<LotList />} />
             <Route path="/items/shipment" element={<Placeholder title="출하 관리" />} />
           </>
         )}
