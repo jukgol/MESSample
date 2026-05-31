@@ -1,5 +1,3 @@
-# AI 규칙 확인 안내
+# AI 규칙 확인 및 작동 지침
 
-이 파일의 기존 내용은 아래의 경로로 이동되었습니다. 해당 파일에서 규칙을 확인하시기 바랍니다.
-
-- [.aiinfo/rule/history.md](file:///f:/ProjectGit/MESSample/.aiinfo/rule/history.md)
+- **최초 시작 시 규칙 인지**: 이 대화 세션을 최초로 시작할 때, [.aiinfo/rule/](file:///f:/ProjectGit/MESSample/.aiinfo/rule/) 디렉토리 내에 있는 규칙 파일들을 한 번 확인하여 지침을 미리 인지합니다.
