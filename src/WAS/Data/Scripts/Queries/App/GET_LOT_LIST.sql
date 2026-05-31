@@ -1,0 +1,10 @@
+SELECT L.LOT_ID, 
+       L.ITEM_ID, 
+       I.ITEM_NAME, 
+       L.LOT_NO, 
+       L.QTY, 
+       L.RECEIVED_AT, 
+       L.STATUS
+FROM LOT L
+JOIN ITEM I ON L.ITEM_ID = I.ITEM_ID
+ORDER BY L.LOT_ID DESC

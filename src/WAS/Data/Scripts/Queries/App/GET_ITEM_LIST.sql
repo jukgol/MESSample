@@ -1,6 +1,6 @@
 SELECT ITEM_ID, 
        ITEM_NAME, 
-       CATEGORY, 
+       CATEGORY AS ItemType, 
        UNIT,
        Description,
        CREATED_AT

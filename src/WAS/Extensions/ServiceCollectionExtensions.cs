@@ -1,4 +1,4 @@
-﻿using WAS.Services;
+using WAS.Services;
 using WAS.Services.Admin;
 using WAS.Services.Admin.Table;
 using WAS.Services.Auth;
@@ -37,6 +37,9 @@ namespace WAS.Extensions
             // App 관련 서비스 등록
             services.AddScoped<ItemService>();
             services.AddScoped<IItemService>(sp => LoggingProxy<IItemService>.Create(sp.GetRequiredService<ItemService>(), sp.GetRequiredService<ILogger<ItemService>>()));
+
+            services.AddScoped<LotService>();
+            services.AddScoped<ILotService>(sp => LoggingProxy<ILotService>.Create(sp.GetRequiredService<LotService>(), sp.GetRequiredService<ILogger<LotService>>()));
 
             services.AddScoped<ProcedureRegistration>();
 
