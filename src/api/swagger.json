@@ -1808,6 +1808,10 @@
             "type": "string",
             "nullable": true
           },
+          "roleCode": {
+            "type": "string",
+            "nullable": true
+          },
           "isActive": {
             "type": "string",
             "nullable": true

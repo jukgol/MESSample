@@ -54,30 +54,30 @@ namespace WAS.Services.App
             var items = await _itemService.GetItemsAsync();
             var itemIds = items.Select(x => x.ItemID).ToList();
 
-            // 방어 코드: 등록된 자재가 없는 경우, 임시 자재 생성
+            // Fallback: If no items are registered, create dummy items
             if (itemIds.Count == 0)
             {
                 await _itemService.CreateItemAsync(new ItemCreateDto
                 {
-                    ItemName = "임시 테스트용 PCB A타입",
-                    ItemType = "원자재",
-                    Unit = "개",
-                    Description = "테스트 데이터 생성기가 자동으로 등록한 마스터 정보입니다."
+                    ItemName = "Dummy PCB Type A",
+                    ItemType = "RawMaterial",
+                    Unit = "EA",
+                    Description = "Auto-generated master item for testing."
                 });
                 await _itemService.CreateItemAsync(new ItemCreateDto
                 {
-                    ItemName = "임시 테스트용 저항칩 R01",
-                    ItemType = "부품",
-                    Unit = "개",
-                    Description = "테스트 데이터 생성기가 자동으로 등록한 마스터 정보입니다."
+                    ItemName = "Dummy Resistor R01",
+                    ItemType = "Component",
+                    Unit = "EA",
+                    Description = "Auto-generated master item for testing."
                 });
 
-                // 다시 자재 목록 로드
+                // Reload items
                 items = await _itemService.GetItemsAsync();
                 itemIds = items.Select(x => x.ItemID).ToList();
             }
 
-            // Bogus 룰 정의
+            // Define Bogus fake data rules
             var faker = new Faker<LotCreateDto>()
                 .RuleFor(l => l.ItemID, f => f.PickRandom(itemIds))
                 .RuleFor(l => l.LotNo, f => $"LOT-{f.Date.Recent():yyyyMMdd}-{f.Random.AlphaNumeric(4).ToUpper()}")
