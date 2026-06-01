@@ -3,10 +3,10 @@ import { useItems } from './useItems';
 import type { Item } from './useItems';
 import ItemHeader from './ItemHeader';
 import ItemTable from './ItemTable';
-import { Search, Loader2, Plus, RotateCw } from 'lucide-react';
+import { Search, Loader2, Plus, RotateCw, Database } from 'lucide-react';
 
 const ItemList: React.FC = () => {
-  const { items, loading, error, fetchItems, createItem, updateItem, deleteItem } = useItems();
+  const { items, loading, error, fetchItems, createItem, updateItem, deleteItem, generateDummyItems } = useItems();
 
   // 검색어 상태
   const [searchTerm, setSearchTerm] = useState('');
@@ -120,6 +120,18 @@ const ItemList: React.FC = () => {
 
       {/* 1. 버튼 컨테이너 (하나의 컨테이너로 묶고 검색창 위로, 왼쪽 정렬) */}
       <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', marginBottom: '1rem' }}>
+        <button
+          onClick={async () => {
+            const success = await generateDummyItems(10);
+            if (success) {
+              alert('10개의 테스트 데이터가 성공적으로 생성되었습니다.');
+            }
+          }}
+          disabled={loading}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#818cf8', boxShadow: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px' }}
+        >
+          {loading ? <Loader2 className="animate-spin" size={16} /> : <Database size={16} />} 테스트 데이터 10개 생성
+        </button>
         <button
           onClick={fetchItems}
           disabled={loading}

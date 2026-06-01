@@ -8,5 +8,6 @@ namespace WAS.Services.App
         Task CreateItemAsync(ItemCreateDto dto);
         Task UpdateItemAsync(int id, ItemUpdateDto dto);
         Task DeleteItemAsync(int id);
+        Task GenerateDummyItemsAsync(int count);
     }
 }

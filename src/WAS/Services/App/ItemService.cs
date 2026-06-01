@@ -1,4 +1,5 @@
 using Shared.Models.App;
+using Bogus;
 
 namespace WAS.Services.App
 {
@@ -45,6 +46,22 @@ namespace WAS.Services.App
             {
                 ItemId = id
             });
+        }
+
+        public async Task GenerateDummyItemsAsync(int count)
+        {
+            var faker = new Faker<ItemCreateDto>()
+                .RuleFor(i => i.ItemName, f => f.Commerce.ProductName())
+                .RuleFor(i => i.ItemType, f => f.PickRandom("RawMaterial", "Component", "Product"))
+                .RuleFor(i => i.Unit, f => f.PickRandom("EA", "SET", "KG", "BOX", "M"))
+                .RuleFor(i => i.Description, f => $"{f.Commerce.ProductAdjective()} - {f.Commerce.ProductDescription()}");
+
+            var dummyItems = faker.Generate(count);
+
+            foreach (var dummy in dummyItems)
+            {
+                await CreateItemAsync(dummy);
+            }
         }
     }
 }

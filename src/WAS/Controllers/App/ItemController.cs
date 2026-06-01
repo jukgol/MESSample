@@ -102,5 +102,27 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"품목 삭제 중 오류 발생: {ex.Message}" });
             }
         }
+
+        [HttpPost("dummy")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> CreateDummyItems([FromQuery] int count = 10)
+        {
+            try
+            {
+                if (count <= 0)
+                {
+                    return BadRequest(new { Message = "생성할 수량은 1개 이상이어야 합니다." });
+                }
+
+                await _itemService.GenerateDummyItemsAsync(count);
+                return Ok(new { Message = $"성공적으로 {count}개의 품목 테스트 데이터가 생성되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"품목 테스트 데이터 생성 중 오류 발생: {ex.Message}" });
+            }
+        }
     }
 }

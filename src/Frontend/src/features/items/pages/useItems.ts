@@ -96,6 +96,22 @@ export const useItems = () => {
     }
   };
 
+  const generateDummyItems = async (count: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await apiClient.post(`/api/Item/dummy?count=${count}`);
+      await fetchItems();
+      return true;
+    } catch (err: any) {
+      console.error('더미 품목 생성 실패:', err);
+      setError(err.response?.data?.message || '더미 품목을 생성하는 중 오류가 발생했습니다.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
@@ -107,6 +123,7 @@ export const useItems = () => {
     fetchItems,
     createItem,
     updateItem,
-    deleteItem
+    deleteItem,
+    generateDummyItems
   };
 };
