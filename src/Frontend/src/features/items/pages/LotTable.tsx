@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, Loader2, Edit, Trash2 } from 'lucide-react';
+import React from 'react';
+import { Loader2, Edit, Trash2 } from 'lucide-react';
 import type { LotDto } from '../../../api/generated-api';
 
 interface LotTableProps {
@@ -11,8 +11,6 @@ interface LotTableProps {
 }
 
 const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateModal, onDelete }) => {
-  const [searchTerm, setSearchTerm] = useState('');
-
   // 날짜 포맷팅 함수 (YYYY-MM-DD HH:mm:ss)
   const formatDate = (dateString?: string) => {
     if (!dateString) return '-';
@@ -32,14 +30,6 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
     }
   };
 
-  // 검색어 필터링
-  const filteredLots = lots.filter(lot => {
-    const searchLower = searchTerm.toLowerCase();
-    const lotNoMatch = lot.lotNo?.toLowerCase().includes(searchLower) ?? false;
-    const itemNameMatch = lot.itemName?.toLowerCase().includes(searchLower) ?? false;
-    return lotNoMatch || itemNameMatch;
-  });
-
   return (
     <div className="premium-card" style={{ padding: '1.5rem' }}>
       {error && (
@@ -48,27 +38,7 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
-        <div style={{ flex: 1, position: 'relative' }}>
-          <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-          <input
-            type="text"
-            placeholder="자재명 또는 LOT 번호로 검색..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: '100%',
-              padding: '0.8rem 1rem 0.8rem 2.5rem',
-              background: 'rgba(0,0,0,0.2)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '10px',
-              color: 'white'
-            }}
-          />
-        </div>
-      </div>
-
-      <div style={{ overflowX: 'auto' }}>
+      <div style={{ overflowX: 'auto', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
         {loading ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 className="animate-spin" style={{ margin: '0 auto 1rem' }} size={32} />
@@ -77,7 +47,14 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+              <tr style={{
+                borderBottom: '1px solid var(--border-color)',
+                color: 'var(--text-secondary)',
+                position: 'sticky',
+                top: 0,
+                background: '#151720',
+                zIndex: 1
+              }}>
                 <th style={{ padding: '1rem' }}>LOT ID</th>
                 <th style={{ padding: '1rem' }}>자재 ID</th>
                 <th style={{ padding: '1rem' }}>자재명</th>
@@ -89,8 +66,8 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
               </tr>
             </thead>
             <tbody>
-              {filteredLots.length > 0 ? (
-                filteredLots.map((lot) => (
+              {lots.length > 0 ? (
+                lots.map((lot) => (
                   <tr key={lot.lotID} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }} className="table-row">
                     <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-primary)' }}>{lot.lotID}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{lot.itemID}</td>
@@ -153,7 +130,7 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
               ) : (
                 <tr>
                   <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                    {searchTerm ? '검색 결과에 맞는 LOT 정보가 없습니다.' : '등록된 LOT 정보가 없습니다.'}
+                    등록된 LOT 정보가 없습니다.
                   </td>
                 </tr>
               )}

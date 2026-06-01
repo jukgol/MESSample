@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../../api/client';
 
 export interface Item {
@@ -10,16 +10,26 @@ export interface Item {
   unit: string;
 }
 
+export interface ItemCreateDto {
+  itemName: string;
+  itemType: string;
+  unit: string;
+  description: string;
+}
+
+export interface ItemUpdateDto {
+  itemName: string;
+  itemType: string;
+  unit: string;
+  description: string;
+}
+
 export const useItems = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchItems();
-  }, []);
-
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -30,7 +40,7 @@ export const useItems = () => {
       if (Array.isArray(response.data)) {
         // 백엔드의 camelCase 필드명을 프론트엔드 형식으로 매핑
         const mappedItems = response.data.map((item: any) => ({
-          id: item.itemId,
+          id: item.itemID || item.itemId,
           name: item.itemName,
           spec: item.description || '-',
           category: item.itemType || 'N/A',
@@ -45,12 +55,58 @@ export const useItems = () => {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  const createItem = async (dto: ItemCreateDto) => {
+    try {
+      setError(null);
+      await apiClient.post('/api/Item', dto);
+      await fetchItems();
+      return true;
+    } catch (err: any) {
+      console.error('품목 등록 실패:', err);
+      setError(err.response?.data?.message || '품목을 등록하는 중 오류가 발생했습니다.');
+      return false;
+    }
   };
+
+  const updateItem = async (id: number | string, dto: ItemUpdateDto) => {
+    try {
+      setError(null);
+      await apiClient.put(`/api/Item/${id}`, dto);
+      await fetchItems();
+      return true;
+    } catch (err: any) {
+      console.error('품목 수정 실패:', err);
+      setError(err.response?.data?.message || '품목 정보를 수정하는 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
+  const deleteItem = async (id: number | string) => {
+    try {
+      setError(null);
+      await apiClient.delete(`/api/Item/${id}`);
+      await fetchItems();
+      return true;
+    } catch (err: any) {
+      console.error('품목 삭제 실패:', err);
+      setError(err.response?.data?.message || '품목을 삭제하는 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
 
   return {
     items,
     loading,
     error,
-    fetchItems
+    fetchItems,
+    createItem,
+    updateItem,
+    deleteItem
   };
 };

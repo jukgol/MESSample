@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLots } from './useLots';
 import { useItems } from './useItems';
 import LotHeader from './LotHeader';
 import LotTable from './LotTable';
+import { Search, Loader2, Database, RotateCw, Plus } from 'lucide-react';
 import type { LotDto } from '../../../api/generated-api';
 
 const LotList: React.FC = () => {
   const { lots, loading: lotsLoading, error: lotsError, fetchLots, createLot, updateLot, deleteLot, generateDummyLots } = useLots();
   const { items, fetchItems } = useItems();
+
+  // 검색어 상태
+  const [searchTerm, setSearchTerm] = useState('');
 
   // 모달 제어 상태
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -32,6 +36,16 @@ const LotList: React.FC = () => {
   useEffect(() => {
     fetchItems();
   }, []);
+
+  // 검색어 필터링
+  const filteredLots = useMemo(() => {
+    return lots.filter(lot => {
+      const searchLower = searchTerm.toLowerCase();
+      const lotNoMatch = lot.lotNo?.toLowerCase().includes(searchLower) ?? false;
+      const itemNameMatch = lot.itemName?.toLowerCase().includes(searchLower) ?? false;
+      return lotNoMatch || itemNameMatch;
+    });
+  }, [lots, searchTerm]);
 
   // 등록 모달 열기 핸들러
   const handleOpenCreate = () => {
@@ -102,20 +116,60 @@ const LotList: React.FC = () => {
 
   return (
     <div style={{ padding: '1rem' }}>
-      <LotHeader
-        loading={lotsLoading}
-        onRefresh={fetchLots}
-        onOpenCreateModal={handleOpenCreate}
-        onGenerateDummy={async (count) => {
-          const success = await generateDummyLots(count);
-          if (success) {
-            alert(`${count}개의 테스트 데이터가 성공적으로 생성되었습니다.`);
-          }
-        }}
-      />
+      <LotHeader />
 
+      {/* 1. 버튼 컨테이너 (하나의 컨테이너로 묶고 검색창 위로, 왼쪽 정렬) */}
+      <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', marginBottom: '1rem' }}>
+        <button
+          onClick={async () => {
+            const success = await generateDummyLots(10);
+            if (success) {
+              alert('10개의 테스트 데이터가 성공적으로 생성되었습니다.');
+            }
+          }}
+          disabled={lotsLoading}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(99, 102, 241, 0.15)', border: '1px solid rgba(99, 102, 241, 0.3)', color: '#818cf8', boxShadow: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px' }}
+        >
+          {lotsLoading ? <Loader2 className="animate-spin" size={16} /> : <Database size={16} />} 테스트 데이터 10개 생성
+        </button>
+        <button
+          onClick={fetchLots}
+          disabled={lotsLoading}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-color)', color: 'white', boxShadow: 'none', padding: '0.6rem 1.2rem', borderRadius: '8px' }}
+        >
+          {lotsLoading ? <Loader2 className="animate-spin" size={16} /> : <RotateCw size={16} />} 새로고침
+        </button>
+        <button
+          onClick={handleOpenCreate}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.2rem', borderRadius: '8px' }}
+        >
+          <Plus size={16} /> LOT 신규 등록
+        </button>
+      </div>
+
+      {/* 2. 검색창 (버튼 아래에 위치, 스크롤 컨테이너 바깥) */}
+      <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
+        <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+        <input
+          type="text"
+          placeholder="자재명 또는 LOT 번호로 검색..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '0.8rem 1rem 0.8rem 2.5rem',
+            background: 'rgba(0,0,0,0.2)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '10px',
+            color: 'white',
+            outline: 'none'
+          }}
+        />
+      </div>
+
+      {/* 3. 테이블 컴포넌트 */}
       <LotTable
-        lots={lots}
+        lots={filteredLots}
         loading={lotsLoading}
         error={lotsError}
         onOpenUpdateModal={handleOpenUpdate}
