@@ -9,5 +9,6 @@ namespace WAS.Services.App
         Task CreateProcessStepAsync(ProcessStepCreateDto dto);
         Task UpdateProcessStepAsync(int id, ProcessStepUpdateDto dto);
         Task DeleteProcessStepAsync(int id);
+        Task LoadScenarioStepsAsync();
     }
 }

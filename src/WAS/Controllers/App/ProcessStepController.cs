@@ -126,5 +126,21 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"공정 단계 삭제 중 오류 발생: {ex.Message}" });
             }
         }
+
+        [HttpPost("dummy")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> CreateDummySteps()
+        {
+            try
+            {
+                await _processStepService.LoadScenarioStepsAsync();
+                return Ok(new { Message = "성공적으로 시나리오 공정 데이터가 로드되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"공정 데이터 생성 중 오류 발생: {ex.Message}" });
+            }
+        }
     }
 }
