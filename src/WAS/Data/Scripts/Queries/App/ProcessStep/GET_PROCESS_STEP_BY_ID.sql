@@ -3,6 +3,7 @@ SELECT step_id,
        seq_no,
        step_type,
        description,
+       bom_id,
        created_at
 FROM PROCESS_STEP
 WHERE step_id = :StepId

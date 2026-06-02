@@ -1,0 +1,3 @@
+UPDATE BOM
+SET BOM_QTY = :BomQty
+WHERE BOM_ID = :BomId

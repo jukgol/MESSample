@@ -1,0 +1,2 @@
+INSERT INTO BOM (PARENT_ITEM_ID, CHILD_ITEM_ID, BOM_QTY)
+VALUES (:ParentItemId, :ChildItemId, :BomQty)

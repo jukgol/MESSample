@@ -32,7 +32,8 @@ namespace WAS.Services.App
                 StepName = dto.StepName,
                 SeqNo = dto.SeqNo,
                 StepType = dto.StepType,
-                Description = dto.Description
+                Description = dto.Description,
+                BomId = dto.BomID
             });
         }
 
@@ -44,7 +45,8 @@ namespace WAS.Services.App
                 StepName = dto.StepName,
                 SeqNo = dto.SeqNo,
                 StepType = dto.StepType,
-                Description = dto.Description
+                Description = dto.Description,
+                BomId = dto.BomID
             });
         }
 

@@ -44,6 +44,9 @@ namespace WAS.Extensions
             services.AddScoped<ProcessStepService>();
             services.AddScoped<IProcessStepService>(sp => LoggingProxy<IProcessStepService>.Create(sp.GetRequiredService<ProcessStepService>(), sp.GetRequiredService<ILogger<ProcessStepService>>()));
 
+            services.AddScoped<BomService>();
+            services.AddScoped<IBomService>(sp => LoggingProxy<IBomService>.Create(sp.GetRequiredService<BomService>(), sp.GetRequiredService<ILogger<BomService>>()));
+
             services.AddScoped<ProcedureRegistration>();
 
             return services;
