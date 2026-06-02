@@ -1,0 +1,26 @@
+[
+  {
+    "step_name": "반죽 공정",
+    "seq_no": 10,
+    "step_type": "생산",
+    "description": "밀가루에 정제수를 섞어 반죽을 만드는 단계"
+  },
+  {
+    "step_name": "제면 공정",
+    "seq_no": 20,
+    "step_type": "생산",
+    "description": "반죽을 밀어 면발 형태로 뽑아내고 찌는 단계"
+  },
+  {
+    "step_name": "유탕 공정",
+    "seq_no": 30,
+    "step_type": "생산",
+    "description": "150도 기름에 면발을 튀겨 건조하는 단계"
+  },
+  {
+    "step_name": "포장 공정",
+    "seq_no": 40,
+    "step_type": "포장 / 검사",
+    "description": "면발, 스프들을 한데 모아 비닐포장 및 중량 검사하는 단계"
+  }
+]
