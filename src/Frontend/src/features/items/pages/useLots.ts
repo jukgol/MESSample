@@ -1,6 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
-import { api } from '../../../api/client';
-import type { LotDto, LotCreateDto, LotUpdateDto } from '../../../api/generated-api';
+import apiClient from '../../../api/client';
+
+export interface LotDto {
+  lotID: number;
+  itemID: number;
+  itemName: string;
+  lotNo: string;
+  qty: number;
+  receivedAt: string;
+  status: string;
+}
+
+export interface LotCreateDto {
+  itemID: number;
+  lotNo: string;
+  qty: number;
+  status: string;
+}
+
+export interface LotUpdateDto {
+  qty: number;
+  status: string;
+}
 
 export const useLots = () => {
   const [lots, setLots] = useState<LotDto[]>([]);
@@ -11,9 +32,18 @@ export const useLots = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.api.getApi();
+      const response = await apiClient.get('/api/Lot');
       if (Array.isArray(response.data)) {
-        setLots(response.data);
+        const mappedLots = response.data.map((lot: any) => ({
+          lotID: lot.lotID || lot.lotId,
+          itemID: lot.itemID || lot.itemId,
+          itemName: lot.itemName,
+          lotNo: lot.lotNo,
+          qty: lot.qty,
+          receivedAt: lot.receivedAt,
+          status: lot.status
+        }));
+        setLots(mappedLots);
       }
     } catch (err: any) {
       console.error('LOT 목록 조회 실패:', err);
@@ -26,7 +56,12 @@ export const useLots = () => {
   const createLot = async (dto: LotCreateDto) => {
     try {
       setError(null);
-      await api.api.postApi(dto);
+      await apiClient.post('/api/Lot', {
+        itemID: dto.itemID,
+        lotNo: dto.lotNo,
+        qty: dto.qty,
+        status: dto.status
+      });
       await fetchLots();
       return true;
     } catch (err: any) {
@@ -39,7 +74,10 @@ export const useLots = () => {
   const updateLot = async (id: number, dto: LotUpdateDto) => {
     try {
       setError(null);
-      await api.api.putApi(id, dto);
+      await apiClient.put(`/api/Lot/${id}`, {
+        qty: dto.qty,
+        status: dto.status
+      });
       await fetchLots();
       return true;
     } catch (err: any) {
@@ -52,7 +90,7 @@ export const useLots = () => {
   const deleteLot = async (id: number) => {
     try {
       setError(null);
-      await api.api.deleteApi(id);
+      await apiClient.delete(`/api/Lot/${id}`);
       await fetchLots();
       return true;
     } catch (err: any) {
@@ -66,7 +104,7 @@ export const useLots = () => {
     try {
       setLoading(true);
       setError(null);
-      await api.api.lotDummyCreate({ count });
+      await apiClient.post(`/api/Lot/dummy?count=${count}`);
       await fetchLots();
       return true;
     } catch (err: any) {

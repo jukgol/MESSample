@@ -38,6 +38,7 @@ const Sidebar = () => {
       children: [
         { title: '품목 리스트', path: '/dashboard/items/list', icon: <Database size={16} />, allowedRoles: ['ADMIN'] },
         { title: 'LOT 관리', path: '/dashboard/items/lot', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN'] },
+        { title: 'BOM 레시피 관리', path: '/dashboard/items/bom', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
         { title: '출하 관리', path: '/dashboard/items/shipment', icon: <Truck size={16} />, allowedRoles: ['ADMIN'] },
       ]
     },

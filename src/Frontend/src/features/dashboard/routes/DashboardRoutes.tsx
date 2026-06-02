@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../../../layouts/Layout';
 import ItemList from '../../items/pages/ItemList';
 import LotList from '../../items/pages/LotList';
+import BomManagePage from '../../items/pages/BomManagePage';
+import ProcessStepList from '../../process/pages/ProcessStepList';
 import DashboardHome from '../pages/DashboardHome';
 import { useAuthStore } from '../../../store/useAuthStore';
 
@@ -33,6 +35,7 @@ const DashboardRoutes = () => {
             <Route path="/items" element={<Navigate to="/items/list" replace />} />
             <Route path="/items/list" element={<ItemList />} />
             <Route path="/items/lot" element={<LotList />} />
+            <Route path="/items/bom" element={<BomManagePage />} />
             <Route path="/items/shipment" element={<Placeholder title="출하 관리" />} />
           </>
         )}
@@ -40,7 +43,7 @@ const DashboardRoutes = () => {
         {/* 공정 관리 - ADMIN, OPERATOR */}
         {hasAccess(['ADMIN', 'OPERATOR']) && (
           <>
-            <Route path="/process/steps" element={<Placeholder title="공정 단계 정의" />} />
+            <Route path="/process/steps" element={<ProcessStepList />} />
             <Route path="/process/workorder" element={<Placeholder title="작업 지시 (WO)" />} />
           </>
         )}

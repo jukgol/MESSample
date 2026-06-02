@@ -15,6 +15,33 @@ export interface ActionResponse {
   executedSql?: string | null;
 }
 
+export interface BomCreateDto {
+  /** @format int32 */
+  parentItemID?: number;
+  /** @format int32 */
+  childItemID?: number;
+  /** @format int32 */
+  bomQty?: number;
+}
+
+export interface BomDto {
+  /** @format int32 */
+  bomID?: number;
+  /** @format int32 */
+  parentItemID?: number;
+  parentItemName?: string | null;
+  /** @format int32 */
+  childItemID?: number;
+  childItemName?: string | null;
+  /** @format int32 */
+  bomQty?: number;
+}
+
+export interface BomUpdateDto {
+  /** @format int32 */
+  bomQty?: number;
+}
+
 export interface ColumnMetadata {
   name?: string | null;
   dataType?: string | null;
@@ -125,6 +152,40 @@ export interface ProblemDetails {
   [key: string]: any;
 }
 
+export interface ProcessStepCreateDto {
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  stepType?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  bomID?: number | null;
+}
+
+export interface ProcessStepDto {
+  /** @format int32 */
+  stepID?: number;
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  stepType?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  bomID?: number | null;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface ProcessStepUpdateDto {
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  stepType?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  bomID?: number | null;
+}
+
 export interface RoleDto {
   roleCode?: string | null;
   roleName?: string | null;
@@ -155,6 +216,7 @@ export interface UserListDto {
   password?: string | null;
   userName?: string | null;
   roleName?: string | null;
+  roleCode?: string | null;
   isActive?: string | null;
 }
 
@@ -365,6 +427,67 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
+     * @tags Bom
+     * @name BomParentDetail
+     * @request GET:/api/bom/parent/{parentId}
+     */
+    bomParentDetail: (parentId: number, params: RequestParams = {}) =>
+      this.http.request<BomDto[], ProblemDetails>({
+        path: `/api/bom/parent/${parentId}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bom
+     * @name PostApi
+     * @request POST:/api/bom
+     */
+    postApi: (data: BomCreateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/bom`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bom
+     * @name PutApi
+     * @request PUT:/api/bom/{id}
+     */
+    putApi: (id: number, data: BomUpdateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/bom/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Bom
+     * @name DeleteApi
+     * @request DELETE:/api/bom/{id}
+     */
+    deleteApi: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/bom/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Item
      * @name ItemList
      * @request GET:/api/Item
@@ -426,6 +549,30 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
+     * @tags Item
+     * @name ItemDummyCreate
+     * @request POST:/api/Item/dummy
+     */
+    itemDummyCreate: (
+      query?: {
+        /**
+         * @format int32
+         * @default 10
+         */
+        count?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Item/dummy`,
+        method: "POST",
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Lot
      * @name GetApi
      * @request GET:/api/Lot
@@ -442,10 +589,12 @@ export class Api<SecurityDataType extends unknown> {
      * No description
      *
      * @tags Lot
-     * @name PostApi
+     * @name PostApi2
      * @request POST:/api/Lot
+     * @originalName postApi
+     * @duplicate
      */
-    postApi: (data: LotCreateDto, params: RequestParams = {}) =>
+    postApi2: (data: LotCreateDto, params: RequestParams = {}) =>
       this.http.request<void, ProblemDetails>({
         path: `/api/Lot`,
         method: "POST",
@@ -458,10 +607,12 @@ export class Api<SecurityDataType extends unknown> {
      * No description
      *
      * @tags Lot
-     * @name PutApi
+     * @name PutApi2
      * @request PUT:/api/Lot/{id}
+     * @originalName putApi
+     * @duplicate
      */
-    putApi: (id: number, data: LotUpdateDto, params: RequestParams = {}) =>
+    putApi2: (id: number, data: LotUpdateDto, params: RequestParams = {}) =>
       this.http.request<void, ProblemDetails>({
         path: `/api/Lot/${id}`,
         method: "PUT",
@@ -474,10 +625,12 @@ export class Api<SecurityDataType extends unknown> {
      * No description
      *
      * @tags Lot
-     * @name DeleteApi
+     * @name DeleteApi2
      * @request DELETE:/api/Lot/{id}
+     * @originalName deleteApi
+     * @duplicate
      */
-    deleteApi: (id: number, params: RequestParams = {}) =>
+    deleteApi2: (id: number, params: RequestParams = {}) =>
       this.http.request<void, ProblemDetails>({
         path: `/api/Lot/${id}`,
         method: "DELETE",
@@ -550,6 +703,89 @@ export class Api<SecurityDataType extends unknown> {
         path: `/api/admin/Navigator/current-user`,
         method: "GET",
         format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ProcessStep
+     * @name ProcessStepList
+     * @request GET:/api/process-step
+     */
+    processStepList: (params: RequestParams = {}) =>
+      this.http.request<ProcessStepDto[], ProblemDetails>({
+        path: `/api/process-step`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ProcessStep
+     * @name ProcessStepCreate
+     * @request POST:/api/process-step
+     */
+    processStepCreate: (
+      data: ProcessStepCreateDto,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/process-step`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ProcessStep
+     * @name ProcessStepDetail
+     * @request GET:/api/process-step/{id}
+     */
+    processStepDetail: (id: number, params: RequestParams = {}) =>
+      this.http.request<ProcessStepDto, ProblemDetails>({
+        path: `/api/process-step/${id}`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ProcessStep
+     * @name ProcessStepUpdate
+     * @request PUT:/api/process-step/{id}
+     */
+    processStepUpdate: (
+      id: number,
+      data: ProcessStepUpdateDto,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/process-step/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ProcessStep
+     * @name ProcessStepDelete
+     * @request DELETE:/api/process-step/{id}
+     */
+    processStepDelete: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/process-step/${id}`,
+        method: "DELETE",
         ...params,
       }),
 
