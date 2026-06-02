@@ -5,6 +5,7 @@ namespace Shared.Models.App
     public class ItemDto
     {
         public int ItemID { get; set; }
+        public string ItemCode { get; set; } = string.Empty;
         public string ItemName { get; set; } = string.Empty;
         public string ItemType { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
@@ -14,6 +15,7 @@ namespace Shared.Models.App
 
     public class ItemCreateDto
     {
+        public string ItemCode { get; set; } = string.Empty;
         public string ItemName { get; set; } = string.Empty;
         public string ItemType { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;
@@ -22,6 +24,7 @@ namespace Shared.Models.App
 
     public class ItemUpdateDto
     {
+        public string ItemCode { get; set; } = string.Empty;
         public string ItemName { get; set; } = string.Empty;
         public string ItemType { get; set; } = string.Empty;
         public string Unit { get; set; } = string.Empty;

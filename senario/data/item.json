@@ -1,0 +1,79 @@
+[
+  {
+    "item_code": "101",
+    "item_name": "밀가루",
+    "item_type": "RawMaterial",
+    "unit": "kg",
+    "description": "공통 반죽용 밀가루 원재료"
+  },
+  {
+    "item_code": "201",
+    "item_name": "신라면 분말스프",
+    "item_type": "RawMaterial",
+    "unit": "ea",
+    "description": "신라면용 국물 조미 스프"
+  },
+  {
+    "item_code": "202",
+    "item_name": "진라면 분말스프",
+    "item_type": "RawMaterial",
+    "unit": "ea",
+    "description": "진라면용 국물 조미 스프"
+  },
+  {
+    "item_code": "203",
+    "item_name": "신라면 건더기스프",
+    "item_type": "RawMaterial",
+    "unit": "ea",
+    "description": "신라면용 야채/고기 스프"
+  },
+  {
+    "item_code": "204",
+    "item_name": "진라면 건더기스프",
+    "item_type": "RawMaterial",
+    "unit": "ea",
+    "description": "진라면용 야채/고기 스프"
+  },
+  {
+    "item_code": "301",
+    "item_name": "신라면 포장비닐",
+    "item_type": "RawMaterial",
+    "unit": "ea",
+    "description": "신라면 완제품 밀봉용 포장 부자재"
+  },
+  {
+    "item_code": "302",
+    "item_name": "진라면 포장비닐",
+    "item_type": "RawMaterial",
+    "unit": "ea",
+    "description": "진라면 완제품 밀봉용 포장 부자재"
+  },
+  {
+    "item_code": "401",
+    "item_name": "신라면 면발",
+    "item_type": "Component",
+    "unit": "ea",
+    "description": "신라면 전용 건조/유탕 면 사리"
+  },
+  {
+    "item_code": "402",
+    "item_name": "진라면 면발",
+    "item_type": "Component",
+    "unit": "ea",
+    "description": "진라면 전용 건조/유탕 면 사리"
+  },
+  {
+    "item_code": "501",
+    "item_name": "신라면 (완제품)",
+    "item_type": "Product",
+    "unit": "ea",
+    "description": "출하 가능한 신라면 최종 완제품"
+  },
+  {
+    "item_code": "502",
+    "item_name": "진라면 (완제품)",
+    "item_type": "Product",
+    "unit": "ea",
+    "description": "출하 가능한 진라면 최종 완제품"
+  }
+]

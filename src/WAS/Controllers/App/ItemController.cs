@@ -105,19 +105,13 @@ namespace WAS.Controllers.App
 
         [HttpPost("dummy")]
         [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult> CreateDummyItems([FromQuery] int count = 10)
+        public async Task<ActionResult> CreateDummyItems()
         {
             try
             {
-                if (count <= 0)
-                {
-                    return BadRequest(new { Message = "생성할 수량은 1개 이상이어야 합니다." });
-                }
-
-                await _itemService.GenerateDummyItemsAsync(count);
-                return Ok(new { Message = $"성공적으로 {count}개의 품목 테스트 데이터가 생성되었습니다." });
+                await _itemService.LoadScenarioItemsAsync();
+                return Ok(new { Message = "성공적으로 시나리오 품목 데이터가 로드되었습니다." });
             }
             catch (Exception ex)
             {

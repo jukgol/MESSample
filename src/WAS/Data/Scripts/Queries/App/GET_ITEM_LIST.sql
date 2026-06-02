@@ -1,4 +1,5 @@
 SELECT ITEM_ID, 
+       ITEM_CODE,
        ITEM_NAME, 
        CATEGORY AS ItemType, 
        UNIT,

@@ -1,0 +1,6 @@
+-- 0014: ITEM 테이블의 item_id 생성 방식을 ALWAYS로 변경
+
+ALTER TABLE ITEM MODIFY (
+    item_id NUMBER GENERATED ALWAYS AS IDENTITY
+);
+/

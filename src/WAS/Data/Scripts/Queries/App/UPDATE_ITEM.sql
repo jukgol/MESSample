@@ -1,5 +1,6 @@
 UPDATE ITEM
-SET ITEM_NAME = :ItemName,
+SET ITEM_CODE = :ItemCode,
+    ITEM_NAME = :ItemName,
     CATEGORY = :ItemType,
     UNIT = :Unit,
     DESCRIPTION = :Description
