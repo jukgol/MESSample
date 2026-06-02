@@ -1,4 +1,4 @@
-# Step 6: 품질 검사 (QC) 및 출하 (step6_qc_shipment.md)
+# Step 5: 품질 검사 (QC) 및 출하 (step5_qc_shipment.md)
 
 생산 완료된 **완제품(Finished Product) Lot**의 최종 품질 합격 여부를 판정하고, 합격된 완제품에 한해서만 창고 밖으로 출하(Shipment)시키는 최종 검증 단계입니다.
 

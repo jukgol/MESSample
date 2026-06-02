@@ -1,0 +1,2 @@
+DELETE FROM PROCESS_STEP
+WHERE step_id = :StepId
