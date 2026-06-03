@@ -10,5 +10,6 @@ namespace WAS.Services.App
         Task CreateBomAsync(BomCreateDto dto);
         Task UpdateBomAsync(int id, BomUpdateDto dto);
         Task DeleteBomAsync(int id);
+        Task LoadScenarioBomsAsync();
     }
 }

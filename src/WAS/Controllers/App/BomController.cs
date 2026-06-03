@@ -105,5 +105,21 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"BOM 삭제 중 오류 발생: {ex.Message}" });
             }
         }
+
+        [HttpPost("dummy")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> CreateDummyBoms()
+        {
+            try
+            {
+                await _bomService.LoadScenarioBomsAsync();
+                return Ok(new { Message = "성공적으로 시나리오 BOM 데이터가 로드되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"BOM 시나리오 데이터 로드 중 오류 발생: {ex.Message}" });
+            }
+        }
     }
 }

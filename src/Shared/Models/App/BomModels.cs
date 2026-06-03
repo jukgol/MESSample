@@ -23,4 +23,11 @@ namespace Shared.Models.App
     {
         public int BomQty { get; set; }
     }
+
+    public class BomScenarioDto
+    {
+        public string ParentItemCode { get; set; } = string.Empty;
+        public string ChildItemCode { get; set; } = string.Empty;
+        public int BomQty { get; set; }
+    }
 }
