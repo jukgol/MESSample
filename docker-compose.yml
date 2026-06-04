@@ -2,6 +2,7 @@ services:
   oracle-db:
     image: container-registry.oracle.com/database/free:latest
     container_name: oracle-db
+    hostname: oracle-db
     ports:
       - "1521:1521"
       - "5500:5500"
