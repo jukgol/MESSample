@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { useItems } from './useItems';
-import { useBoms } from './useBoms';
-import type { Bom } from './useBoms';
-import BomParentList from './BomParentList';
-import BomDetailTable from './BomDetailTable';
+import { useItems } from '../../item/hooks/useItems';
+import { useBoms } from '../hooks/useBoms';
+import type { Bom } from '../hooks/useBoms';
+import BomParentList from '../components/BomParentList';
+import BomDetailTable from '../components/BomDetailTable';
 import { Settings, Info } from 'lucide-react';
 
 const BomManagePage: React.FC = () => {

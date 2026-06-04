@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loader2, Edit, Trash2 } from 'lucide-react';
-import type { LotDto } from '../../../api/generated-api';
+import type { LotDto } from '../../../../api/generated-api';
 
 interface LotTableProps {
   lots: LotDto[];

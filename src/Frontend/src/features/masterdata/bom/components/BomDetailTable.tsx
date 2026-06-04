@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loader2, Edit, Trash2, Plus, Info } from 'lucide-react';
-import type { Bom } from './useBoms';
-import type { Item } from './useItems';
+import type { Bom } from '../hooks/useBoms';
+import type { Item } from '../../item/hooks/useItems';
 
 interface BomDetailTableProps {
   selectedItem: Item | null;

@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../../../layouts/Layout';
-import ItemList from '../../items/pages/ItemList';
-import LotList from '../../items/pages/LotList';
-import BomManagePage from '../../items/pages/BomManagePage';
+import ItemList from '../../masterdata/item/pages/ItemList';
+import BomManagePage from '../../masterdata/bom/pages/BomManagePage';
+import LotList from '../../inventory/lot/pages/LotList';
 import ProcessStepList from '../../process/pages/ProcessStepList';
 import DashboardHome from '../pages/DashboardHome';
 import { useAuthStore } from '../../../store/useAuthStore';
@@ -29,14 +29,16 @@ const DashboardRoutes = () => {
         {/* Dashboard / Root */}
         <Route path="/" element={<DashboardHome />} />
 
-        {/* 물품 관리 - ADMIN만 */}
+        {/* 기준 정보 & 재고 관리 - ADMIN만 */}
         {hasAccess(['ADMIN']) && (
           <>
-            <Route path="/items" element={<Navigate to="/items/list" replace />} />
-            <Route path="/items/list" element={<ItemList />} />
-            <Route path="/items/lot" element={<LotList />} />
-            <Route path="/items/bom" element={<BomManagePage />} />
-            <Route path="/items/shipment" element={<Placeholder title="출하 관리" />} />
+            <Route path="/masterdata" element={<Navigate to="/masterdata/items" replace />} />
+            <Route path="/masterdata/items" element={<ItemList />} />
+            <Route path="/masterdata/boms" element={<BomManagePage />} />
+
+            <Route path="/inventory" element={<Navigate to="/inventory/lots" replace />} />
+            <Route path="/inventory/lots" element={<LotList />} />
+            <Route path="/inventory/shipments" element={<Placeholder title="출하 관리" />} />
           </>
         )}
 
