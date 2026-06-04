@@ -74,9 +74,6 @@ const BomManagePage: React.FC = () => {
       bomQty: dto.bomQty
     });
 
-    if (success) {
-      alert('BOM 레시피 항목이 성공적으로 등록되었습니다.');
-    }
     return success;
   };
 
@@ -88,9 +85,6 @@ const BomManagePage: React.FC = () => {
       bomQty: dto.bomQty
     });
 
-    if (success) {
-      alert('소요량이 성공적으로 수정되었습니다.');
-    }
     return success;
   };
 
@@ -99,9 +93,6 @@ const BomManagePage: React.FC = () => {
     if (!selectedParentId || selectedBomIdForDelete === null) return false;
 
     const success = await deleteBom(selectedBomIdForDelete, selectedParentId);
-    if (success) {
-      alert('BOM 레시피 항목이 해제되었습니다.');
-    }
     return success;
   };
 

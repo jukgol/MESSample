@@ -42,41 +42,28 @@ const LotList: React.FC = () => {
   // 등록 처리 핸들러
   const handleCreateSubmit = async (dto: { itemID: number; lotNo: string; qty: number; status: string }) => {
     const success = await createLot(dto);
-    if (success) {
-      alert('LOT이 성공적으로 등록되었습니다.');
-    }
     return success;
   };
 
   // 수정 처리 핸들러
   const handleUpdateSubmit = async (id: number, dto: { qty: number; status: string }) => {
     const success = await updateLot(id, dto);
-    if (success) {
-      alert('LOT 정보가 성공적으로 수정되었습니다.');
-    }
     return success;
   };
 
   // 삭제 처리 핸들러
   const handleDeleteConfirm = async (id: number) => {
     const success = await deleteLot(id);
-    if (success) {
-      alert('LOT이 삭제되었습니다.');
-    }
     return success;
   };
 
   // 전체 삭제 핸들러
   const handleDeleteAll = async () => {
     if (lots.length === 0) {
-      alert('삭제할 LOT이 없습니다.');
       return;
     }
     if (window.confirm(`정말로 모든 LOT(${lots.length}개)을 삭제하시겠습니까?\n이 작업은 프런트엔드에서 순차적으로 삭제 처리를 진행합니다.`)) {
-      const success = await deleteAllLots(lots);
-      if (success) {
-        alert('모든 LOT이 성공적으로 삭제되었습니다.');
-      }
+      await deleteAllLots(lots);
     }
   };
 
@@ -87,10 +74,7 @@ const LotList: React.FC = () => {
       {/* 1. 액션 버튼 그룹 */}
       <LotActionBar
         onGenerateDummy={async () => {
-          const success = await generateDummyLots(10);
-          if (success) {
-            alert('10개의 테스트 데이터가 성공적으로 생성되었습니다.');
-          }
+          await generateDummyLots(10);
         }}
         onRefresh={fetchLots}
         onOpenCreate={() => setIsCreateOpen(true)}

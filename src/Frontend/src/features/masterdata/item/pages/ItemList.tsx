@@ -36,27 +36,18 @@ const ItemList: React.FC = () => {
   // 등록 처리 핸들러
   const handleCreateSubmit = async (dto: { itemName: string; itemType: string; unit: string; description: string }) => {
     const success = await createItem(dto);
-    if (success) {
-      alert('품목이 성공적으로 등록되었습니다.');
-    }
     return success;
   };
 
   // 수정 처리 핸들러
   const handleUpdateSubmit = async (id: number | string, dto: { itemName: string; itemType: string; unit: string; description: string }) => {
     const success = await updateItem(id, dto);
-    if (success) {
-      alert('품목 정보가 성공적으로 수정되었습니다.');
-    }
     return success;
   };
 
   // 삭제 처리 핸들러
   const handleDeleteConfirm = async (id: number | string) => {
     const success = await deleteItem(id);
-    if (success) {
-      alert('품목이 삭제되었습니다.');
-    }
     return success;
   };
 
@@ -68,10 +59,7 @@ const ItemList: React.FC = () => {
       {/* 2. 버튼 액션 그룹 */}
       <ItemActionBar
         onGenerateDummy={async () => {
-          const success = await generateDummyItems(10);
-          if (success) {
-            alert('10개의 테스트 데이터가 성공적으로 생성되었습니다.');
-          }
+          await generateDummyItems(10);
         }}
         onRefresh={fetchItems}
         onOpenCreate={() => setIsCreateOpen(true)}
