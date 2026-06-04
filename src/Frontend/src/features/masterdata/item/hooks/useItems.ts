@@ -3,6 +3,7 @@ import apiClient from '../../../../api/client';
 
 export interface Item {
   id: string | number;
+  itemCode: string;
   name: string;
   spec: string;
   category: string;
@@ -11,6 +12,7 @@ export interface Item {
 }
 
 export interface ItemCreateDto {
+  itemCode: string;
   itemName: string;
   itemType: string;
   unit: string;
@@ -18,6 +20,7 @@ export interface ItemCreateDto {
 }
 
 export interface ItemUpdateDto {
+  itemCode: string;
   itemName: string;
   itemType: string;
   unit: string;
@@ -41,6 +44,7 @@ export const useItems = () => {
         // 백엔드의 camelCase 필드명을 프론트엔드 형식으로 매핑
         const mappedItems = response.data.map((item: any) => ({
           id: item.itemID || item.itemId,
+          itemCode: item.itemCode || '',
           name: item.itemName,
           spec: item.description || '-',
           category: item.itemType || 'N/A',

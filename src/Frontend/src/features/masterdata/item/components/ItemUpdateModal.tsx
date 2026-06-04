@@ -5,7 +5,7 @@ interface ItemUpdateModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedItem: Item | null;
-  onSubmit: (id: number | string, dto: { itemName: string; itemType: string; unit: string; description: string }) => Promise<boolean>;
+  onSubmit: (id: number | string, dto: { itemCode: string; itemName: string; itemType: string; unit: string; description: string }) => Promise<boolean>;
 }
 
 const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
@@ -15,6 +15,7 @@ const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
   onSubmit
 }) => {
   const [form, setForm] = useState({
+    itemCode: '',
     itemName: '',
     itemType: 'RawMaterial',
     unit: 'EA',
@@ -24,6 +25,7 @@ const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
   useEffect(() => {
     if (isOpen && selectedItem) {
       setForm({
+        itemCode: selectedItem.itemCode || '',
         itemName: selectedItem.name,
         itemType: selectedItem.category,
         unit: selectedItem.unit,
@@ -43,6 +45,7 @@ const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
     }
 
     const success = await onSubmit(selectedItem.id, {
+      itemCode: form.itemCode,
       itemName: form.itemName,
       itemType: form.itemType,
       unit: form.unit,
@@ -70,6 +73,25 @@ const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>품목 코드</label>
+            <input
+              type="text"
+              required
+              placeholder="예: ITEM_101"
+              value={form.itemCode}
+              onChange={(e) => setForm({ ...form, itemCode: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none'
+              }}
+            />
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>품목명</label>
             <input

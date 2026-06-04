@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 interface ItemCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (dto: { itemName: string; itemType: string; unit: string; description: string }) => Promise<boolean>;
+  onSubmit: (dto: { itemCode: string; itemName: string; itemType: string; unit: string; description: string }) => Promise<boolean>;
 }
 
 const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [form, setForm] = useState({
+    itemCode: '',
     itemName: '',
     itemType: 'RawMaterial',
     unit: 'EA',
@@ -17,6 +18,7 @@ const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSu
   useEffect(() => {
     if (isOpen) {
       setForm({
+        itemCode: '',
         itemName: '',
         itemType: 'RawMaterial',
         unit: 'EA',
@@ -29,11 +31,16 @@ const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSu
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.itemCode) {
+      alert('품목 코드는 필수 입력 항목입니다.');
+      return;
+    }
     if (!form.itemName) {
       alert('품목명은 필수 입력 항목입니다.');
       return;
     }
     const success = await onSubmit({
+      itemCode: form.itemCode,
       itemName: form.itemName,
       itemType: form.itemType,
       unit: form.unit,
@@ -57,6 +64,25 @@ const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSu
         <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.5rem' }}>품목 신규 등록</h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>품목 코드</label>
+            <input
+              type="text"
+              required
+              placeholder="예: ITEM_101"
+              value={form.itemCode}
+              onChange={(e) => setForm({ ...form, itemCode: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none'
+              }}
+            />
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>품목명</label>
             <input

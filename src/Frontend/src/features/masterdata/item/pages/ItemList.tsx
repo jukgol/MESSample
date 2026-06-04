@@ -28,19 +28,20 @@ const ItemList: React.FC = () => {
       const searchLower = searchTerm.toLowerCase();
       const nameMatch = item.name?.toLowerCase().includes(searchLower) ?? false;
       const idMatch = item.id?.toString().toLowerCase().includes(searchLower) ?? false;
+      const codeMatch = item.itemCode?.toLowerCase().includes(searchLower) ?? false;
       const specMatch = item.spec?.toLowerCase().includes(searchLower) ?? false;
-      return nameMatch || idMatch || specMatch;
+      return nameMatch || idMatch || codeMatch || specMatch;
     });
   }, [items, searchTerm]);
 
   // 등록 처리 핸들러
-  const handleCreateSubmit = async (dto: { itemName: string; itemType: string; unit: string; description: string }) => {
+  const handleCreateSubmit = async (dto: { itemCode: string; itemName: string; itemType: string; unit: string; description: string }) => {
     const success = await createItem(dto);
     return success;
   };
 
   // 수정 처리 핸들러
-  const handleUpdateSubmit = async (id: number | string, dto: { itemName: string; itemType: string; unit: string; description: string }) => {
+  const handleUpdateSubmit = async (id: number | string, dto: { itemCode: string; itemName: string; itemType: string; unit: string; description: string }) => {
     const success = await updateItem(id, dto);
     return success;
   };

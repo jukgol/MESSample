@@ -3,6 +3,7 @@ import { Loader2, Edit, Trash2 } from 'lucide-react';
 
 interface Item {
   id: string | number;
+  itemCode: string;
   name: string;
   spec: string;
   category: string;
@@ -43,6 +44,7 @@ const ItemTable: React.FC<ItemTableProps> = ({ items, loading, error, onOpenUpda
                     zIndex: 1
                   }}>
                     <th style={{ padding: '1rem' }}>ID</th>
+                    <th style={{ padding: '1rem' }}>품목 코드</th>
                     <th style={{ padding: '1rem' }}>품목명</th>
                     <th style={{ padding: '1rem' }}>설명(규격)</th>
                     <th style={{ padding: '1rem' }}>구분</th>
@@ -55,6 +57,7 @@ const ItemTable: React.FC<ItemTableProps> = ({ items, loading, error, onOpenUpda
                     items.map((item) => (
                       <tr key={item.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }} className="table-row">
                         <td style={{ padding: '1rem', fontWeight: '600', color: 'var(--accent-primary)' }}>{item.id}</td>
+                        <td style={{ padding: '1rem', fontWeight: '500', color: 'var(--text-primary)' }}>{item.itemCode}</td>
                         <td style={{ padding: '1rem', fontWeight: '500' }}>{item.name}</td>
                         <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{item.spec}</td>
                         <td style={{ padding: '1rem' }}>
