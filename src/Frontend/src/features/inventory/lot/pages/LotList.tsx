@@ -11,7 +11,7 @@ import LotSearchBar from '../components/LotSearchBar';
 import type { LotDto } from '../../../../api/generated-api';
 
 const LotList: React.FC = () => {
-  const { lots, loading: lotsLoading, error: lotsError, fetchLots, createLot, updateLot, deleteLot, generateDummyLots } = useLots();
+  const { lots, loading: lotsLoading, error: lotsError, fetchLots, createLot, updateLot, deleteLot, generateDummyLots, deleteAllLots } = useLots();
   const { items, fetchItems } = useItems();
 
   // 검색어 상태
@@ -66,6 +66,20 @@ const LotList: React.FC = () => {
     return success;
   };
 
+  // 전체 삭제 핸들러
+  const handleDeleteAll = async () => {
+    if (lots.length === 0) {
+      alert('삭제할 LOT이 없습니다.');
+      return;
+    }
+    if (window.confirm(`정말로 모든 LOT(${lots.length}개)을 삭제하시겠습니까?\n이 작업은 프런트엔드에서 순차적으로 삭제 처리를 진행합니다.`)) {
+      const success = await deleteAllLots(lots);
+      if (success) {
+        alert('모든 LOT이 성공적으로 삭제되었습니다.');
+      }
+    }
+  };
+
   return (
     <div style={{ padding: '1rem' }}>
       <LotHeader />
@@ -80,6 +94,7 @@ const LotList: React.FC = () => {
         }}
         onRefresh={fetchLots}
         onOpenCreate={() => setIsCreateOpen(true)}
+        onDeleteAll={handleDeleteAll}
         loading={lotsLoading}
       />
 

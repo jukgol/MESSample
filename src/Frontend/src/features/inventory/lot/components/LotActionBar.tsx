@@ -1,10 +1,11 @@
 import React from 'react';
-import { Loader2, Database, RotateCw, Plus } from 'lucide-react';
+import { Loader2, Database, RotateCw, Plus, Trash2 } from 'lucide-react';
 
 interface LotActionBarProps {
   onGenerateDummy: () => void;
   onRefresh: () => void;
   onOpenCreate: () => void;
+  onDeleteAll: () => void;
   loading: boolean;
 }
 
@@ -12,6 +13,7 @@ const LotActionBar: React.FC<LotActionBarProps> = ({
   onGenerateDummy,
   onRefresh,
   onOpenCreate,
+  onDeleteAll,
   loading
 }) => {
   return (
@@ -63,6 +65,25 @@ const LotActionBar: React.FC<LotActionBarProps> = ({
         }}
       >
         <Plus size={16} /> LOT 신규 등록
+      </button>
+
+      <button
+        onClick={onDeleteAll}
+        disabled={loading}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          background: 'rgba(239, 68, 68, 0.15)',
+          border: '1px solid rgba(239, 68, 68, 0.3)',
+          color: '#ef4444',
+          boxShadow: 'none',
+          padding: '0.6rem 1.2rem',
+          borderRadius: '8px',
+          cursor: 'pointer'
+        }}
+      >
+        <Trash2 size={16} /> 전체 삭제
       </button>
     </div>
   );

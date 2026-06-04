@@ -116,6 +116,26 @@ export const useLots = () => {
     }
   };
 
+  const deleteAllLots = async (lotsToDelete: LotDto[]) => {
+    try {
+      setLoading(true);
+      setError(null);
+      for (const lot of lotsToDelete) {
+        if (lot.lotID !== undefined) {
+          await apiClient.delete(`/api/Lot/${lot.lotID}`);
+        }
+      }
+      await fetchLots();
+      return true;
+    } catch (err: any) {
+      console.error('전체 LOT 삭제 실패:', err);
+      setError(err.response?.data?.message || 'LOT을 삭제하는 중 오류가 발생했습니다.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchLots();
   }, [fetchLots]);
@@ -128,6 +148,7 @@ export const useLots = () => {
     createLot,
     updateLot,
     deleteLot,
-    generateDummyLots
+    generateDummyLots,
+    deleteAllLots
   };
 };
