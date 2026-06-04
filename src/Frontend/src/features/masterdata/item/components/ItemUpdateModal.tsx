@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import type { Item } from '../hooks/useItems';
+import { useItemTypes } from '../../itemtype/hooks/useItemTypes';
 
 interface ItemUpdateModalProps {
   isOpen: boolean;
@@ -14,6 +15,7 @@ const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
   selectedItem,
   onSubmit
 }) => {
+  const { itemTypes } = useItemTypes();
   const [form, setForm] = useState({
     itemCode: '',
     itemName: '',
@@ -125,9 +127,16 @@ const ItemUpdateModal: React.FC<ItemUpdateModalProps> = ({
                 outline: 'none'
               }}
             >
-              <option value="RawMaterial" style={{ background: '#1e1e24' }}>원자재 (RawMaterial)</option>
-              <option value="Component" style={{ background: '#1e1e24' }}>부품 (Component)</option>
-              <option value="Product" style={{ background: '#1e1e24' }}>제품 (Product)</option>
+              {itemTypes.map((type) => (
+                <option key={type.itemTypeID} value={type.typeName} style={{ background: '#1e1e24' }}>
+                  {type.typeName}
+                </option>
+              ))}
+              {form.itemType && !itemTypes.some(t => t.typeName === form.itemType) && (
+                <option value={form.itemType} style={{ background: '#1e1e24' }}>
+                  {form.itemType}
+                </option>
+              )}
             </select>
           </div>
 

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useItemTypes } from '../../itemtype/hooks/useItemTypes';
 
 interface ItemCreateModalProps {
   isOpen: boolean;
@@ -7,10 +8,11 @@ interface ItemCreateModalProps {
 }
 
 const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSubmit }) => {
+  const { itemTypes } = useItemTypes();
   const [form, setForm] = useState({
     itemCode: '',
     itemName: '',
-    itemType: 'RawMaterial',
+    itemType: '',
     unit: 'EA',
     description: ''
   });
@@ -20,12 +22,12 @@ const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSu
       setForm({
         itemCode: '',
         itemName: '',
-        itemType: 'RawMaterial',
+        itemType: itemTypes[0]?.typeName || 'RawMaterial',
         unit: 'EA',
         description: ''
       });
     }
-  }, [isOpen]);
+  }, [isOpen, itemTypes]);
 
   if (!isOpen) return null;
 
@@ -116,9 +118,16 @@ const ItemCreateModal: React.FC<ItemCreateModalProps> = ({ isOpen, onClose, onSu
                 outline: 'none'
               }}
             >
-              <option value="RawMaterial" style={{ background: '#1e1e24' }}>원자재 (RawMaterial)</option>
-              <option value="Component" style={{ background: '#1e1e24' }}>부품 (Component)</option>
-              <option value="Product" style={{ background: '#1e1e24' }}>제품 (Product)</option>
+              {itemTypes.map((type) => (
+                <option key={type.itemTypeID} value={type.typeName} style={{ background: '#1e1e24' }}>
+                  {type.typeName}
+                </option>
+              ))}
+              {form.itemType && !itemTypes.some(t => t.typeName === form.itemType) && (
+                <option value={form.itemType} style={{ background: '#1e1e24' }}>
+                  {form.itemType}
+                </option>
+              )}
             </select>
           </div>
 

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../../../layouts/Layout';
 import ItemList from '../../masterdata/item/pages/ItemList';
+import ItemTypeList from '../../masterdata/itemtype/pages/ItemTypeList';
 import BomManagePage from '../../masterdata/bom/pages/BomManagePage';
 import LotList from '../../inventory/lot/pages/LotList';
 import ProcessStepList from '../../process/pages/ProcessStepList';
@@ -34,6 +35,7 @@ const DashboardRoutes = () => {
           <>
             <Route path="/masterdata" element={<Navigate to="/masterdata/items" replace />} />
             <Route path="/masterdata/items" element={<ItemList />} />
+            <Route path="/masterdata/itemtype" element={<ItemTypeList />} />
             <Route path="/masterdata/boms" element={<BomManagePage />} />
 
             <Route path="/inventory" element={<Navigate to="/inventory/lots" replace />} />

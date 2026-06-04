@@ -9,7 +9,8 @@ import {
   Truck,
   ClipboardList,
   ShieldCheck,
-  LogOut
+  LogOut,
+  Layers
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -37,6 +38,7 @@ const Sidebar = () => {
       allowedRoles: ['ADMIN'],
       children: [
         { title: '품목 리스트', path: '/dashboard/masterdata/items', icon: <Package size={16} />, allowedRoles: ['ADMIN'] },
+        { title: '품목 유형 관리', path: '/dashboard/masterdata/itemtype', icon: <Layers size={16} />, allowedRoles: ['ADMIN'] },
         { title: 'BOM 레시피 관리', path: '/dashboard/masterdata/boms', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
       ]
     },
