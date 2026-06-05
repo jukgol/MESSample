@@ -33,12 +33,12 @@ const DashboardRoutes = () => {
         {/* 기준 정보 & 재고 관리 - ADMIN만 */}
         {hasAccess(['ADMIN']) && (
           <>
-            <Route path="/masterdata" element={<Navigate to="/masterdata/items" replace />} />
+            <Route path="/masterdata" element={<Navigate to="items" replace />} />
             <Route path="/masterdata/items" element={<ItemList />} />
             <Route path="/masterdata/itemtype" element={<ItemTypeList />} />
             <Route path="/masterdata/boms" element={<BomManagePage />} />
 
-            <Route path="/inventory" element={<Navigate to="/inventory/lots" replace />} />
+            <Route path="/inventory" element={<Navigate to="lots" replace />} />
             <Route path="/inventory/lots" element={<LotList />} />
             <Route path="/inventory/shipments" element={<Placeholder title="출하 관리" />} />
           </>
