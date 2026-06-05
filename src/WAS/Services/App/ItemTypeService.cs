@@ -85,12 +85,10 @@ namespace WAS.Services.App
                 return;
             }
 
-            var dbItemTypes = await GetItemTypesAsync();
-            var existingNames = dbItemTypes.Select(x => x.TypeName).ToHashSet();
-
             foreach (var it in itemTypes)
             {
-                if (existingNames.Contains(it.TypeName))
+                var existing = await _scriptExecutor.ExecuteQueryAsync<ItemTypeDto>("App/ItemType/GET_ITEM_TYPE_BY_NAME", new { TypeName = it.TypeName });
+                if (existing.Any())
                 {
                     _logger.LogInformation("[SKIP] {TypeName} 이미 존재함", it.TypeName);
                 }

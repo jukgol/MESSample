@@ -103,12 +103,10 @@ namespace WAS.Services.App
                 return;
             }
 
-            var dbSteps = await GetProcessStepsAsync();
-            var existingStepNames = dbSteps.Select(x => x.StepName).ToHashSet();
-
             foreach (var step in steps)
             {
-                if (existingStepNames.Contains(step.StepName))
+                var existing = await _scriptExecutor.ExecuteQueryAsync<ProcessStepDto>("App/ProcessStep/GET_PROCESS_STEP_BY_NAME", new { StepName = step.StepName });
+                if (existing.Any())
                 {
                     _logger.LogInformation("[SKIP] {StepName} (Seq: {SeqNo}) 이미 존재함", step.StepName, step.SeqNo);
                 }

@@ -94,12 +94,10 @@ namespace WAS.Services.App
                 return;
             }
 
-            var dbItems = await GetItemsAsync();
-            var existingCodes = dbItems.Select(x => x.ItemCode).ToHashSet();
-
             foreach (var item in items)
             {
-                if (existingCodes.Contains(item.ItemCode))
+                var existing = await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_BY_CODE", new { ItemCode = item.ItemCode });
+                if (existing.Any())
                 {
                     _logger.LogInformation("[SKIP] {ItemName} ({ItemCode}) 이미 존재함", item.ItemName, item.ItemCode);
                 }

@@ -93,29 +93,29 @@ namespace WAS.Services.App
                 return;
             }
 
-            // 품목 코드 -> 품목 ID 매핑용 딕셔너리 구성
-            var items = await _itemService.GetItemsAsync();
-            var itemMap = items.ToDictionary(x => x.ItemCode, x => x.ItemID);
-
-            // 기존 등록된 전체 BOM 목록 조회 (중복 사전 방지용)
-            var dbBoms = await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_LIST");
-            var existingBoms = dbBoms.Select(x => (x.ParentItemID, x.ChildItemID)).ToHashSet();
-
             foreach (var bom in boms)
             {
-                if (!itemMap.TryGetValue(bom.ParentItemCode, out var parentId))
+                var parentItemResult = await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_BY_CODE", new { ItemCode = bom.ParentItemCode });
+                var parentItem = parentItemResult.FirstOrDefault();
+                if (parentItem == null)
                 {
                     _logger.LogWarning("[WARN] 부모 품목 코드({ParentCode})가 등록되어 있지 않아 BOM을 스킵합니다.", bom.ParentItemCode);
                     continue;
                 }
 
-                if (!itemMap.TryGetValue(bom.ChildItemCode, out var childId))
+                var childItemResult = await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_BY_CODE", new { ItemCode = bom.ChildItemCode });
+                var childItem = childItemResult.FirstOrDefault();
+                if (childItem == null)
                 {
                     _logger.LogWarning("[WARN] 자식 품목 코드({ChildCode})가 등록되어 있지 않아 BOM을 스킵합니다.", bom.ChildItemCode);
                     continue;
                 }
 
-                if (existingBoms.Contains((parentId, childId)))
+                var parentId = parentItem.ItemID;
+                var childId = childItem.ItemID;
+
+                var existingBomResult = await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_RELATION", new { ParentItemId = parentId, ChildItemId = childId });
+                if (existingBomResult.Any())
                 {
                     _logger.LogInformation("[SKIP] BOM: {ParentCode} -> {ChildCode} 이미 존재함", bom.ParentItemCode, bom.ChildItemCode);
                 }
