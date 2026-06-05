@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WAS.Services.App;
 using Shared.Models.App;
+using WAS.Attributes;
+using WAS.Common.Constants;
 
 namespace WAS.Controllers.App
 {
@@ -18,6 +20,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpGet]
+        [HasPermission(Permissions.MasterDataView)]
         [ProducesResponseType(typeof(IEnumerable<ItemDto>), 200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult<IEnumerable<ItemDto>>> GetItems()
@@ -34,6 +37,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPost]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -61,6 +65,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPut("{id}")]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -88,6 +93,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult> DeleteItem(int id)
@@ -104,6 +110,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPost("dummy")]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult> CreateDummyItems()

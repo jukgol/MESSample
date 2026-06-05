@@ -5,6 +5,8 @@ using Shared.Models.App;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WAS.Attributes;
+using WAS.Common.Constants;
 
 namespace WAS.Controllers.App
 {
@@ -21,6 +23,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpGet("parent/{parentId}")]
+        [HasPermission(Permissions.MasterDataView)]
         [ProducesResponseType(typeof(IEnumerable<BomDto>), 200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult<IEnumerable<BomDto>>> GetBomsByParent(int parentId)
@@ -37,6 +40,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPost]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -64,6 +68,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPut("{id}")]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -91,6 +96,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult> DeleteBom(int id)
@@ -107,6 +113,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPost("dummy")]
+        [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult> CreateDummyBoms()

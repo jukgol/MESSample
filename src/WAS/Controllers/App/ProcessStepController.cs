@@ -5,6 +5,8 @@ using Shared.Models.App;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WAS.Attributes;
+using WAS.Common.Constants;
 
 namespace WAS.Controllers.App
 {
@@ -21,6 +23,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpGet]
+        [HasPermission(Permissions.ProcessView)]
         [ProducesResponseType(typeof(IEnumerable<ProcessStepDto>), 200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult<IEnumerable<ProcessStepDto>>> GetProcessSteps()
@@ -37,6 +40,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpGet("{id}")]
+        [HasPermission(Permissions.ProcessView)]
         [ProducesResponseType(typeof(ProcessStepDto), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(401)]
@@ -58,6 +62,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPost]
+        [HasPermission(Permissions.ProcessExecute)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -85,6 +90,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPut("{id}")]
+        [HasPermission(Permissions.ProcessExecute)]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
@@ -112,6 +118,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpDelete("{id}")]
+        [HasPermission(Permissions.ProcessExecute)]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult> DeleteProcessStep(int id)
@@ -128,6 +135,7 @@ namespace WAS.Controllers.App
         }
 
         [HttpPost("dummy")]
+        [HasPermission(Permissions.ProcessExecute)]
         [ProducesResponseType(200)]
         [ProducesResponseType(401)]
         public async Task<ActionResult> CreateDummySteps()
