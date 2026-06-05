@@ -1311,6 +1311,44 @@
         }
       }
     },
+    "/api/Permission": {
+      "get": {
+        "tags": [
+          "Permission"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PermissionDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/process-step": {
       "get": {
         "tags": [
@@ -2718,6 +2756,20 @@
             "nullable": true
           },
           "path": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PermissionDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
             "type": "string",
             "nullable": true
           }
