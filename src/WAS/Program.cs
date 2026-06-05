@@ -8,9 +8,7 @@ Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // 프로젝트 서비스 일괄 등록
 builder.Services.AddControllers();
-builder.Services.AddOracleDbServices(builder.Configuration); // DB 서비스 (기존)
-builder.Services.AddCorsServices();                        // CORS 정책 (분리됨)
-builder.Services.AddIdentityServices(builder.Configuration); // JWT 인증 (분리됨)
+builder.Services.AddProjectServices(builder.Configuration); // 전체 프로젝트 서비스 일괄 등록
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
