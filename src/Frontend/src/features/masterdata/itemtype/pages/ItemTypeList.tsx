@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { RefreshCw, Plus, Search } from 'lucide-react';
+import { RefreshCw, Plus, Search, Database } from 'lucide-react';
 import { useItemTypes } from '../hooks/useItemTypes';
 import type { ItemType } from '../hooks/useItemTypes';
 import ItemTypeHeader from '../components/ItemTypeHeader';
@@ -9,7 +9,16 @@ import ItemTypeUpdateModal from '../components/ItemTypeUpdateModal';
 import ItemTypeDeleteModal from '../components/ItemTypeDeleteModal';
 
 const ItemTypeList: React.FC = () => {
-  const { itemTypes, loading, error, fetchItemTypes, createItemType, updateItemType, deleteItemType } = useItemTypes();
+  const {
+    itemTypes,
+    loading,
+    error,
+    fetchItemTypes,
+    createItemType,
+    updateItemType,
+    deleteItemType,
+    generateDummyItemTypes
+  } = useItemTypes();
 
   // 검색어 상태
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,6 +63,21 @@ const ItemTypeList: React.FC = () => {
       {/* 2. 액션 바 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={generateDummyItemTypes}
+            disabled={loading}
+            style={{
+              background: 'rgba(99,102,241,0.15)',
+              border: '1px solid rgba(99,102,241,0.3)',
+              color: 'var(--accent-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <Database size={16} />
+            시나리오 로드
+          </button>
           <button
             onClick={() => setIsCreateOpen(true)}
             style={{ display: 'flex', alignItems: 'center', gap: '6px' }}

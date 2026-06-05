@@ -79,6 +79,22 @@ export const useItemTypes = () => {
     }
   };
 
+  const generateDummyItemTypes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await apiClient.post('/api/ItemType/dummy');
+      await fetchItemTypes();
+      return true;
+    } catch (err: any) {
+      console.error('품목 유형 시나리오 로드 실패:', err);
+      setError(err.response?.data?.message || '품목 유형 시나리오 데이터를 로드하는 중 오류가 발생했습니다.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchItemTypes();
   }, [fetchItemTypes]);
@@ -90,6 +106,7 @@ export const useItemTypes = () => {
     fetchItemTypes,
     createItemType,
     updateItemType,
-    deleteItemType
+    deleteItemType,
+    generateDummyItemTypes
   };
 };

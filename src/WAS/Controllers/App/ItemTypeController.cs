@@ -98,5 +98,22 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"품목 유형 삭제 중 오류 발생: {ex.Message}" });
             }
         }
+
+        [HttpPost("dummy")]
+        [HasPermission(Permissions.MasterDataEdit)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> CreateDummyItemTypes()
+        {
+            try
+            {
+                await _itemTypeService.LoadScenarioItemTypesAsync();
+                return Ok(new { Message = "성공적으로 시나리오 품목 유형 데이터가 로드되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"품목 유형 테스트 데이터 생성 중 오류 발생: {ex.Message}" });
+            }
+        }
     }
 }
