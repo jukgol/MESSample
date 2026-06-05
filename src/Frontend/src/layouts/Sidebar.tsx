@@ -10,7 +10,8 @@ import {
   ClipboardList,
   ShieldCheck,
   LogOut,
-  Layers
+  Layers,
+  Users
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -70,6 +71,16 @@ const Sidebar = () => {
       children: [
         { title: '공정 이력', path: '/dashboard/log-monitor/process', icon: <History size={16} />, allowedRoles: ['ADMIN', 'VIEWER'] },
         { title: '품질 검사 (QC)', path: '/dashboard/log-monitor/qc', icon: <ShieldCheck size={16} />, allowedRoles: ['ADMIN', 'QC'] },
+      ]
+    },
+    {
+      title: '시스템 설정',
+      icon: <Settings size={20} />,
+      path: '/dashboard/system',
+      allowedRoles: ['ADMIN'],
+      children: [
+        { title: '사용자 관리', path: '/dashboard/system/users', icon: <Users size={16} />, allowedRoles: ['ADMIN'] },
+        { title: '직책 권한 설정', path: '/dashboard/system/roles', icon: <ShieldCheck size={16} />, allowedRoles: ['ADMIN'] }
       ]
     },
   ];

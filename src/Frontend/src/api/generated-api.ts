@@ -71,6 +71,7 @@ export interface ExecuteAttributeRequest {
 }
 
 export interface ItemCreateDto {
+  itemCode?: string | null;
   itemName?: string | null;
   itemType?: string | null;
   unit?: string | null;
@@ -80,6 +81,7 @@ export interface ItemCreateDto {
 export interface ItemDto {
   /** @format int32 */
   itemID?: number;
+  itemCode?: string | null;
   itemName?: string | null;
   itemType?: string | null;
   unit?: string | null;
@@ -88,7 +90,22 @@ export interface ItemDto {
   createdAt?: string;
 }
 
+export interface ItemTypeCreateDto {
+  typeName?: string | null;
+}
+
+export interface ItemTypeDto {
+  /** @format int32 */
+  itemTypeID?: number;
+  typeName?: string | null;
+}
+
+export interface ItemTypeUpdateDto {
+  typeName?: string | null;
+}
+
 export interface ItemUpdateDto {
+  itemCode?: string | null;
   itemName?: string | null;
   itemType?: string | null;
   unit?: string | null;
@@ -142,6 +159,11 @@ export interface NavItemDto {
   path?: string | null;
 }
 
+export interface PermissionDto {
+  code?: string | null;
+  name?: string | null;
+}
+
 export interface ProblemDetails {
   type?: string | null;
   title?: string | null;
@@ -189,6 +211,12 @@ export interface ProcessStepUpdateDto {
 export interface RoleDto {
   roleCode?: string | null;
   roleName?: string | null;
+  description?: string | null;
+  permissions?: string[] | null;
+}
+
+export interface RolePermissionsUpdateDto {
+  permissions?: string[] | null;
 }
 
 export interface SchemaPrivilegeDto {
@@ -488,6 +516,20 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
+     * @tags Bom
+     * @name BomDummyCreate
+     * @request POST:/api/bom/dummy
+     */
+    bomDummyCreate: (params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/bom/dummy`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags Item
      * @name ItemList
      * @request GET:/api/Item
@@ -553,20 +595,75 @@ export class Api<SecurityDataType extends unknown> {
      * @name ItemDummyCreate
      * @request POST:/api/Item/dummy
      */
-    itemDummyCreate: (
-      query?: {
-        /**
-         * @format int32
-         * @default 10
-         */
-        count?: number;
-      },
-      params: RequestParams = {},
-    ) =>
+    itemDummyCreate: (params: RequestParams = {}) =>
       this.http.request<void, ProblemDetails>({
         path: `/api/Item/dummy`,
         method: "POST",
-        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ItemType
+     * @name ItemTypeList
+     * @request GET:/api/ItemType
+     */
+    itemTypeList: (params: RequestParams = {}) =>
+      this.http.request<ItemTypeDto[], ProblemDetails>({
+        path: `/api/ItemType`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ItemType
+     * @name ItemTypeCreate
+     * @request POST:/api/ItemType
+     */
+    itemTypeCreate: (data: ItemTypeCreateDto, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/ItemType`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ItemType
+     * @name ItemTypeUpdate
+     * @request PUT:/api/ItemType/{id}
+     */
+    itemTypeUpdate: (
+      id: number,
+      data: ItemTypeUpdateDto,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/ItemType/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ItemType
+     * @name ItemTypeDelete
+     * @request DELETE:/api/ItemType/{id}
+     */
+    itemTypeDelete: (id: number, params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/ItemType/${id}`,
+        method: "DELETE",
         ...params,
       }),
 
@@ -709,6 +806,21 @@ export class Api<SecurityDataType extends unknown> {
     /**
      * No description
      *
+     * @tags Permission
+     * @name PermissionList
+     * @request GET:/api/Permission
+     */
+    permissionList: (params: RequestParams = {}) =>
+      this.http.request<PermissionDto[], any>({
+        path: `/api/Permission`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
      * @tags ProcessStep
      * @name ProcessStepList
      * @request GET:/api/process-step
@@ -786,6 +898,55 @@ export class Api<SecurityDataType extends unknown> {
       this.http.request<void, ProblemDetails>({
         path: `/api/process-step/${id}`,
         method: "DELETE",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags ProcessStep
+     * @name ProcessStepDummyCreate
+     * @request POST:/api/process-step/dummy
+     */
+    processStepDummyCreate: (params: RequestParams = {}) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/process-step/dummy`,
+        method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Role
+     * @name RoleList
+     * @request GET:/api/Role
+     */
+    roleList: (params: RequestParams = {}) =>
+      this.http.request<RoleDto[], ProblemDetails>({
+        path: `/api/Role`,
+        method: "GET",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Role
+     * @name RoleUpdate
+     * @request PUT:/api/Role/{roleCode}
+     */
+    roleUpdate: (
+      roleCode: string,
+      data: RolePermissionsUpdateDto,
+      params: RequestParams = {},
+    ) =>
+      this.http.request<void, ProblemDetails>({
+        path: `/api/Role/${roleCode}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
 

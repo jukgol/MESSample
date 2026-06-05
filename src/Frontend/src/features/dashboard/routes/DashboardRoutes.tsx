@@ -6,6 +6,8 @@ import BomManagePage from '../../masterdata/bom/pages/BomManagePage';
 import LotList from '../../inventory/lot/pages/LotList';
 import ProcessStepList from '../../process/pages/ProcessStepList';
 import DashboardHome from '../pages/DashboardHome';
+import UserList from '../../system/user/pages/UserList';
+import RoleManager from '../../system/manager/pages/RoleManager';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 // Placeholder components for other routes
@@ -41,6 +43,8 @@ const DashboardRoutes = () => {
             <Route path="/inventory" element={<Navigate to="lots" replace />} />
             <Route path="/inventory/lots" element={<LotList />} />
             <Route path="/inventory/shipments" element={<Placeholder title="출하 관리" />} />
+            <Route path="/system/users" element={<UserList />} />
+            <Route path="/system/roles" element={<RoleManager />} />
           </>
         )}
 
