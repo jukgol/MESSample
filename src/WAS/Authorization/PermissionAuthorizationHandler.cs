@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using WAS.Services.Auth;
+using WAS.Services.App;
 
 namespace WAS.Authorization
 {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WAS.Authorization;
-using WAS.Services.Auth;
+using WAS.Services.App;
 
 namespace WAS.Extensions
 {
@@ -34,7 +34,6 @@ namespace WAS.Extensions
             });
 
             // 권한 시스템(Permission) 서비스 등록
-            services.AddSingleton<IRolePermissionService, RolePermissionService>();
             services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
             services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
 

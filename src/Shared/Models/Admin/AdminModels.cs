@@ -18,6 +18,13 @@ namespace Shared.Models.Admin
     {
         public string RoleCode { get; set; } = string.Empty;
         public string RoleName { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public List<string> Permissions { get; set; } = new();
+    }
+
+    public class RolePermissionsUpdateDto
+    {
+        public List<string> Permissions { get; set; } = new();
     }
 
     // 2. 테이블 데이터 관련 모델

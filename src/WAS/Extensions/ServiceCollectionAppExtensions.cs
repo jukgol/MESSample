@@ -23,6 +23,10 @@ namespace WAS.Extensions
             services.AddScoped<ItemTypeService>();
             services.AddScoped<IItemTypeService>(sp => LoggingProxy<IItemTypeService>.Create(sp.GetRequiredService<ItemTypeService>(), sp.GetRequiredService<ILogger<ItemTypeService>>()));
 
+            // Role / 권한 매핑 관련 서비스 등록
+            services.AddScoped<RolePermissionService>();
+            services.AddScoped<IRolePermissionService>(sp => LoggingProxy<IRolePermissionService>.Create(sp.GetRequiredService<RolePermissionService>(), sp.GetRequiredService<ILogger<RolePermissionService>>()));
+
             return services;
         }
     }

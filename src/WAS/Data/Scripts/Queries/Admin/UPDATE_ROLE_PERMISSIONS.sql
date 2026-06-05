@@ -1,0 +1,3 @@
+UPDATE USER_ROLE 
+SET PERMISSIONS = :Permissions 
+WHERE ROLE_CODE = :RoleCode
