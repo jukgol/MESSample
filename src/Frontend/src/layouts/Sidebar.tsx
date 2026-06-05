@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Package, 
   Settings, 
@@ -26,6 +27,9 @@ interface MenuItem {
 const Sidebar = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
+  const location = useLocation();
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+
   const menuItems: MenuItem[] = [
     { 
       title: 'Dashboard', 
@@ -84,6 +88,24 @@ const Sidebar = () => {
       ]
     },
   ];
+
+  // URL 경로 감지하여 서브메뉴의 부모 대메뉴 자동 펼침
+  useEffect(() => {
+    const initialExpanded: Record<string, boolean> = {};
+    menuItems.forEach(item => {
+      if (item.children) {
+        const hasActiveChild = item.children.some(child => location.pathname === child.path);
+        if (hasActiveChild) {
+          initialExpanded[item.title] = true;
+        }
+      }
+    });
+    setExpandedItems(prev => ({ ...initialExpanded, ...prev }));
+  }, [location.pathname]);
+
+  const toggleExpand = (title: string) => {
+    setExpandedItems(prev => ({ ...prev, [title]: !prev[title] }));
+  };
 
   // 유저 역할에 맞게 선언적으로 메뉴 필터링 (하드코딩 제거)
   const roleCode = user?.roleCode || 'VIEWER';
@@ -170,33 +192,56 @@ const Sidebar = () => {
       </div>
       
       <nav className="sidebar-nav">
-        {filteredMenuItems.map((item) => (
-          <div key={item.path} className="menu-group">
-            <NavLink 
-              to={item.path} 
-              className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}
-            >
-              <span className="icon">{item.icon}</span>
-              <span className="title">{item.title}</span>
-              {item.children && <ChevronRight size={14} className="arrow" />}
-            </NavLink>
-            
-            {item.children && (
-              <div className="submenu">
-                {item.children.map((child) => (
-                  <NavLink 
-                    key={child.path} 
-                    to={child.path}
-                    className={({ isActive }) => `submenu-item ${isActive ? 'active' : ''}`}
-                  >
-                    <span className="icon">{child.icon}</span>
-                    <span className="title">{child.title}</span>
-                  </NavLink>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+        {filteredMenuItems.map((item) => {
+          const hasChildren = !!item.children;
+          const isExpanded = !!expandedItems[item.title];
+
+          return (
+            <div key={item.path} className="menu-group">
+              {hasChildren ? (
+                <div 
+                  onClick={() => toggleExpand(item.title)}
+                  className="menu-item"
+                  style={{ cursor: 'pointer' }}
+                >
+                  <span className="icon">{item.icon}</span>
+                  <span className="title">{item.title}</span>
+                  <ChevronRight 
+                    size={14} 
+                    className="arrow" 
+                    style={{ 
+                      transition: 'transform 0.2s ease',
+                      transform: isExpanded ? 'rotate(90deg)' : 'none'
+                    }}
+                  />
+                </div>
+              ) : (
+                <NavLink 
+                  to={item.path} 
+                  className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}
+                >
+                  <span className="icon">{item.icon}</span>
+                  <span className="title">{item.title}</span>
+                </NavLink>
+              )}
+              
+              {hasChildren && isExpanded && (
+                <div className="submenu">
+                  {item.children?.map((child) => (
+                    <NavLink 
+                      key={child.path} 
+                      to={child.path}
+                      className={({ isActive }) => `submenu-item ${isActive ? 'active' : ''}`}
+                    >
+                      <span className="icon">{child.icon}</span>
+                      <span className="title">{child.title}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </nav>
     </aside>
   );

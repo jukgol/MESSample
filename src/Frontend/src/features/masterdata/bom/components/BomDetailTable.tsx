@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2, Edit, Trash2, Plus, Info } from 'lucide-react';
+import { Loader2, Edit, Trash2, Info } from 'lucide-react';
 import type { Bom } from '../hooks/useBoms';
 import type { Item } from '../../item/hooks/useItems';
 
@@ -8,7 +8,6 @@ interface BomDetailTableProps {
   boms: Bom[];
   loading: boolean;
   error: string | null;
-  onOpenCreateModal: () => void;
   onOpenUpdateModal: (bom: Bom) => void;
   onDelete: (id: number) => void;
 }
@@ -18,7 +17,6 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
   boms,
   loading,
   error,
-  onOpenCreateModal,
   onOpenUpdateModal,
   onDelete
 }) => {
@@ -56,13 +54,6 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
             ID: {selectedItem.id} | 구분: {selectedItem.category} | 단위: {selectedItem.unit} | 설명: {selectedItem.spec}
           </p>
         </div>
-        
-        <button
-          onClick={onOpenCreateModal}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1rem', borderRadius: '8px', fontSize: '0.9rem' }}
-        >
-          <Plus size={16} /> 구성 요소 추가
-        </button>
       </div>
 
       {/* 테이블 / 리스트 영역 */}
@@ -144,7 +135,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
               ) : (
                 <tr>
                   <td colSpan={5} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    정의된 자식 구성 요소(BOM)가 없습니다. 레시피를 등록하려면 우측 상단의 "구성 요소 추가" 버튼을 클릭하세요.
+                    정의된 자식 구성 요소(BOM)가 없습니다. 레시피를 등록하려면 상단 액션바의 "구성 요소 추가" 버튼을 클릭하세요.
                   </td>
                 </tr>
               )}

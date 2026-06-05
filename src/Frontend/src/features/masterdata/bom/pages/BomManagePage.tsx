@@ -10,10 +10,11 @@ import BomDeleteModal from '../components/BomDeleteModal';
 import BomHeader from '../components/BomHeader';
 import BomErrorAlert from '../components/BomErrorAlert';
 import BomLayout from '../components/BomLayout';
+import BomActionBar from '../components/BomActionBar';
 
 const BomManagePage: React.FC = () => {
   // 전체 품목 리스트 가져오기
-  const { items, loading: itemsLoading, error: itemsError } = useItems();
+  const { items, loading: itemsLoading, error: itemsError, fetchItems } = useItems();
   
   // BOM CRUD 훅
   const {
@@ -23,7 +24,8 @@ const BomManagePage: React.FC = () => {
     fetchBomsByParent,
     createBom,
     updateBom,
-    deleteBom
+    deleteBom,
+    generateDummyBoms
   } = useBoms();
 
   // 선택된 부모 품목 ID 상태
@@ -97,14 +99,31 @@ const BomManagePage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
       {/* 1. 타이틀 헤더 */}
       <BomHeader />
 
       {/* 2. 에러 피드백 */}
-      <BomErrorAlert message={itemsError} />
+      <BomErrorAlert message={itemsError || bomsError} />
 
-      {/* 3. 2-Pane 레이아웃 그리드 */}
+      {/* 3. 액션 바 */}
+      <BomActionBar
+        onGenerateDummy={async () => {
+          await generateDummyBoms(selectedParentId || undefined);
+          await fetchItems();
+        }}
+        onRefresh={async () => {
+          await fetchItems();
+          if (selectedParentId) {
+            await fetchBomsByParent(selectedParentId);
+          }
+        }}
+        onOpenCreate={() => setIsCreateOpen(true)}
+        loading={itemsLoading || bomsLoading}
+        hasParentSelected={selectedParentId !== null}
+      />
+
+      {/* 4. 2-Pane 레이아웃 그리드 */}
       <BomLayout
         left={
           <BomParentList
@@ -120,7 +139,6 @@ const BomManagePage: React.FC = () => {
             boms={boms}
             loading={bomsLoading}
             error={bomsError}
-            onOpenCreateModal={() => setIsCreateOpen(true)}
             onOpenUpdateModal={(bom) => {
               setSelectedBomForUpdate(bom);
               setIsUpdateOpen(true);

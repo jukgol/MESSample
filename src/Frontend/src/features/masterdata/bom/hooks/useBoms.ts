@@ -98,6 +98,24 @@ export const useBoms = () => {
     }
   };
 
+  const generateDummyBoms = async (parentId?: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await apiClient.post('/api/bom/dummy');
+      if (parentId) {
+        await fetchBomsByParent(parentId);
+      }
+      return true;
+    } catch (err: any) {
+      console.error('더미 BOM 생성 실패:', err);
+      setError(err.response?.data?.message || '더미 BOM 데이터를 로드하는 중 오류가 발생했습니다.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     boms,
     loading,
@@ -105,6 +123,7 @@ export const useBoms = () => {
     fetchBomsByParent,
     createBom,
     updateBom,
-    deleteBom
+    deleteBom,
+    generateDummyBoms
   };
 };
