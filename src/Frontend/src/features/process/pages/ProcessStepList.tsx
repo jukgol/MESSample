@@ -3,7 +3,7 @@ import { useProcessSteps } from './useProcessSteps';
 import type { ProcessStep } from './useProcessSteps';
 import ProcessStepHeader from './ProcessStepHeader';
 import ProcessStepTable from './ProcessStepTable';
-import { Search, Plus, RotateCw } from 'lucide-react';
+import { Search, Plus, RotateCw, Database } from 'lucide-react';
 
 const ProcessStepList: React.FC = () => {
   const {
@@ -13,7 +13,8 @@ const ProcessStepList: React.FC = () => {
     fetchProcessSteps,
     createProcessStep,
     updateProcessStep,
-    deleteProcessStep
+    deleteProcessStep,
+    generateDummyProcessSteps
   } = useProcessSteps();
 
   // 검색어 상태
@@ -139,6 +140,13 @@ const ProcessStepList: React.FC = () => {
 
       {/* 버튼 컨트롤 영역 */}
       <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-start', marginBottom: '1rem' }}>
+        <button
+          onClick={generateDummyProcessSteps}
+          disabled={loading}
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(99,102,241,0.15)', border: '1px solid rgba(99,102,241,0.3)', color: 'var(--accent-primary)', padding: '0.6rem 1.2rem', borderRadius: '8px' }}
+        >
+          <Database size={16} /> 공정 시나리오 로드
+        </button>
         <button
           onClick={fetchProcessSteps}
           disabled={loading}

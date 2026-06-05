@@ -99,6 +99,22 @@ export const useProcessSteps = () => {
     }
   };
 
+  const generateDummyProcessSteps = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await apiClient.post('/api/process-step/dummy');
+      await fetchProcessSteps();
+      return true;
+    } catch (err: any) {
+      console.error('공정 시나리오 생성 실패:', err);
+      setError(err.response?.data?.message || '공정 시나리오 데이터를 생성하는 중 오류가 발생했습니다.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchProcessSteps();
   }, [fetchProcessSteps]);
@@ -110,6 +126,7 @@ export const useProcessSteps = () => {
     fetchProcessSteps,
     createProcessStep,
     updateProcessStep,
-    deleteProcessStep
+    deleteProcessStep,
+    generateDummyProcessSteps
   };
 };
