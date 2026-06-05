@@ -81,7 +81,11 @@ namespace WAS.Services.App
             }
 
             var jsonText = await File.ReadAllTextAsync(path);
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var options = new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            };
             var items = JsonSerializer.Deserialize<List<ItemCreateDto>>(jsonText, options);
 
             if (items == null || items.Count == 0)

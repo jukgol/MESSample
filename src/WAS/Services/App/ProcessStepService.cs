@@ -90,7 +90,11 @@ namespace WAS.Services.App
             }
 
             var jsonText = await File.ReadAllTextAsync(path);
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var options = new JsonSerializerOptions 
+            { 
+                PropertyNameCaseInsensitive = true,
+                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+            };
             var steps = JsonSerializer.Deserialize<List<ProcessStepCreateDto>>(jsonText, options);
 
             if (steps == null || steps.Count == 0)
