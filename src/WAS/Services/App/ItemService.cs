@@ -19,12 +19,12 @@ namespace WAS.Services.App
 
         public async Task<IEnumerable<ItemDto>> GetItemsAsync()
         {
-            return await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/GET_ITEM_LIST");
+            return await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_LIST");
         }
 
         public async Task CreateItemAsync(ItemCreateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/CREATE_ITEM", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Item/CREATE_ITEM", new
             {
                 ItemCode = dto.ItemCode,
                 ItemName = dto.ItemName,
@@ -36,7 +36,7 @@ namespace WAS.Services.App
 
         public async Task UpdateItemAsync(int id, ItemUpdateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/UPDATE_ITEM", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Item/UPDATE_ITEM", new
             {
                 ItemId = id,
                 ItemCode = dto.ItemCode,
@@ -49,7 +49,7 @@ namespace WAS.Services.App
 
         public async Task DeleteItemAsync(int id)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/DELETE_ITEM", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Item/DELETE_ITEM", new
             {
                 ItemId = id
             });

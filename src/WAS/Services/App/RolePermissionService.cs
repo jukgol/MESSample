@@ -82,7 +82,7 @@ namespace WAS.Services.App
         public async Task<IEnumerable<RoleDto>> GetAllRolesAsync()
         {
             var results = await _scriptExecutor.ExecuteQueryAsync<dynamic>(
-                "Admin/GET_ALL_ROLES",
+                "App/Role/GET_ALL_ROLES",
                 null
             );
 
@@ -135,7 +135,7 @@ namespace WAS.Services.App
             try
             {
                 await _scriptExecutor.ExecuteNonQueryAsync(
-                    "Admin/UPDATE_ROLE_PERMISSIONS",
+                    "App/Role/UPDATE_ROLE_PERMISSIONS",
                     new
                     {
                         Permissions = permissionsJson,

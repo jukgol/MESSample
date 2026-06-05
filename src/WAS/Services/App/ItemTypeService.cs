@@ -13,12 +13,12 @@ namespace WAS.Services.App
 
         public async Task<IEnumerable<ItemTypeDto>> GetItemTypesAsync()
         {
-            return await _scriptExecutor.ExecuteQueryAsync<ItemTypeDto>("App/GET_ITEM_TYPE_LIST");
+            return await _scriptExecutor.ExecuteQueryAsync<ItemTypeDto>("App/ItemType/GET_ITEM_TYPE_LIST");
         }
 
         public async Task CreateItemTypeAsync(ItemTypeCreateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/CREATE_ITEM_TYPE", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/ItemType/CREATE_ITEM_TYPE", new
             {
                 TypeName = dto.TypeName
             });
@@ -26,7 +26,7 @@ namespace WAS.Services.App
 
         public async Task UpdateItemTypeAsync(int id, ItemTypeUpdateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/UPDATE_ITEM_TYPE", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/ItemType/UPDATE_ITEM_TYPE", new
             {
                 ItemTypeId = id,
                 TypeName = dto.TypeName
@@ -35,7 +35,7 @@ namespace WAS.Services.App
 
         public async Task DeleteItemTypeAsync(int id)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/DELETE_ITEM_TYPE", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/ItemType/DELETE_ITEM_TYPE", new
             {
                 ItemTypeId = id
             });

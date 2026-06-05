@@ -17,12 +17,12 @@ namespace WAS.Services.App
 
         public async Task<IEnumerable<LotDto>> GetLotsAsync()
         {
-            return await _scriptExecutor.ExecuteQueryAsync<LotDto>("App/GET_LOT_LIST");
+            return await _scriptExecutor.ExecuteQueryAsync<LotDto>("App/Lot/GET_LOT_LIST");
         }
 
         public async Task CreateLotAsync(LotCreateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/CREATE_LOT", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Lot/CREATE_LOT", new
             {
                 ItemId = dto.ItemID,
                 LotNo = dto.LotNo,
@@ -33,7 +33,7 @@ namespace WAS.Services.App
 
         public async Task UpdateLotAsync(int id, LotUpdateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/UPDATE_LOT", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Lot/UPDATE_LOT", new
             {
                 LotId = id,
                 Qty = dto.Qty,
@@ -43,7 +43,7 @@ namespace WAS.Services.App
 
         public async Task DeleteLotAsync(int id)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/DELETE_LOT", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Lot/DELETE_LOT", new
             {
                 LotId = id
             });
