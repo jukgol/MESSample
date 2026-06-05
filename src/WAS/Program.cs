@@ -34,11 +34,14 @@ app.UseStaticFiles();
 
 app.MapControllers();
 
-// 서버 시작 시 DB 프로시저 자동 등록
+// 서버 시작 시 DB 프로시저 자동 등록 및 권한 캐시 초기화
 using (var scope = app.Services.CreateScope())
 {
     var registration = scope.ServiceProvider.GetRequiredService<WAS.Services.ProcedureRegistration>();
     await registration.DeployProceduresAsync();
+
+    var rolePermissionService = scope.ServiceProvider.GetRequiredService<WAS.Services.App.IRolePermissionService>();
+    await rolePermissionService.InitializeCacheAsync();
 }
 
 // 애플리케이션 종료 시 이벤트 핸들러 등록

@@ -11,6 +11,7 @@ namespace WAS.Services.App
     {
         Task<List<string>> GetPermissionsForRoleAsync(string roleCode);
         void ClearCache();
+        Task InitializeCacheAsync();
         Task<IEnumerable<RoleDto>> GetAllRolesAsync();
         Task<bool> UpdateRolePermissionsAsync(string roleCode, List<string> permissions);
     }
@@ -25,53 +26,34 @@ namespace WAS.Services.App
             _scriptExecutor = scriptExecutor;
         }
 
-        public async Task<List<string>> GetPermissionsForRoleAsync(string roleCode)
+        public Task<List<string>> GetPermissionsForRoleAsync(string roleCode)
         {
             if (string.IsNullOrEmpty(roleCode))
             {
-                return new List<string>();
+                return Task.FromResult(new List<string>());
             }
 
             // 캐시에 정보가 있으면 즉시 반환
             if (_cache.TryGetValue(roleCode, out var cachedPermissions))
             {
-                return cachedPermissions;
+                return Task.FromResult(cachedPermissions);
             }
 
-            // DB에서 해당 역할의 PERMISSIONS 컬럼 조회
-            var roles = await _scriptExecutor.ExecuteQueryAsync<dynamic>(
-                "SELECT ROLE_CODE, PERMISSIONS FROM USER_ROLE WHERE ROLE_CODE = :roleCode",
-                new { roleCode }
-            );
+            // 서버 시작 시 이미 전체 캐싱이 되므로, 캐시에 없다면 권한이 없는 것으로 간주
+            return Task.FromResult(new List<string>());
+        }
 
-            var role = roles.FirstOrDefault();
-            var permissions = new List<string>();
-
-            if (role != null)
+        public async Task InitializeCacheAsync()
+        {
+            var roles = await GetAllRolesAsync();
+            _cache.Clear();
+            foreach (var role in roles)
             {
-                var roleDict = role as IDictionary<string, object>;
-                if (roleDict != null && roleDict.TryGetValue("PERMISSIONS", out var permissionsObj) && permissionsObj != null)
+                if (!string.IsNullOrEmpty(role.RoleCode))
                 {
-                    string permissionsJson = permissionsObj.ToString()!;
-                    try
-                    {
-                        var parsed = JsonSerializer.Deserialize<List<string>>(permissionsJson);
-                        if (parsed != null)
-                        {
-                            permissions = parsed;
-                        }
-                    }
-                    catch
-                    {
-                        // JSON 파싱 실패 시 빈 리스트
-                    }
+                    _cache[role.RoleCode] = role.Permissions;
                 }
             }
-
-            // 캐시에 저장
-            _cache[roleCode] = permissions;
-
-            return permissions;
         }
 
         public void ClearCache()
@@ -144,7 +126,7 @@ namespace WAS.Services.App
                 );
 
                 // 인메모리 캐시 갱신 (실시간 동기화)
-                _cache.TryRemove(roleCode, out _);
+                _cache[roleCode] = permissions;
                 return true;
             }
             catch
