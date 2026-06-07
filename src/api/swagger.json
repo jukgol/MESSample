@@ -2564,6 +2564,11 @@
           "bomQty": {
             "type": "integer",
             "format": "int32"
+          },
+          "processStepID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2594,6 +2599,15 @@
           "bomQty": {
             "type": "integer",
             "format": "int32"
+          },
+          "processStepID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "processStepName": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2604,6 +2618,11 @@
           "bomQty": {
             "type": "integer",
             "format": "int32"
+          },
+          "processStepID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2992,11 +3011,6 @@
           "description": {
             "type": "string",
             "nullable": true
-          },
-          "bomID": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3024,11 +3038,6 @@
             "type": "string",
             "nullable": true
           },
-          "bomID": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -3053,11 +3062,6 @@
           },
           "description": {
             "type": "string",
-            "nullable": true
-          },
-          "bomID": {
-            "type": "integer",
-            "format": "int32",
             "nullable": true
           }
         },

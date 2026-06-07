@@ -33,7 +33,8 @@ namespace WAS.Services.App
             {
                 ParentItemId = dto.ParentItemID,
                 ChildItemId = dto.ChildItemID,
-                BomQty = dto.BomQty
+                BomQty = dto.BomQty,
+                ProcessStepId = dto.ProcessStepID
             });
         }
 
@@ -42,7 +43,8 @@ namespace WAS.Services.App
             await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM", new
             {
                 BomId = id,
-                BomQty = dto.BomQty
+                BomQty = dto.BomQty,
+                ProcessStepId = dto.ProcessStepID
             });
         }
 
@@ -114,6 +116,17 @@ namespace WAS.Services.App
                 var parentId = parentItem.ItemID;
                 var childId = childItem.ItemID;
 
+                int? processStepId = null;
+                if (!string.IsNullOrEmpty(bom.ProcessStepName))
+                {
+                    var stepResult = await _scriptExecutor.ExecuteQueryAsync<ProcessStepDto>("App/ProcessStep/GET_PROCESS_STEP_BY_NAME", new { StepName = bom.ProcessStepName });
+                    var step = stepResult.FirstOrDefault();
+                    if (step != null)
+                    {
+                        processStepId = step.StepID;
+                    }
+                }
+
                 var existingBomResult = await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_RELATION", new { ParentItemId = parentId, ChildItemId = childId });
                 if (existingBomResult.Any())
                 {
@@ -125,9 +138,10 @@ namespace WAS.Services.App
                     {
                         ParentItemID = parentId,
                         ChildItemID = childId,
-                        BomQty = bom.BomQty
+                        BomQty = bom.BomQty,
+                        ProcessStepID = processStepId
                     });
-                    _logger.LogInformation("[INSERT] BOM: {ParentCode} -> {ChildCode} (Qty: {Qty}) 추가 완료", bom.ParentItemCode, bom.ChildItemCode, bom.BomQty);
+                    _logger.LogInformation("[INSERT] BOM: {ParentCode} -> {ChildCode} (Qty: {Qty}, Step: {StepName}) 추가 완료", bom.ParentItemCode, bom.ChildItemCode, bom.BomQty, bom.ProcessStepName);
                 }
             }
         }

@@ -2,71 +2,85 @@
   {
     "parent_item_code": "401",
     "child_item_code": "101",
-    "bom_qty": 100
+    "bom_qty": 100,
+    "process_step_name": "면공정"
   },
   {
     "parent_item_code": "402",
     "child_item_code": "101",
-    "bom_qty": 95
+    "bom_qty": 95,
+    "process_step_name": "면공정"
   },
   {
     "parent_item_code": "201",
     "child_item_code": "102",
-    "bom_qty": 10
+    "bom_qty": 10,
+    "process_step_name": "분말공정"
   },
   {
     "parent_item_code": "202",
     "child_item_code": "102",
-    "bom_qty": 8
+    "bom_qty": 8,
+    "process_step_name": "분말공정"
   },
   {
     "parent_item_code": "203",
     "child_item_code": "103",
-    "bom_qty": 5
+    "bom_qty": 5,
+    "process_step_name": "건더기공정"
   },
   {
     "parent_item_code": "204",
     "child_item_code": "103",
-    "bom_qty": 4
+    "bom_qty": 4,
+    "process_step_name": "건더기공정"
   },
   {
     "parent_item_code": "501",
     "child_item_code": "401",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "501",
     "child_item_code": "201",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "501",
     "child_item_code": "203",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "501",
     "child_item_code": "301",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "502",
     "child_item_code": "402",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "502",
     "child_item_code": "202",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "502",
     "child_item_code": "204",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   },
   {
     "parent_item_code": "502",
     "child_item_code": "302",
-    "bom_qty": 1
+    "bom_qty": 1,
+    "process_step_name": "포장공정"
   }
 ]

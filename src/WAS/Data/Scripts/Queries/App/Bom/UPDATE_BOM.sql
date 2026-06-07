@@ -1,3 +1,4 @@
 UPDATE BOM
-SET BOM_QTY = :BomQty
+SET BOM_QTY = :BomQty,
+    PROCESS_STEP_ID = :ProcessStepId
 WHERE BOM_ID = :BomId

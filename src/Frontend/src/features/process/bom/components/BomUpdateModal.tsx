@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import type { Item } from '../../item/hooks/useItems';
+import type { Item } from '../../../masterdata/item/hooks/useItems';
 import type { Bom } from '../hooks/useBoms';
+import type { ProcessStep } from '../../pages/useProcessSteps';
 
 interface BomUpdateModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedParentItem: Item | null;
   selectedBomForUpdate: Bom | null;
-  onSubmit: (dto: { bomQty: number }) => Promise<boolean>;
+  processSteps: ProcessStep[];
+  onSubmit: (dto: { bomQty: number; processStepID?: number | null }) => Promise<boolean>;
 }
 
 const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
@@ -15,16 +17,19 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
   onClose,
   selectedParentItem,
   selectedBomForUpdate,
+  processSteps,
   onSubmit
 }) => {
-  const [form, setForm] = useState<{ bomQty: number | '' }>({
-    bomQty: 1
+  const [form, setForm] = useState<{ bomQty: number | ''; processStepID: string }>({
+    bomQty: 1,
+    processStepID: ''
   });
 
   useEffect(() => {
     if (isOpen && selectedBomForUpdate) {
       setForm({
-        bomQty: selectedBomForUpdate.bomQty
+        bomQty: selectedBomForUpdate.bomQty,
+        processStepID: selectedBomForUpdate.processStepID?.toString() || ''
       });
     }
   }, [isOpen, selectedBomForUpdate]);
@@ -39,7 +44,8 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
     }
 
     const success = await onSubmit({
-      bomQty: Number(form.bomQty)
+      bomQty: Number(form.bomQty),
+      processStepID: form.processStepID === '' ? null : Number(form.processStepID)
     });
 
     if (success) {
@@ -65,6 +71,30 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>투입할 공정 단계 (선택)</label>
+            <select
+              value={form.processStepID}
+              onChange={(e) => setForm({ ...form, processStepID: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none',
+                fontSize: '0.95rem'
+              }}
+            >
+              <option value="" style={{ background: '#1e1e24' }}>-- 연결 없음 (미지정) --</option>
+              {processSteps.map((step) => (
+                <option key={step.stepID} value={step.stepID} style={{ background: '#1e1e24' }}>
+                  Seq {step.seqNo}: {step.stepName} ({step.stepType})
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>수정할 소요 수량 (Qty)</label>
             <input

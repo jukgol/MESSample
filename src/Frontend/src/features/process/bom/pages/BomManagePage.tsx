@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useItems } from '../../item/hooks/useItems';
+import { useItems } from '../../../masterdata/item/hooks/useItems';
 import { useBoms } from '../hooks/useBoms';
 import type { Bom } from '../hooks/useBoms';
+import { useProcessSteps } from '../../pages/useProcessSteps';
 import BomParentList from '../components/BomParentList';
 import BomDetailTable from '../components/BomDetailTable';
 import BomCreateModal from '../components/BomCreateModal';
@@ -16,6 +17,9 @@ const BomManagePage: React.FC = () => {
   // 전체 품목 리스트 가져오기
   const { items, loading: itemsLoading, error: itemsError, fetchItems } = useItems();
   
+  // 전체 공정 리스트 가져오기
+  const { processSteps } = useProcessSteps();
+
   // BOM CRUD 훅
   const {
     boms,
@@ -67,24 +71,26 @@ const BomManagePage: React.FC = () => {
   };
 
   // 등록 처리
-  const handleCreateSubmit = async (dto: { childItemID: number; bomQty: number }) => {
+  const handleCreateSubmit = async (dto: { childItemID: number; bomQty: number; processStepID?: number | null }) => {
     if (!selectedParentId) return false;
     
     const success = await createBom({
       parentItemID: selectedParentId,
       childItemID: dto.childItemID,
-      bomQty: dto.bomQty
+      bomQty: dto.bomQty,
+      processStepID: dto.processStepID
     });
 
     return success;
   };
 
   // 수정 처리
-  const handleUpdateSubmit = async (dto: { bomQty: number }) => {
+  const handleUpdateSubmit = async (dto: { bomQty: number; processStepID?: number | null }) => {
     if (!selectedParentId || !selectedBomForUpdate) return false;
 
     const success = await updateBom(selectedBomForUpdate.bomID, selectedParentId, {
-      bomQty: dto.bomQty
+      bomQty: dto.bomQty,
+      processStepID: dto.processStepID
     });
 
     return success;
@@ -157,6 +163,7 @@ const BomManagePage: React.FC = () => {
         onClose={() => setIsCreateOpen(false)}
         selectedParentItem={selectedParentItem}
         availableChildItems={availableChildItems}
+        processSteps={processSteps}
         onSubmit={handleCreateSubmit}
       />
 
@@ -169,6 +176,7 @@ const BomManagePage: React.FC = () => {
         }}
         selectedParentItem={selectedParentItem}
         selectedBomForUpdate={selectedBomForUpdate}
+        processSteps={processSteps}
         onSubmit={handleUpdateSubmit}
       />
 

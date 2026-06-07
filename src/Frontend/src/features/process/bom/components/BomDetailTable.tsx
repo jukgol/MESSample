@@ -1,7 +1,7 @@
 import React from 'react';
 import { Loader2, Edit, Trash2, Info } from 'lucide-react';
 import type { Bom } from '../hooks/useBoms';
-import type { Item } from '../../item/hooks/useItems';
+import type { Item } from '../../../masterdata/item/hooks/useItems';
 
 interface BomDetailTableProps {
   selectedItem: Item | null;
@@ -74,6 +74,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                 <th style={{ padding: '0.8rem 1rem' }}>BOM ID</th>
                 <th style={{ padding: '0.8rem 1rem' }}>자식 품목 ID</th>
                 <th style={{ padding: '0.8rem 1rem' }}>자식 품목명</th>
+                <th style={{ padding: '0.8rem 1rem' }}>투입 공정</th>
                 <th style={{ padding: '0.8rem 1rem', textAlign: 'right' }}>소요량 (BomQty)</th>
                 <th style={{ padding: '0.8rem 1rem', textAlign: 'center' }}>작업</th>
               </tr>
@@ -90,6 +91,23 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                     </td>
                     <td style={{ padding: '0.9rem 1rem', fontWeight: '500' }}>
                       {bom.childItemName || `품목 #${bom.childItemID}`}
+                    </td>
+                    <td style={{ padding: '0.9rem 1rem' }}>
+                      {bom.processStepID ? (
+                        <span style={{
+                          padding: '4px 8px',
+                          background: 'rgba(99, 102, 241, 0.15)',
+                          borderRadius: '4px',
+                          fontSize: '0.85rem',
+                          border: '1px solid rgba(99, 102, 241, 0.3)',
+                          color: '#818cf8',
+                          fontWeight: '600'
+                        }}>
+                          {bom.processStepName || `공정 #${bom.processStepID}`}
+                        </span>
+                      ) : (
+                        <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.85rem' }}>연결 없음</span>
+                      )}
                     </td>
                     <td style={{ padding: '0.9rem 1rem', fontWeight: '600', color: 'var(--accent-primary)', textAlign: 'right', fontSize: '1rem' }}>
                       {bom.bomQty.toLocaleString()}
@@ -134,7 +152,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                  <td colSpan={6} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
                     정의된 자식 구성 요소(BOM)가 없습니다. 레시피를 등록하려면 상단 액션바의 "구성 요소 추가" 버튼을 클릭하세요.
                   </td>
                 </tr>

@@ -7,7 +7,6 @@ export interface ProcessStep {
   seqNo: number;
   stepType: string;
   description: string;
-  bomID?: number | null;
   createdAt?: string;
 }
 
@@ -16,7 +15,6 @@ export interface ProcessStepCreateDto {
   seqNo: number;
   stepType: string;
   description: string;
-  bomID?: number | null;
 }
 
 export interface ProcessStepUpdateDto {
@@ -24,7 +22,6 @@ export interface ProcessStepUpdateDto {
   seqNo: number;
   stepType: string;
   description: string;
-  bomID?: number | null;
 }
 
 export const useProcessSteps = () => {
@@ -47,7 +44,6 @@ export const useProcessSteps = () => {
           seqNo: step.seqNo,
           stepType: step.stepType,
           description: step.description || '-',
-          bomID: step.bomID !== undefined ? step.bomID : step.bomId,
           createdAt: step.createdAt
         }));
         setProcessSteps(mappedSteps);

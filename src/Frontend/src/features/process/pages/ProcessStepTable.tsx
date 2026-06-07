@@ -45,7 +45,6 @@ const ProcessStepTable: React.FC<ProcessStepTableProps> = ({
                     <th style={{ padding: '1rem' }}>공정 단계명</th>
                     <th style={{ padding: '1rem' }}>공정 유형</th>
                     <th style={{ padding: '1rem' }}>설명</th>
-                    <th style={{ padding: '1rem' }}>연계 BOM ID</th>
                     <th style={{ padding: '1rem', textAlign: 'center' }}>관리</th>
                   </tr>
                 </thead>
@@ -69,23 +68,6 @@ const ProcessStepTable: React.FC<ProcessStepTableProps> = ({
                           </span>
                         </td>
                         <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{step.description}</td>
-                        <td style={{ padding: '1rem' }}>
-                          {step.bomID ? (
-                            <span style={{
-                              padding: '4px 8px',
-                              background: 'rgba(99, 102, 241, 0.15)',
-                              borderRadius: '4px',
-                              fontSize: '0.85rem',
-                              border: '1px solid rgba(99, 102, 241, 0.3)',
-                              color: '#818cf8',
-                              fontWeight: '600'
-                            }}>
-                              BOM #{step.bomID}
-                            </span>
-                          ) : (
-                            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.85rem' }}>연결 없음</span>
-                          )}
-                        </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                             <button
@@ -126,7 +108,7 @@ const ProcessStepTable: React.FC<ProcessStepTableProps> = ({
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                      <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                         등록된 공정 단계가 없습니다.
                       </td>
                     </tr>

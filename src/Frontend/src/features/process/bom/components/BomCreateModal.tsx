@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
-import type { Item } from '../../item/hooks/useItems';
+import type { Item } from '../../../masterdata/item/hooks/useItems';
+import type { ProcessStep } from '../../pages/useProcessSteps';
 
 interface BomCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedParentItem: Item | null;
   availableChildItems: Item[];
-  onSubmit: (dto: { childItemID: number; bomQty: number }) => Promise<boolean>;
+  processSteps: ProcessStep[];
+  onSubmit: (dto: { childItemID: number; bomQty: number; processStepID?: number | null }) => Promise<boolean>;
 }
 
 const BomCreateModal: React.FC<BomCreateModalProps> = ({
@@ -15,18 +17,21 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
   onClose,
   selectedParentItem,
   availableChildItems,
+  processSteps,
   onSubmit
 }) => {
-  const [form, setForm] = useState<{ childItemID: string; bomQty: number | '' }>({
+  const [form, setForm] = useState<{ childItemID: string; bomQty: number | ''; processStepID: string }>({
     childItemID: '',
-    bomQty: 1
+    bomQty: 1,
+    processStepID: ''
   });
 
   useEffect(() => {
     if (isOpen) {
       setForm({
         childItemID: '',
-        bomQty: 1
+        bomQty: 1,
+        processStepID: ''
       });
     }
   }, [isOpen]);
@@ -46,7 +51,8 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
 
     const success = await onSubmit({
       childItemID: Number(form.childItemID),
-      bomQty: Number(form.bomQty)
+      bomQty: Number(form.bomQty),
+      processStepID: form.processStepID === '' ? null : Number(form.processStepID)
     });
 
     if (success) {
@@ -99,6 +105,30 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
                 <Info size={16} /> 추가 가능한 다른 자식 품목이 존재하지 않습니다.
               </div>
             )}
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>투입할 공정 단계 (선택)</label>
+            <select
+              value={form.processStepID}
+              onChange={(e) => setForm({ ...form, processStepID: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none',
+                fontSize: '0.95rem'
+              }}
+            >
+              <option value="" style={{ background: '#1e1e24' }}>-- 연결 없음 (미지정) --</option>
+              {processSteps.map((step) => (
+                <option key={step.stepID} value={step.stepID} style={{ background: '#1e1e24' }}>
+                  Seq {step.seqNo}: {step.stepName} ({step.stepType})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>

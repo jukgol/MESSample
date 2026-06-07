@@ -9,7 +9,6 @@ namespace Shared.Models.App
         public int SeqNo { get; set; }
         public string StepType { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int? BomID { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -19,7 +18,6 @@ namespace Shared.Models.App
         public int SeqNo { get; set; }
         public string StepType { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int? BomID { get; set; }
     }
 
     public class ProcessStepUpdateDto
@@ -28,6 +26,5 @@ namespace Shared.Models.App
         public int SeqNo { get; set; }
         public string StepType { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public int? BomID { get; set; }
     }
 }

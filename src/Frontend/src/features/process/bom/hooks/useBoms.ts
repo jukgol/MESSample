@@ -8,16 +8,20 @@ export interface Bom {
   childItemID: number;
   childItemName: string;
   bomQty: number;
+  processStepID?: number | null;
+  processStepName?: string;
 }
 
 export interface BomCreateDto {
   parentItemID: number;
   childItemID: number;
   bomQty: number;
+  processStepID?: number | null;
 }
 
 export interface BomUpdateDto {
   bomQty: number;
+  processStepID?: number | null;
 }
 
 export const useBoms = () => {
@@ -38,7 +42,9 @@ export const useBoms = () => {
           parentItemName: item.parentItemName || '',
           childItemID: item.childItemID || item.childItemId,
           childItemName: item.childItemName || '',
-          bomQty: item.bomQty !== undefined ? item.bomQty : item.quantity
+          bomQty: item.bomQty !== undefined ? item.bomQty : item.quantity,
+          processStepID: item.processStepID !== undefined ? item.processStepID : item.processStepId,
+          processStepName: item.processStepName || ''
         }));
         setBoms(mappedBoms);
       } else {
@@ -59,7 +65,8 @@ export const useBoms = () => {
       await apiClient.post('/api/bom', {
         parentItemID: Number(dto.parentItemID),
         childItemID: Number(dto.childItemID),
-        bomQty: Number(dto.bomQty)
+        bomQty: Number(dto.bomQty),
+        processStepID: dto.processStepID ? Number(dto.processStepID) : null
       });
       await fetchBomsByParent(dto.parentItemID);
       return true;
@@ -74,7 +81,8 @@ export const useBoms = () => {
     try {
       setError(null);
       await apiClient.put(`/api/bom/${id}`, {
-        bomQty: Number(dto.bomQty)
+        bomQty: Number(dto.bomQty),
+        processStepID: dto.processStepID ? Number(dto.processStepID) : null
       });
       await fetchBomsByParent(parentId);
       return true;

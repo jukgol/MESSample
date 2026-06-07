@@ -10,6 +10,8 @@ namespace Shared.Models.App
         public int ChildItemID { get; set; }
         public string ChildItemName { get; set; } = string.Empty;
         public int BomQty { get; set; }
+        public int? ProcessStepID { get; set; }
+        public string ProcessStepName { get; set; } = string.Empty;
     }
 
     public class BomCreateDto
@@ -17,11 +19,13 @@ namespace Shared.Models.App
         public int ParentItemID { get; set; }
         public int ChildItemID { get; set; }
         public int BomQty { get; set; }
+        public int? ProcessStepID { get; set; }
     }
 
     public class BomUpdateDto
     {
         public int BomQty { get; set; }
+        public int? ProcessStepID { get; set; } // 공정 변경 가능하도록 허용
     }
 
     public class BomScenarioDto
@@ -29,5 +33,6 @@ namespace Shared.Models.App
         public string ParentItemCode { get; set; } = string.Empty;
         public string ChildItemCode { get; set; } = string.Empty;
         public int BomQty { get; set; }
+        public string ProcessStepName { get; set; } = string.Empty;
     }
 }
