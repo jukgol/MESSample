@@ -16,7 +16,7 @@ import BomActionBar from '../components/BomActionBar';
 const BomManagePage: React.FC = () => {
   // 전체 품목 리스트 가져오기
   const { items, loading: itemsLoading, error: itemsError, fetchItems } = useItems();
-  
+
   // 전체 공정 리스트 가져오기
   const { processSteps } = useProcessSteps();
 
@@ -53,7 +53,7 @@ const BomManagePage: React.FC = () => {
   // 자식 품목으로 선택 가능한 리스트 (부모 품목 및 이미 등록된 자식 품목을 제외하고 드롭다운에 출력)
   const availableChildItems = useMemo(() => {
     if (!selectedParentId) return [];
-    
+
     // 이미 등록된 자식 품목 ID 세트
     const registeredChildIds = new Set(boms.map(bom => bom.childItemID));
 
@@ -73,7 +73,7 @@ const BomManagePage: React.FC = () => {
   // 등록 처리
   const handleCreateSubmit = async (dto: { childItemID: number; bomQty: number; processStepID?: number | null }) => {
     if (!selectedParentId) return false;
-    
+
     const success = await createBom({
       parentItemID: selectedParentId,
       childItemID: dto.childItemID,
@@ -105,7 +105,7 @@ const BomManagePage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', minHeight: 0 }}>
       {/* 1. 타이틀 헤더 */}
       <BomHeader />
 

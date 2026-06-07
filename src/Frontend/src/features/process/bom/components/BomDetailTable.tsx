@@ -57,7 +57,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
       </div>
 
       {/* 테이블 / 리스트 영역 */}
-      <div style={{ flex: 1, overflowX: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
         {error ? (
           <div style={{ color: '#ef4444', padding: '1rem', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>
             {error}

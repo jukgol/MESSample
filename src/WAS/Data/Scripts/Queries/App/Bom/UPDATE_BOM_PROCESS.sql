@@ -1,0 +1,3 @@
+UPDATE BOM
+SET PROCESS_STEP_ID = :ProcessStepId
+WHERE BOM_ID = :BomId

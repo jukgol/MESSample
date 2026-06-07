@@ -34,7 +34,7 @@ const BomParentList: React.FC<BomParentListProps> = ({
         <Database size={20} className="gradient-text" />
         <h2 style={{ fontSize: '1.2rem', margin: 0 }}>대상 품목 목록</h2>
       </div>
-      
+
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
         BOM 레시피를 정의하거나 조회할 대상 부모 품목을 아래 목록에서 선택하세요.
       </p>
@@ -61,7 +61,7 @@ const BomParentList: React.FC<BomParentListProps> = ({
       </div>
 
       {/* 품목 리스트 영역 */}
-      <div style={{ flex: 1, overflowY: 'auto', maxHeight: 'calc(100vh - 350px)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 className="animate-spin" style={{ margin: '0 auto 8px' }} size={24} />
@@ -71,7 +71,7 @@ const BomParentList: React.FC<BomParentListProps> = ({
           filteredItems.map((item) => {
             const itemIdNum = Number(item.id);
             const isSelected = selectedItemId === itemIdNum;
-            
+
             return (
               <div
                 key={item.id}
@@ -104,10 +104,10 @@ const BomParentList: React.FC<BomParentListProps> = ({
                   <span style={{ fontWeight: '600', color: isSelected ? 'var(--accent-primary)' : 'white', fontSize: '0.95rem' }}>
                     {item.name}
                   </span>
-                  <span style={{ 
-                    fontSize: '0.75rem', 
-                    padding: '2px 8px', 
-                    background: item.category === '제품' ? 'rgba(16, 185, 129, 0.1)' : item.category === '반제품' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(107, 114, 128, 0.1)', 
+                  <span style={{
+                    fontSize: '0.75rem',
+                    padding: '2px 8px',
+                    background: item.category === '제품' ? 'rgba(16, 185, 129, 0.1)' : item.category === '반제품' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(107, 114, 128, 0.1)',
                     color: item.category === '제품' ? '#34d399' : item.category === '반제품' ? '#818cf8' : '#9ca3af',
                     borderRadius: '12px',
                     border: `1px solid ${item.category === '제품' ? 'rgba(16, 185, 129, 0.2)' : item.category === '반제품' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(107, 114, 128, 0.2)'}`

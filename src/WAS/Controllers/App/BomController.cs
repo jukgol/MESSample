@@ -39,6 +39,40 @@ namespace WAS.Controllers.App
             }
         }
 
+        [HttpGet("step/{stepId}")]
+        [HasPermission(Permissions.MasterDataView)]
+        [ProducesResponseType(typeof(IEnumerable<BomDto>), 200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<IEnumerable<BomDto>>> GetBomsByStep(int stepId)
+        {
+            try
+            {
+                var boms = await _bomService.GetBomsByStepAsync(stepId);
+                return Ok(boms);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"공정 단계 ID({stepId}) 기준 BOM 목록 조회 중 오류 발생: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        [HasPermission(Permissions.MasterDataView)]
+        [ProducesResponseType(typeof(IEnumerable<BomDto>), 200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<IEnumerable<BomDto>>> GetAllBoms()
+        {
+            try
+            {
+                var boms = await _bomService.GetAllBomsAsync();
+                return Ok(boms);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"전체 BOM 목록 조회 중 오류 발생: {ex.Message}" });
+            }
+        }
+
         [HttpPost]
         [HasPermission(Permissions.MasterDataEdit)]
         [ProducesResponseType(200)]
@@ -92,6 +126,29 @@ namespace WAS.Controllers.App
             catch (Exception ex)
             {
                 return StatusCode(500, new { Message = $"BOM 수정 중 오류 발생: {ex.Message}" });
+            }
+        }
+
+        [HttpPut("{id}/step")]
+        [HasPermission(Permissions.MasterDataEdit)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> UpdateBomProcess(int id, [FromBody] BomUpdateProcessDto dto)
+        {
+            try
+            {
+                if (dto == null)
+                {
+                    return BadRequest(new { Message = "요청 본문이 올바르지 않습니다." });
+                }
+
+                await _bomService.UpdateBomProcessStepAsync(id, dto.ProcessStepID);
+                return Ok(new { Message = "BOM 공정 매핑 정보가 성공적으로 수정되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"BOM 공정 매핑 수정 중 오류 발생: {ex.Message}" });
             }
         }
 

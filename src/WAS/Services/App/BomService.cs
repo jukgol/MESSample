@@ -27,6 +27,16 @@ namespace WAS.Services.App
             return await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_PARENT", new { ParentItemId = parentId });
         }
 
+        public async Task<IEnumerable<BomDto>> GetBomsByStepAsync(int stepId)
+        {
+            return await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_STEP", new { ProcessStepId = stepId });
+        }
+
+        public async Task<IEnumerable<BomDto>> GetAllBomsAsync()
+        {
+            return await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_ALL_BOMS");
+        }
+
         public async Task CreateBomAsync(BomCreateDto dto)
         {
             await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM", new
@@ -45,6 +55,15 @@ namespace WAS.Services.App
                 BomId = id,
                 BomQty = dto.BomQty,
                 ProcessStepId = dto.ProcessStepID
+            });
+        }
+
+        public async Task UpdateBomProcessStepAsync(int bomId, int? processStepId)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM_PROCESS", new
+            {
+                BomId = bomId,
+                ProcessStepId = processStepId
             });
         }
 

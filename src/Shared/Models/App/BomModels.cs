@@ -35,4 +35,9 @@ namespace Shared.Models.App
         public int BomQty { get; set; }
         public string ProcessStepName { get; set; } = string.Empty;
     }
+
+    public class BomUpdateProcessDto
+    {
+        public int? ProcessStepID { get; set; }
+    }
 }

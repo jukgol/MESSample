@@ -59,6 +59,79 @@ export const useBoms = () => {
     }
   }, []);
 
+  const fetchBomsByStep = useCallback(async (stepId: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get(`/api/bom/step/${stepId}`);
+      if (Array.isArray(response.data)) {
+        const mappedBoms = response.data.map((item: any) => ({
+          bomID: item.bomID || item.bomId,
+          parentItemID: item.parentItemID || item.parentItemId,
+          parentItemName: item.parentItemName || '',
+          childItemID: item.childItemID || item.childItemId,
+          childItemName: item.childItemName || '',
+          bomQty: item.bomQty !== undefined ? item.bomQty : item.quantity,
+          processStepID: item.processStepID !== undefined ? item.processStepID : item.processStepId,
+          processStepName: item.processStepName || ''
+        }));
+        setBoms(mappedBoms);
+        return mappedBoms;
+      }
+      setBoms([]);
+      return [];
+    } catch (err: any) {
+      console.error('공정 기준 BOM 목록 조회 실패:', err);
+      setError('공정별 BOM 데이터를 조회하는 중 오류가 발생했습니다.');
+      setBoms([]);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchAllBoms = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await apiClient.get('/api/bom');
+      if (Array.isArray(response.data)) {
+        const mappedBoms = response.data.map((item: any) => ({
+          bomID: item.bomID || item.bomId,
+          parentItemID: item.parentItemID || item.parentItemId,
+          parentItemName: item.parentItemName || '',
+          childItemID: item.childItemID || item.childItemId,
+          childItemName: item.childItemName || '',
+          bomQty: item.bomQty !== undefined ? item.bomQty : item.quantity,
+          processStepID: item.processStepID !== undefined ? item.processStepID : item.processStepId,
+          processStepName: item.processStepName || ''
+        }));
+        return mappedBoms;
+      }
+      return [];
+    } catch (err: any) {
+      console.error('전체 BOM 목록 조회 실패:', err);
+      setError('전체 BOM 데이터를 조회하는 중 오류가 발생했습니다.');
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const updateBomProcess = async (bomId: number, processStepID: number | null) => {
+    try {
+      setError(null);
+      await apiClient.put(`/api/bom/${bomId}/step`, {
+        processStepID: processStepID ? Number(processStepID) : null
+      });
+      return true;
+    } catch (err: any) {
+      console.error('BOM 공정 매핑 수정 실패:', err);
+      setError(err.response?.data?.message || 'BOM 공정 매핑 수정 중 오류가 발생했습니다.');
+      return false;
+    }
+  };
+
   const createBom = async (dto: BomCreateDto) => {
     try {
       setError(null);
@@ -129,6 +202,9 @@ export const useBoms = () => {
     loading,
     error,
     fetchBomsByParent,
+    fetchBomsByStep,
+    fetchAllBoms,
+    updateBomProcess,
     createBom,
     updateBom,
     deleteBom,

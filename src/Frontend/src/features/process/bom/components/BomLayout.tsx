@@ -12,10 +12,11 @@ const BomLayout: React.FC<BomLayoutProps> = ({ left, right }) => {
       gridTemplateColumns: 'minmax(300px, 1fr) 2fr',
       gap: '20px',
       alignItems: 'stretch',
-      flex: 1
+      height: 'calc(100vh - 240px)', // BOM 윈도우 한계를 뷰포트에서 직접 제한
+      minHeight: 0
     }}>
-      <div>{left}</div>
-      <div>{right}</div>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>{left}</div>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>{right}</div>
     </div>
   );
 };
