@@ -1,26 +1,26 @@
 [
   {
-    "step_name": "반죽 공정",
+    "step_name": "면공정",
     "seq_no": 10,
     "step_type": "생산",
-    "description": "밀가루에 정제수를 섞어 반죽을 만드는 단계"
+    "description": "밀가루를 원재료로 하여 라면 면발을 생산하는 단계"
   },
   {
-    "step_name": "제면 공정",
+    "step_name": "분말공정",
     "seq_no": 20,
     "step_type": "생산",
-    "description": "반죽을 밀어 면발 형태로 뽑아내고 찌는 단계"
+    "description": "고춧가루 및 원료를 배합하여 분말 스프를 만드는 단계"
   },
   {
-    "step_name": "유탕 공정",
+    "step_name": "건더기공정",
     "seq_no": 30,
     "step_type": "생산",
-    "description": "150도 기름에 면발을 튀겨 건조하는 단계"
+    "description": "건조 파 등의 건더기 부자재를 혼합하는 단계"
   },
   {
-    "step_name": "포장 공정",
+    "step_name": "포장공정",
     "seq_no": 40,
     "step_type": "포장 / 검사",
-    "description": "면발, 스프들을 한데 모아 비닐포장 및 중량 검사하는 단계"
+    "description": "완성된 면발, 스프, 건더기와 포장비닐을 모아 최종 포장하는 단계"
   }
 ]

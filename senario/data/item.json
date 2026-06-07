@@ -4,35 +4,21 @@
     "item_name": "밀가루",
     "item_type": "RawMaterial",
     "unit": "kg",
-    "description": "공통 반죽용 밀가루 원재료"
+    "description": "면공정 투입용 밀가루 원재료"
   },
   {
-    "item_code": "201",
-    "item_name": "신라면 분말스프",
+    "item_code": "102",
+    "item_name": "고춧가루",
     "item_type": "RawMaterial",
-    "unit": "ea",
-    "description": "신라면용 국물 조미 스프"
+    "unit": "kg",
+    "description": "분말공정 투입용 스프 조미 원재료"
   },
   {
-    "item_code": "202",
-    "item_name": "진라면 분말스프",
+    "item_code": "103",
+    "item_name": "건조 파",
     "item_type": "RawMaterial",
-    "unit": "ea",
-    "description": "진라면용 국물 조미 스프"
-  },
-  {
-    "item_code": "203",
-    "item_name": "신라면 건더기스프",
-    "item_type": "RawMaterial",
-    "unit": "ea",
-    "description": "신라면용 야채/고기 스프"
-  },
-  {
-    "item_code": "204",
-    "item_name": "진라면 건더기스프",
-    "item_type": "RawMaterial",
-    "unit": "ea",
-    "description": "진라면용 야채/고기 스프"
+    "unit": "kg",
+    "description": "건더기공정 투입용 야채 건조 원재료"
   },
   {
     "item_code": "301",
@@ -53,27 +39,55 @@
     "item_name": "신라면 면발",
     "item_type": "Component",
     "unit": "ea",
-    "description": "신라면 전용 건조/유탕 면 사리"
+    "description": "면공정에서 생산되어 포장공정으로 투입되는 면발 반제품"
   },
   {
     "item_code": "402",
     "item_name": "진라면 면발",
     "item_type": "Component",
     "unit": "ea",
-    "description": "진라면 전용 건조/유탕 면 사리"
+    "description": "면공정에서 생산되어 포장공정으로 투입되는 면발 반제품"
+  },
+  {
+    "item_code": "201",
+    "item_name": "신라면 분말스프",
+    "item_type": "Component",
+    "unit": "ea",
+    "description": "분말공정에서 생산되어 포장공정으로 투입되는 스프 반제품"
+  },
+  {
+    "item_code": "202",
+    "item_name": "진라면 분말스프",
+    "item_type": "Component",
+    "unit": "ea",
+    "description": "분말공정에서 생산되어 포장공정으로 투입되는 스프 반제품"
+  },
+  {
+    "item_code": "203",
+    "item_name": "신라면 건더기스프",
+    "item_type": "Component",
+    "unit": "ea",
+    "description": "건더기공정에서 생산되어 포장공정으로 투입되는 건더기 반제품"
+  },
+  {
+    "item_code": "204",
+    "item_name": "진라면 건더기스프",
+    "item_type": "Component",
+    "unit": "ea",
+    "description": "건더기공정에서 생산되어 포장공정으로 투입되는 건더기 반제품"
   },
   {
     "item_code": "501",
     "item_name": "신라면 (완제품)",
     "item_type": "Product",
     "unit": "ea",
-    "description": "출하 가능한 신라면 최종 완제품"
+    "description": "포장공정을 거쳐 출하 가능한 신라면 최종 완제품"
   },
   {
     "item_code": "502",
     "item_name": "진라면 (완제품)",
     "item_type": "Product",
     "unit": "ea",
-    "description": "출하 가능한 진라면 최종 완제품"
+    "description": "포장공정을 거쳐 출하 가능한 진라면 최종 완제품"
   }
 ]

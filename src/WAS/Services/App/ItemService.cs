@@ -97,9 +97,18 @@ namespace WAS.Services.App
             foreach (var item in items)
             {
                 var existing = await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_BY_CODE", new { ItemCode = item.ItemCode });
-                if (existing.Any())
+                var existingItem = existing.FirstOrDefault();
+                if (existingItem != null)
                 {
-                    _logger.LogInformation("[SKIP] {ItemName} ({ItemCode}) 이미 존재함", item.ItemName, item.ItemCode);
+                    await UpdateItemAsync(existingItem.ItemID, new ItemUpdateDto
+                    {
+                        ItemCode = item.ItemCode,
+                        ItemName = item.ItemName,
+                        ItemType = item.ItemType,
+                        Unit = item.Unit,
+                        Description = item.Description
+                    });
+                    _logger.LogInformation("[UPDATE] {ItemName} ({ItemCode}) 업데이트 완료", item.ItemName, item.ItemCode);
                 }
                 else
                 {

@@ -1,8 +1,33 @@
 [
   {
-    "parent_item_code": "501",
+    "parent_item_code": "401",
     "child_item_code": "101",
     "bom_qty": 100
+  },
+  {
+    "parent_item_code": "402",
+    "child_item_code": "101",
+    "bom_qty": 95
+  },
+  {
+    "parent_item_code": "201",
+    "child_item_code": "102",
+    "bom_qty": 10
+  },
+  {
+    "parent_item_code": "202",
+    "child_item_code": "102",
+    "bom_qty": 8
+  },
+  {
+    "parent_item_code": "203",
+    "child_item_code": "103",
+    "bom_qty": 5
+  },
+  {
+    "parent_item_code": "204",
+    "child_item_code": "103",
+    "bom_qty": 4
   },
   {
     "parent_item_code": "501",
@@ -23,11 +48,6 @@
     "parent_item_code": "501",
     "child_item_code": "301",
     "bom_qty": 1
-  },
-  {
-    "parent_item_code": "502",
-    "child_item_code": "101",
-    "bom_qty": 95
   },
   {
     "parent_item_code": "502",

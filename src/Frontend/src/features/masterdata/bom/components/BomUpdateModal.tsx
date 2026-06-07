@@ -17,7 +17,7 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
   selectedBomForUpdate,
   onSubmit
 }) => {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{ bomQty: number | '' }>({
     bomQty: 1
   });
 
@@ -33,7 +33,7 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (Number(form.bomQty) <= 0) {
+    if (form.bomQty === '' || Number(form.bomQty) <= 0) {
       alert('소요량은 1개 이상이어야 합니다.');
       return;
     }
@@ -73,7 +73,10 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
               min={1}
               placeholder="예: 1"
               value={form.bomQty}
-              onChange={(e) => setForm({ ...form, bomQty: Math.max(1, Number(e.target.value)) })}
+              onChange={(e) => {
+                const val = e.target.value;
+                setForm({ ...form, bomQty: val === '' ? '' : Number(val) });
+              }}
               style={{
                 padding: '0.8rem',
                 background: 'rgba(0,0,0,0.4)',
