@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useProcessSteps } from '../hooks/useProcessSteps';
 import type { ProcessStep } from '../hooks/useProcessSteps';
-import { Search, Plus, RotateCw, Database, LayoutGrid, List } from 'lucide-react';
+import { Search, Plus, RotateCw, Database } from 'lucide-react';
 
 // Split Components
 import ProcessStepHeader from '../components/ProcessStepHeader';
 import ProcessStepTable from '../components/ProcessStepTable';
-import ProcessStepNodeMap from '../components/ProcessStepNodeMap';
 import StepCreateModal from '../components/StepCreateModal';
 import StepUpdateMappingModal from '../components/StepUpdateMappingModal';
 
@@ -24,9 +23,6 @@ const ProcessStepList: React.FC = () => {
 
   // 검색어 상태
   const [searchTerm, setSearchTerm] = useState('');
-
-  // 뷰 모드 상태 ('list' | 'node')
-  const [viewMode, setViewMode] = useState<'list' | 'node'>('list');
 
   // 모달 제어 상태
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -93,78 +89,34 @@ const ProcessStepList: React.FC = () => {
         </button>
       </div>
 
-      {/* 탭 컨트롤 영역 */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-        <button
-          onClick={() => setViewMode('list')}
+      {/* 검색창 */}
+      <div style={{ position: 'relative', marginBottom: '1.5rem', marginTop: '1.5rem' }}>
+        <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+        <input
+          type="text"
+          placeholder="공정명 또는 유형으로 검색..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: viewMode === 'list' ? 'var(--accent-primary)' : 'rgba(255,255,255,0.05)',
+            width: '100%',
+            padding: '0.8rem 1rem 0.8rem 2.5rem',
+            background: 'rgba(0,0,0,0.2)',
             border: '1px solid var(--border-color)',
+            borderRadius: '10px',
             color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: '600'
+            outline: 'none'
           }}
-        >
-          <List size={16} /> 목록 뷰
-        </button>
-        <button
-          onClick={() => setViewMode('node')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            background: viewMode === 'node' ? 'var(--accent-primary)' : 'rgba(255,255,255,0.05)',
-            border: '1px solid var(--border-color)',
-            color: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontWeight: '600'
-          }}
-        >
-          <LayoutGrid size={16} /> 노드 맵 뷰
-        </button>
+        />
       </div>
 
-      {viewMode === 'list' ? (
-        <>
-          {/* 검색창 */}
-          <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
-            <input
-              type="text"
-              placeholder="공정명 또는 유형으로 검색..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '0.8rem 1rem 0.8rem 2.5rem',
-                background: 'rgba(0,0,0,0.2)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '10px',
-                color: 'white',
-                outline: 'none'
-              }}
-            />
-          </div>
-
-          {/* 리스트 테이블 */}
-          <ProcessStepTable
-            processSteps={filteredSteps}
-            loading={loading}
-            error={error}
-            onOpenUpdateModal={handleOpenUpdate}
-            onDelete={handleDeleteConfirm}
-          />
-        </>
-      ) : (
-        <ProcessStepNodeMap processSteps={processSteps} />
-      )}
+      {/* 리스트 테이블 */}
+      <ProcessStepTable
+        processSteps={filteredSteps}
+        loading={loading}
+        error={error}
+        onOpenUpdateModal={handleOpenUpdate}
+        onDelete={handleDeleteConfirm}
+      />
 
       {/* 1. 신규 등록 모달 */}
       <StepCreateModal
