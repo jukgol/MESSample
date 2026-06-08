@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Database, Loader2 } from 'lucide-react';
-import type { Item } from '../../../masterdata/item/hooks/useItems';
+import type { Item } from '../../item/hooks/useItems';
 
 interface BomParentListProps {
   items: Item[];

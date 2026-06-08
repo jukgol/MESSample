@@ -59,13 +59,13 @@ const Sidebar = () => {
     { 
       title: '공정 관리', 
       icon: <Settings size={20} />, 
-      path: '/dashboard/process',
+      path: '/dashboard/masterdata',
       allowedRoles: ['ADMIN', 'OPERATOR'],
       children: [
-        { title: '제품별 공정 관리', path: '/dashboard/process/product-processes', icon: <Settings size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
-        { title: '공정 정의', path: '/dashboard/process/steps', icon: <Settings size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
-        { title: 'BOM 레시피 관리', path: '/dashboard/process/boms', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
-        { title: '작업 지시 (WO)', path: '/dashboard/process/workorder', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
+        { title: '제품별 공정 관리', path: '/dashboard/masterdata/product-processes', icon: <Settings size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
+        { title: '공정 정의', path: '/dashboard/masterdata/steps', icon: <Settings size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
+        { title: 'BOM 레시피 관리', path: '/dashboard/masterdata/boms', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
+        { title: '작업 지시 (WO)', path: '/dashboard/masterdata/workorder', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
       ]
     },
     { 

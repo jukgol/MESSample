@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useItems } from '../../../masterdata/item/hooks/useItems';
+import { useItems } from '../../item/hooks/useItems';
 import { useBoms } from '../hooks/useBoms';
 import type { Bom } from '../hooks/useBoms';
 import { useProcessSteps } from '../../step/hooks/useProcessSteps';

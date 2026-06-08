@@ -2,10 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from '../../../layouts/Layout';
 import ItemList from '../../masterdata/item/pages/ItemList';
 import ItemTypeList from '../../masterdata/itemtype/pages/ItemTypeList';
-import BomManagePage from '../../process/bom/pages/BomManagePage';
+import BomManagePage from '../../masterdata/bom/pages/BomManagePage';
 import LotList from '../../inventory/lot/pages/LotList';
-import ProcessStepList from '../../process/step/pages/ProcessStepList';
-import ProductProcessList from '../../process/master/pages/ProductProcessList';
+import ProcessStepList from '../../masterdata/step/pages/ProcessStepList';
+import ProductProcessList from '../../masterdata/master/pages/ProductProcessList';
 import DashboardHome from '../pages/DashboardHome';
 import UserList from '../../system/user/pages/UserList';
 import RoleManager from '../../system/manager/pages/RoleManager';
@@ -39,7 +39,9 @@ const DashboardRoutes = () => {
             <Route path="/masterdata" element={<Navigate to="items" replace />} />
             <Route path="/masterdata/items" element={<ItemList />} />
             <Route path="/masterdata/itemtype" element={<ItemTypeList />} />
-            <Route path="/process/boms" element={<BomManagePage />} />
+            <Route path="/masterdata/boms" element={<BomManagePage />} />
+            <Route path="/masterdata/steps" element={<ProcessStepList />} />
+            <Route path="/masterdata/product-processes" element={<ProductProcessList />} />
 
             <Route path="/inventory" element={<Navigate to="lots" replace />} />
             <Route path="/inventory/lots" element={<LotList />} />
@@ -52,9 +54,7 @@ const DashboardRoutes = () => {
         {/* 공정 관리 - ADMIN, OPERATOR */}
         {hasAccess(['ADMIN', 'OPERATOR']) && (
           <>
-            <Route path="/process/steps" element={<ProcessStepList />} />
-            <Route path="/process/product-processes" element={<ProductProcessList />} />
-            <Route path="/process/workorder" element={<Placeholder title="작업 지시 (WO)" />} />
+            <Route path="/masterdata/workorder" element={<Placeholder title="작업 지시 (WO)" />} />
           </>
         )}
 

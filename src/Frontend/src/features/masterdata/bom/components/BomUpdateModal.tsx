@@ -1,56 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { Info } from 'lucide-react';
-import type { Item } from '../../../masterdata/item/hooks/useItems';
+import type { Item } from '../../item/hooks/useItems';
+import type { Bom } from '../hooks/useBoms';
 import type { ProcessStep } from '../../step/hooks/useProcessSteps';
 
-interface BomCreateModalProps {
+interface BomUpdateModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedParentItem: Item | null;
-  availableChildItems: Item[];
+  selectedBomForUpdate: Bom | null;
   processSteps: ProcessStep[];
-  onSubmit: (dto: { childItemID: number; bomQty: number; processStepID?: number | null }) => Promise<boolean>;
+  onSubmit: (dto: { bomQty: number; processStepID?: number | null }) => Promise<boolean>;
 }
 
-const BomCreateModal: React.FC<BomCreateModalProps> = ({
+const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
   isOpen,
   onClose,
   selectedParentItem,
-  availableChildItems,
+  selectedBomForUpdate,
   processSteps,
   onSubmit
 }) => {
-  const [form, setForm] = useState<{ childItemID: string; bomQty: number | ''; processStepID: string }>({
-    childItemID: '',
+  const [form, setForm] = useState<{ bomQty: number | ''; processStepID: string }>({
     bomQty: 1,
     processStepID: ''
   });
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && selectedBomForUpdate) {
       setForm({
-        childItemID: '',
-        bomQty: 1,
-        processStepID: ''
+        bomQty: selectedBomForUpdate.bomQty,
+        processStepID: selectedBomForUpdate.processStepID?.toString() || ''
       });
     }
-  }, [isOpen]);
+  }, [isOpen, selectedBomForUpdate]);
 
-  if (!isOpen || !selectedParentItem) return null;
+  if (!isOpen || !selectedParentItem || !selectedBomForUpdate) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.childItemID) {
-      alert('입력 품목을 선택해 주세요.');
-      return;
-    }
     if (form.bomQty === '' || Number(form.bomQty) <= 0) {
-      alert('소요량은 1개 이상이어야 합니다.');
+      alert('?뚯슂?됱? 1媛??댁긽?댁뼱???⑸땲??');
       return;
     }
 
     const success = await onSubmit({
-      childItemID: Number(form.childItemID),
       bomQty: Number(form.bomQty),
       processStepID: form.processStepID === '' ? null : Number(form.processStepID)
     });
@@ -69,46 +62,17 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
       zIndex: 1000
     }}>
       <div className="premium-card" style={{ width: '450px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#1e1e24', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
-        <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.4rem' }}>BOM 구성 요소 추가</h2>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '6px' }}>
-          <strong>기준 출력 품목:</strong> {selectedParentItem.name} (ID: {selectedParentItem.id})
+        <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.4rem' }}>BOM ?뚯슂???섏젙</h2>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '6px' }}>
+          <div><strong>湲곗? 異쒕젰 ?덈ぉ:</strong> {selectedParentItem.name}</div>
+          <div><strong>????낅젰 ?덈ぉ:</strong> {selectedBomForUpdate.childItemName || `?덈ぉ #${selectedBomForUpdate.childItemID}`}</div>
+          <div><strong>BOM 留ㅽ븨 ID:</strong> {selectedBomForUpdate.bomID}</div>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>추가할 입력 품목</label>
-            {availableChildItems.length > 0 ? (
-              <select
-                required
-                value={form.childItemID}
-                onChange={(e) => setForm({ ...form, childItemID: e.target.value })}
-                style={{
-                  padding: '0.8rem',
-                  background: 'rgba(0,0,0,0.4)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  outline: 'none',
-                  fontSize: '0.95rem'
-                }}
-              >
-                <option value="" style={{ background: '#1e1e24' }}>-- 품목 선택 --</option>
-                {availableChildItems.map((item) => (
-                  <option key={item.id} value={item.id} style={{ background: '#1e1e24' }}>
-                    [{item.category}] {item.name} (ID: {item.id})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div style={{ color: '#fbbf24', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '6px' }}>
-                <Info size={16} /> 추가 가능한 다른 입력 품목이 존재하지 않습니다.
-              </div>
-            )}
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>투입할 공정 단계 (선택)</label>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>?ъ엯??怨듭젙 ?④퀎 (?좏깮)</label>
             <select
               value={form.processStepID}
               onChange={(e) => setForm({ ...form, processStepID: e.target.value })}
@@ -122,7 +86,7 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
                 fontSize: '0.95rem'
               }}
             >
-              <option value="" style={{ background: '#1e1e24' }}>-- 연결 없음 (미지정) --</option>
+              <option value="" style={{ background: '#1e1e24' }}>-- ?곌껐 ?놁쓬 (誘몄??? --</option>
               {processSteps.map((step) => (
                 <option key={step.stepID} value={step.stepID} style={{ background: '#1e1e24' }}>
                   Seq {step.seqNo}: {step.stepName} ({step.stepType})
@@ -132,12 +96,12 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>소요 수량 (Qty)</label>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>?섏젙???뚯슂 ?섎웾 (Qty)</label>
             <input
               type="number"
               required
               min={1}
-              placeholder="예: 1"
+              placeholder="?? 1"
               value={form.bomQty}
               onChange={(e) => {
                 const val = e.target.value;
@@ -166,13 +130,10 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
                 boxShadow: 'none'
               }}
             >
-              취소
+              痍⑥냼
             </button>
-            <button 
-              type="submit"
-              disabled={availableChildItems.length === 0}
-            >
-              추가
+            <button type="submit">
+              ?섏젙
             </button>
           </div>
         </form>
@@ -181,4 +142,4 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
   );
 };
 
-export default BomCreateModal;
+export default BomUpdateModal;

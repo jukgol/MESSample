@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Loader2, Plus, X } from 'lucide-react';
 import { useBoms } from '../../bom/hooks/useBoms';
 import type { Bom } from '../../bom/hooks/useBoms';
-import { useItems } from '../../../masterdata/item/hooks/useItems';
-import type { Item } from '../../../masterdata/item/hooks/useItems';
+import { useItems } from '../../item/hooks/useItems';
+import type { Item } from '../../item/hooks/useItems';
 import type { ProcessStep } from '../hooks/useProcessSteps';
 
 interface StepUpdateMappingModalProps {
