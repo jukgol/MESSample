@@ -4,7 +4,8 @@ import ItemList from '../../masterdata/item/pages/ItemList';
 import ItemTypeList from '../../masterdata/itemtype/pages/ItemTypeList';
 import BomManagePage from '../../process/bom/pages/BomManagePage';
 import LotList from '../../inventory/lot/pages/LotList';
-import ProcessStepList from '../../process/pages/ProcessStepList';
+import ProcessStepList from '../../process/step/pages/ProcessStepList';
+import ProductProcessList from '../../process/master/pages/ProductProcessList';
 import DashboardHome from '../pages/DashboardHome';
 import UserList from '../../system/user/pages/UserList';
 import RoleManager from '../../system/manager/pages/RoleManager';
@@ -52,6 +53,7 @@ const DashboardRoutes = () => {
         {hasAccess(['ADMIN', 'OPERATOR']) && (
           <>
             <Route path="/process/steps" element={<ProcessStepList />} />
+            <Route path="/process/product-processes" element={<ProductProcessList />} />
             <Route path="/process/workorder" element={<Placeholder title="작업 지시 (WO)" />} />
           </>
         )}

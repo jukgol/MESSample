@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System;
 using System.Linq;
+using Dapper;
 
 namespace WAS.Services
 {
@@ -40,13 +41,36 @@ namespace WAS.Services
                 var sqlFiles = Directory.GetFiles(scriptsPath, "*.sql");
                 foreach (var file in sqlFiles)
                 {
+                    var procedureName = Path.GetFileNameWithoutExtension(file).ToUpper();
+                    bool exists = false;
+
+                    try
+                    {
+                        using var connection = _db.CreateConnection();
+                        exists = await connection.ExecuteScalarAsync<int>(
+                            "SELECT COUNT(*) FROM USER_OBJECTS WHERE OBJECT_TYPE = 'PROCEDURE' AND OBJECT_NAME = :Name",
+                            new { Name = procedureName }
+                        ) > 0;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "[PROCDRE] 프로시저 '{Name}' 존재 여부 조회 실패. 기본값인 미존재로 간주합니다.", procedureName);
+                    }
+
                     var sql = await File.ReadAllTextAsync(file);
                     var result = await _scriptExecutor.ExecuteSqlAsync(sql);
                     
                     if (result.Success)
-                        _logger.LogInformation($"[PROCDRE] {Path.GetFileName(file)} 배포 성공.");
+                    {
+                        if (!exists)
+                        {
+                            _logger.LogInformation($"[PROCDRE] {Path.GetFileName(file)} 최초 배포 성공.");
+                        }
+                    }
                     else
+                    {
                         _logger.LogError($"[PROCDRE] {Path.GetFileName(file)} 배포 실패: {result.Message}");
+                    }
                 }
             }
             catch (Exception ex)

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import apiClient from '../../../api/client';
+import apiClient from '../../../../api/client';
 
 export interface ProcessStep {
   stepID: number;
@@ -7,6 +7,8 @@ export interface ProcessStep {
   seqNo: number;
   stepType: string;
   description: string;
+  processMasterID?: number | null;
+  processMasterName?: string | null;
   createdAt?: string;
 }
 
@@ -15,6 +17,7 @@ export interface ProcessStepCreateDto {
   seqNo: number;
   stepType: string;
   description: string;
+  processMasterID?: number | null;
 }
 
 export interface ProcessStepUpdateDto {
@@ -22,6 +25,7 @@ export interface ProcessStepUpdateDto {
   seqNo: number;
   stepType: string;
   description: string;
+  processMasterID?: number | null;
 }
 
 export const useProcessSteps = () => {
@@ -44,6 +48,8 @@ export const useProcessSteps = () => {
           seqNo: step.seqNo,
           stepType: step.stepType,
           description: step.description || '-',
+          processMasterID: step.processMasterID || step.processMasterId || null,
+          processMasterName: step.processMasterName || null,
           createdAt: step.createdAt
         }));
         setProcessSteps(mappedSteps);

@@ -5,9 +5,10 @@ import ProcessStepHeader from './ProcessStepHeader';
 import ProcessStepTable from './ProcessStepTable';
 import ProcessStepNodeMap from './ProcessStepNodeMap';
 import { Search, Plus, RotateCw, Database, LayoutGrid, List, Loader2, Link, X } from 'lucide-react';
-import { useBoms } from '../bom/hooks/useBoms';
-import type { Bom } from '../bom/hooks/useBoms';
-import { useItems } from '../../masterdata/item/hooks/useItems';
+import { useBoms } from '../../bom/hooks/useBoms';
+import type { Bom } from '../../bom/hooks/useBoms';
+import { useItems } from '../../../masterdata/item/hooks/useItems';
+import type { Item } from '../../../masterdata/item/hooks/useItems';
 
 const ProcessStepList: React.FC = () => {
   const {
@@ -348,7 +349,7 @@ const ProcessStepList: React.FC = () => {
     if (selectedParentID === null) return [];
     // 이미 등록된 입력 자재 ID들 제외
     const registeredChildIDs = new Set(filteredInputs.map(i => i.childItemID));
-    return items.filter(item => {
+    return items.filter((item: Item) => {
       const itemIdNum = Number(item.id);
       return itemIdNum !== selectedParentID && !registeredChildIDs.has(itemIdNum);
     });

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Item } from '../../../masterdata/item/hooks/useItems';
 import type { Bom } from '../hooks/useBoms';
-import type { ProcessStep } from '../../pages/useProcessSteps';
+import type { ProcessStep } from '../../step/pages/useProcessSteps';
 
 interface BomUpdateModalProps {
   isOpen: boolean;

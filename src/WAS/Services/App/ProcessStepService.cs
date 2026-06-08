@@ -38,7 +38,8 @@ namespace WAS.Services.App
                 StepName = dto.StepName,
                 SeqNo = dto.SeqNo,
                 StepType = dto.StepType,
-                Description = dto.Description
+                Description = dto.Description,
+                ProcessMasterId = dto.ProcessMasterID
             });
         }
 
@@ -50,7 +51,8 @@ namespace WAS.Services.App
                 StepName = dto.StepName,
                 SeqNo = dto.SeqNo,
                 StepType = dto.StepType,
-                Description = dto.Description
+                Description = dto.Description,
+                ProcessMasterId = dto.ProcessMasterID
             });
         }
 
