@@ -12,7 +12,8 @@ import {
   ShieldCheck,
   LogOut,
   Layers,
-  Users
+  Users,
+  Calculator
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -44,6 +45,9 @@ const Sidebar = () => {
       children: [
         { title: '품목 리스트', path: '/dashboard/masterdata/items', icon: <Package size={16} />, allowedRoles: ['ADMIN'] },
         { title: '품목 유형 관리', path: '/dashboard/masterdata/itemtype', icon: <Layers size={16} />, allowedRoles: ['ADMIN'] },
+        { title: '제품별 공정 관리', path: '/dashboard/masterdata/product-processes', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
+        { title: '공정 정의', path: '/dashboard/masterdata/steps', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
+        { title: 'BOM 레시피 관리', path: '/dashboard/masterdata/boms', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
       ]
     },
     { 
@@ -53,6 +57,7 @@ const Sidebar = () => {
       allowedRoles: ['ADMIN'],
       children: [
         { title: 'LOT 관리', path: '/dashboard/inventory/lots', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN'] },
+        { title: '자재 소요량 계획 (MRP)', path: '/dashboard/inventory/mrp', icon: <Calculator size={16} />, allowedRoles: ['ADMIN'] },
         { title: '출하 관리', path: '/dashboard/inventory/shipments', icon: <Truck size={16} />, allowedRoles: ['ADMIN'] },
       ]
     },
@@ -62,9 +67,6 @@ const Sidebar = () => {
       path: '/dashboard/masterdata',
       allowedRoles: ['ADMIN', 'OPERATOR'],
       children: [
-        { title: '제품별 공정 관리', path: '/dashboard/masterdata/product-processes', icon: <Settings size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
-        { title: '공정 정의', path: '/dashboard/masterdata/steps', icon: <Settings size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
-        { title: 'BOM 레시피 관리', path: '/dashboard/masterdata/boms', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
         { title: '작업 지시 (WO)', path: '/dashboard/masterdata/workorder', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
       ]
     },
