@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Info } from 'lucide-react';
 import type { Item } from '../../../masterdata/item/hooks/useItems';
-import type { ProcessStep } from '../../step/pages/useProcessSteps';
+import type { ProcessStep } from '../../step/hooks/useProcessSteps';
 
 interface BomCreateModalProps {
   isOpen: boolean;

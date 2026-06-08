@@ -1,7 +1,7 @@
 import React from 'react';
 import { Settings, HelpCircle, Loader2, ArrowRight } from 'lucide-react';
 import type { ProcessMaster } from '../hooks/useProcessMasters';
-import type { ProcessStep } from '../../step/pages/useProcessSteps';
+import type { ProcessStep } from '../../step/hooks/useProcessSteps';
 
 interface MasterStepAssignedProps {
   selectedMaster: ProcessMaster | null;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { FileText, Loader2, ArrowLeft } from 'lucide-react';
-import type { ProcessStep } from '../../step/pages/useProcessSteps';
+import type { ProcessStep } from '../../step/hooks/useProcessSteps';
 
 interface MasterStepUnassignedProps {
   unassignedSteps: ProcessStep[];

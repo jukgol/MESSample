@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useProcessMasters } from '../hooks/useProcessMasters';
-import { useProcessSteps } from '../../step/pages/useProcessSteps';
+import { useProcessSteps } from '../../step/hooks/useProcessSteps';
 import type { ProcessMaster } from '../hooks/useProcessMasters';
-import type { ProcessStep } from '../../step/pages/useProcessSteps';
+import type { ProcessStep } from '../../step/hooks/useProcessSteps';
 
 // Split Components
 import MasterHeader from '../components/MasterHeader';

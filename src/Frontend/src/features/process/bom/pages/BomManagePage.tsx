@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useItems } from '../../../masterdata/item/hooks/useItems';
 import { useBoms } from '../hooks/useBoms';
 import type { Bom } from '../hooks/useBoms';
-import { useProcessSteps } from '../../step/pages/useProcessSteps';
+import { useProcessSteps } from '../../step/hooks/useProcessSteps';
 import BomParentList from '../components/BomParentList';
 import BomDetailTable from '../components/BomDetailTable';
 import BomCreateModal from '../components/BomCreateModal';

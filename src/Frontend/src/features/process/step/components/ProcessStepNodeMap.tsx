@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { ReactFlow, Background, Controls, useNodesState } from '@xyflow/react';
 import type { Node } from '@xyflow/react';
-import type { ProcessStep } from './useProcessSteps';
+import type { ProcessStep } from '../hooks/useProcessSteps';
 import '@xyflow/react/dist/style.css';
 
 interface ProcessStepNodeMapProps {

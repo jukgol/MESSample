@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loader2, Edit, Trash2 } from 'lucide-react';
-import type { ProcessStep } from './useProcessSteps';
+import type { ProcessStep } from '../hooks/useProcessSteps';
 
 interface ProcessStepTableProps {
   processSteps: ProcessStep[];
