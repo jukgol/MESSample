@@ -32,11 +32,11 @@ const BomParentList: React.FC<BomParentListProps> = ({
     <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1.5rem', gap: '1rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Database size={20} className="gradient-text" />
-        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>대상 품목 목록</h2>
+        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>출력 품목 목록</h2>
       </div>
 
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
-        BOM 레시피를 정의하거나 조회할 대상 부모 품목을 아래 목록에서 선택하세요.
+        BOM 레시피를 정의하거나 조회할 대상 출력 품목을 아래 목록에서 선택하세요.
       </p>
 
       {/* 검색 바 */}

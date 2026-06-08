@@ -71,7 +71,7 @@ const BomActionBar: React.FC<BomActionBarProps> = ({
           color: hasParentSelected ? 'white' : 'var(--text-secondary)',
           boxShadow: hasParentSelected ? undefined : 'none'
         }}
-        title={hasParentSelected ? '부모 품목에 새로운 자식 구성 요소를 추가합니다.' : '먼저 왼쪽에서 부모 품목을 선택해 주세요.'}
+        title={hasParentSelected ? '출력 품목에 새로운 입력 구성 요소를 추가합니다.' : '먼저 왼쪽에서 출력 품목을 선택해 주세요.'}
       >
         <Plus size={16} /> 구성 요소 추가
       </button>

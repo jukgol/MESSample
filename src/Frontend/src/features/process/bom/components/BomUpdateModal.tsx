@@ -65,8 +65,8 @@ const BomUpdateModal: React.FC<BomUpdateModalProps> = ({
         <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.4rem' }}>BOM 소요량 수정</h2>
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '6px' }}>
-          <div><strong>기준 부모 품목:</strong> {selectedParentItem.name}</div>
-          <div><strong>대상 자식 품목:</strong> {selectedBomForUpdate.childItemName || `품목 #${selectedBomForUpdate.childItemID}`}</div>
+          <div><strong>기준 출력 품목:</strong> {selectedParentItem.name}</div>
+          <div><strong>대상 입력 품목:</strong> {selectedBomForUpdate.childItemName || `품목 #${selectedBomForUpdate.childItemID}`}</div>
           <div><strong>BOM 매핑 ID:</strong> {selectedBomForUpdate.bomID}</div>
         </div>
 

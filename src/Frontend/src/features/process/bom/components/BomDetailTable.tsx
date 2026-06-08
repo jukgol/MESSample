@@ -23,8 +23,8 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
   if (!selectedItem) {
     return (
       <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '3rem', textAlign: 'center', minHeight: '400px' }}>
-        <Info size={40} style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }} />
-        <h3 style={{ fontSize: '1.2rem', margin: '0 0 0.5rem' }}>선택된 부모 품목 없음</h3>
+         <Info size={40} style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }} />
+        <h3 style={{ fontSize: '1.2rem', margin: '0 0 0.5rem' }}>선택된 출력 품목 없음</h3>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '300px', margin: 0 }}>
           왼쪽 품목 목록에서 임의의 품목을 선택하여 해당 품목의 BOM 레시피 구조를 조회하거나 정의해 주세요.
         </p>
@@ -46,7 +46,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
               borderRadius: '4px',
               fontWeight: '600'
             }}>
-              부모 품목
+              출력 품목
             </span>
             <h2 style={{ fontSize: '1.3rem', margin: 0 }}>{selectedItem.name}</h2>
           </div>
@@ -72,8 +72,8 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                 <th style={{ padding: '0.8rem 1rem' }}>BOM ID</th>
-                <th style={{ padding: '0.8rem 1rem' }}>자식 품목 ID</th>
-                <th style={{ padding: '0.8rem 1rem' }}>자식 품목명</th>
+                <th style={{ padding: '0.8rem 1rem' }}>입력 품목 ID</th>
+                <th style={{ padding: '0.8rem 1rem' }}>입력 품목명</th>
                 <th style={{ padding: '0.8rem 1rem' }}>투입 공정</th>
                 <th style={{ padding: '0.8rem 1rem', textAlign: 'right' }}>소요량 (BomQty)</th>
                 <th style={{ padding: '0.8rem 1rem', textAlign: 'center' }}>작업</th>
@@ -153,7 +153,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
               ) : (
                 <tr>
                   <td colSpan={6} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    정의된 자식 구성 요소(BOM)가 없습니다. 레시피를 등록하려면 상단 액션바의 "구성 요소 추가" 버튼을 클릭하세요.
+                    정의된 입력 구성 요소(BOM)가 없습니다. 레시피를 등록하려면 상단 액션바의 "구성 요소 추가" 버튼을 클릭하세요.
                   </td>
                 </tr>
               )}

@@ -41,7 +41,7 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.childItemID) {
-      alert('자식 품목을 선택해 주세요.');
+      alert('입력 품목을 선택해 주세요.');
       return;
     }
     if (form.bomQty === '' || Number(form.bomQty) <= 0) {
@@ -71,13 +71,13 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
       <div className="premium-card" style={{ width: '450px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#1e1e24', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
         <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.4rem' }}>BOM 구성 요소 추가</h2>
         <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '6px' }}>
-          <strong>기준 부모 품목:</strong> {selectedParentItem.name} (ID: {selectedParentItem.id})
+          <strong>기준 출력 품목:</strong> {selectedParentItem.name} (ID: {selectedParentItem.id})
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>추가할 자식 품목</label>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>추가할 입력 품목</label>
             {availableChildItems.length > 0 ? (
               <select
                 required
@@ -102,7 +102,7 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
               </select>
             ) : (
               <div style={{ color: '#fbbf24', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '6px' }}>
-                <Info size={16} /> 추가 가능한 다른 자식 품목이 존재하지 않습니다.
+                <Info size={16} /> 추가 가능한 다른 입력 품목이 존재하지 않습니다.
               </div>
             )}
           </div>

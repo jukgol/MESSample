@@ -1,0 +1,2 @@
+DELETE FROM PROCESS_MASTER
+WHERE process_id = :ProcessId
