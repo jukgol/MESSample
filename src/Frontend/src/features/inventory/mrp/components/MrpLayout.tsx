@@ -12,10 +12,11 @@ const MrpLayout: React.FC<MrpLayoutProps> = ({ left, right }) => {
       gridTemplateColumns: 'minmax(300px, 1fr) 2fr',
       gap: '20px',
       alignItems: 'stretch',
-      minHeight: 0
+      flex: 1,
+      minHeight: 0,
     }}>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>{left}</div>
-      <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>{right}</div>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>{left}</div>
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>{right}</div>
     </div>
   );
 };

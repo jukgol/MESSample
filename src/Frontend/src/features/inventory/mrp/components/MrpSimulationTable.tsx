@@ -35,7 +35,7 @@ const MrpSimulationTable: React.FC<MrpSimulationTableProps> = ({
   }
 
   return (
-    <div className="premium-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.2rem', background: 'var(--card-bg, #1a1a24)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.5rem', overflowY: 'auto' }}>
+    <div className="premium-card" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.2rem', background: 'var(--card-bg, #1a1a24)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.5rem', overflow: 'hidden', height: '100%', minHeight: 0 }}>
       {/* Top Configuration Bar */}
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.02)', padding: '12px 16px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -104,16 +104,21 @@ const MrpSimulationTable: React.FC<MrpSimulationTableProps> = ({
       </div>
 
       {/* Process Steps & Consumed Materials Table */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', flex: 1, overflowY: 'auto' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1, minHeight: 0 }}>
         <h4 style={{ margin: 0, fontSize: '1rem', color: 'white', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Calculator size={16} style={{ color: 'var(--accent-primary)' }} /> 공정 단계별 시뮬레이션 결과
         </h4>
+        
+        {/* 구분선 */}
+        <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', margin: '4px 0 8px 0' }} />
 
-        {mrpDetails.length === 0 && !loading ? (
-          <div style={{ border: '1px dashed var(--border-color)', borderRadius: '8px', padding: '30px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            이 공정에 연결된 공정 단계(Step)가 존재하지 않거나 소요 자재 정보가 없습니다.
-          </div>
-        ) : (
+        {/* 투명 스크롤 컨테이너 */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: '4px' }}>
+          {mrpDetails.length === 0 && !loading ? (
+            <div style={{ border: '1px dashed var(--border-color)', borderRadius: '8px', padding: '30px', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+              이 공정에 연결된 공정 단계(Step)가 존재하지 않거나 소요 자재 정보가 없습니다.
+            </div>
+          ) : (
           mrpDetails.map(step => (
             <div
               key={step.stepID}
@@ -122,12 +127,12 @@ const MrpSimulationTable: React.FC<MrpSimulationTableProps> = ({
                 borderRadius: '8px',
                 background: 'rgba(255,255,255,0.01)',
                 overflow: 'hidden',
-                marginBottom: '10px'
+                marginBottom: '10px',
+                flexShrink: 0
               }}
             >
               {/* Step Header */}
               <div style={{
-                background: 'rgba(255,255,255,0.03)',
                 padding: '10px 16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -158,11 +163,11 @@ const MrpSimulationTable: React.FC<MrpSimulationTableProps> = ({
               </div>
 
               {/* Step Material Table */}
-              <div style={{ padding: '8px' }}>
+              <div style={{ padding: '0 8px' }}>
                 {step.items.length > 0 ? (
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
                     <thead>
-                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-secondary)', height: '40px' }}>
+                      <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}>
                         <th style={{ textAlign: 'left', padding: '8px' }}>원자재명</th>
                         <th style={{ textAlign: 'right', padding: '8px' }}>단위 소요량</th>
                         <th style={{ textAlign: 'right', padding: '8px' }}>총 필요 수량</th>
@@ -219,6 +224,7 @@ const MrpSimulationTable: React.FC<MrpSimulationTableProps> = ({
             </div>
           ))
         )}
+        </div>
       </div>
     </div>
   );
