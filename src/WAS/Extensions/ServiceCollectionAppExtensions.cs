@@ -23,6 +23,9 @@ namespace WAS.Extensions
             services.AddScoped<BomService>();
             services.AddScoped<IBomService>(sp => LoggingProxy<IBomService>.Create(sp.GetRequiredService<BomService>(), sp.GetRequiredService<ILogger<BomService>>()));
 
+            services.AddScoped<MrpService>();
+            services.AddScoped<IMrpService>(sp => LoggingProxy<IMrpService>.Create(sp.GetRequiredService<MrpService>(), sp.GetRequiredService<ILogger<MrpService>>()));
+
             services.AddScoped<ItemTypeService>();
             services.AddScoped<IItemTypeService>(sp => LoggingProxy<IItemTypeService>.Create(sp.GetRequiredService<ItemTypeService>(), sp.GetRequiredService<ILogger<ItemTypeService>>()));
 

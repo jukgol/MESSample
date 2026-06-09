@@ -1,11 +1,6 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useProcessMasters } from '../../../masterdata/master/hooks/useProcessMasters';
+import { useState, useEffect, useCallback } from 'react';
+import apiClient from '../../../../api/client';
 import type { ProcessMaster } from '../../../masterdata/master/hooks/useProcessMasters';
-import { useProcessSteps } from '../../../masterdata/step/hooks/useProcessSteps';
-import type { ProcessStep } from '../../../masterdata/step/hooks/useProcessSteps';
-import { useBoms } from '../../../masterdata/bom/hooks/useBoms';
-import type { Bom } from '../../../masterdata/bom/hooks/useBoms';
-import { useLots } from '../../lot/hooks/useLots';
 
 export interface MrpItemDetail {
   bomID: number;
@@ -26,137 +21,132 @@ export interface MrpStepDetail {
   items: MrpItemDetail[];
 }
 
-export const useMrp = () => {
-  const { processMasters, loading: mastersLoading, fetchProcessMasters } = useProcessMasters();
-  const { processSteps, loading: stepsLoading, fetchProcessSteps } = useProcessSteps();
-  const { fetchBomsByStep, loading: bomsLoading } = useBoms();
-  const { lots, loading: lotsLoading, fetchLots } = useLots();
+interface MrpSummary {
+  totalItemsCount: number;
+  shortageItemsCount: number;
+  isFeasible: boolean;
+}
 
-  // State
+interface MrpSimulationResponse {
+  summary?: {
+    totalItemsCount?: number;
+    TotalItemsCount?: number;
+    shortageItemsCount?: number;
+    ShortageItemsCount?: number;
+    isFeasible?: boolean;
+    IsFeasible?: boolean;
+  };
+  Summary?: MrpSimulationResponse['summary'];
+  steps?: MrpStepDetail[];
+  Steps?: MrpStepDetail[];
+}
+
+const emptySummary: MrpSummary = {
+  totalItemsCount: 0,
+  shortageItemsCount: 0,
+  isFeasible: true
+};
+
+const mapProcessMaster = (item: any): ProcessMaster => ({
+  processID: item.processID || item.processId || item.ProcessID,
+  processCode: item.processCode || item.ProcessCode,
+  processName: item.processName || item.ProcessName,
+  description: item.description || item.Description || '-',
+  createdAt: item.createdAt || item.CreatedAt
+});
+
+const mapMrpDetails = (steps: any[] | undefined): MrpStepDetail[] => {
+  if (!Array.isArray(steps)) return [];
+
+  return steps.map(step => ({
+    stepID: step.stepID || step.stepId || step.StepID,
+    stepName: step.stepName || step.StepName,
+    seqNo: step.seqNo || step.SeqNo,
+    stepType: step.stepType || step.StepType,
+    items: Array.isArray(step.items || step.Items)
+      ? (step.items || step.Items).map((item: any) => ({
+          bomID: item.bomID || item.bomId || item.BomID,
+          childItemID: item.childItemID || item.childItemId || item.ChildItemID,
+          childItemName: item.childItemName || item.ChildItemName,
+          unitQty: item.unitQty || item.UnitQty,
+          requiredQty: item.requiredQty || item.RequiredQty,
+          currentStock: item.currentStock || item.CurrentStock || 0,
+          shortage: item.shortage || item.Shortage || 0,
+          isSufficient: item.isSufficient ?? item.IsSufficient ?? false
+        }))
+      : []
+  }));
+};
+
+const mapSummary = (summary: MrpSimulationResponse['summary']): MrpSummary => {
+  if (!summary) return emptySummary;
+
+  return {
+    totalItemsCount: summary.totalItemsCount ?? summary.TotalItemsCount ?? 0,
+    shortageItemsCount: summary.shortageItemsCount ?? summary.ShortageItemsCount ?? 0,
+    isFeasible: summary.isFeasible ?? summary.IsFeasible ?? true
+  };
+};
+
+export const useMrp = () => {
+  const [processMasters, setProcessMasters] = useState<ProcessMaster[]>([]);
   const [selectedMaster, setSelectedMaster] = useState<ProcessMaster | null>(null);
   const [targetQty, setTargetQty] = useState<number>(100);
-  const [stepBomsMap, setStepBomsMap] = useState<Record<number, Bom[]>>({});
-  const [fetchingBoms, setFetchingBoms] = useState(false);
+  const [mrpDetails, setMrpDetails] = useState<MrpStepDetail[]>([]);
+  const [summary, setSummary] = useState<MrpSummary>(emptySummary);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Steps assigned to the selected process master
-  const assignedSteps = useMemo(() => {
-    if (!selectedMaster) return [];
-    return processSteps
-      .filter(step => step.processMasterID === selectedMaster.processID)
-      .sort((a, b) => a.seqNo - b.seqNo);
-  }, [processSteps, selectedMaster]);
+  const fetchProcessMasters = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const response = await apiClient.get('/mrp/masters');
+      setProcessMasters(Array.isArray(response.data) ? response.data.map(mapProcessMaster) : []);
+    } catch (err) {
+      console.error('MRP 공정 마스터 목록 조회 실패:', err);
+      setProcessMasters([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  // Load BOMs for all steps in the selected master
-  const loadBomsForSelectedMaster = useCallback(async (steps: ProcessStep[]) => {
-    if (steps.length === 0) {
-      setStepBomsMap({});
+  const fetchSimulation = useCallback(async () => {
+    if (!selectedMaster) {
+      setMrpDetails([]);
+      setSummary(emptySummary);
       return;
     }
 
     try {
-      setFetchingBoms(true);
-      const newMap: Record<number, Bom[]> = {};
+      setIsLoading(true);
+      const response = await apiClient.post<MrpSimulationResponse>('/mrp/simulation', {
+        processMasterID: selectedMaster.processID,
+        targetQty
+      });
+      const data = response.data;
 
-      // Fetch BOMs for each step in parallel
-      await Promise.all(
-        steps.map(async (step) => {
-          const data = await fetchBomsByStep(step.stepID);
-          newMap[step.stepID] = data || [];
-        })
-      );
-
-      setStepBomsMap(newMap);
+      setSummary(mapSummary(data.summary || data.Summary));
+      setMrpDetails(mapMrpDetails(data.steps || data.Steps));
     } catch (err) {
-      console.error('공정별 BOM 로딩 실패:', err);
+      console.error('MRP 시뮬레이션 조회 실패:', err);
+      setMrpDetails([]);
+      setSummary(emptySummary);
     } finally {
-      setFetchingBoms(false);
+      setIsLoading(false);
     }
-  }, [fetchBomsByStep]);
+  }, [selectedMaster, targetQty]);
 
   useEffect(() => {
-    loadBomsForSelectedMaster(assignedSteps);
-  }, [selectedMaster, assignedSteps, loadBomsForSelectedMaster]);
+    fetchProcessMasters();
+  }, [fetchProcessMasters]);
+
+  useEffect(() => {
+    fetchSimulation();
+  }, [fetchSimulation]);
 
   const handleRefresh = useCallback(async () => {
-    await Promise.all([
-      fetchProcessMasters(),
-      fetchProcessSteps(),
-      fetchLots()
-    ]);
-    if (selectedMaster && assignedSteps.length > 0) {
-      await loadBomsForSelectedMaster(assignedSteps);
-    }
-  }, [fetchProcessMasters, fetchProcessSteps, fetchLots, selectedMaster, assignedSteps, loadBomsForSelectedMaster]);
-
-  // Aggregate current stock by Item ID from LOTs
-  const stockByItemId = useMemo(() => {
-    const map: Record<number, number> = {};
-    lots.forEach(lot => {
-      const id = lot.itemID;
-      map[id] = (map[id] || 0) + lot.qty;
-    });
-    return map;
-  }, [lots]);
-
-  // Compute MRP calculation details per step
-  const mrpDetails = useMemo<MrpStepDetail[]>(() => {
-    if (!selectedMaster || assignedSteps.length === 0) return [];
-
-    return assignedSteps.map(step => {
-      const stepBoms = stepBomsMap[step.stepID] || [];
-
-      const items = stepBoms.map(bom => {
-        const requiredQty = bom.bomQty * targetQty;
-        const currentStock = stockByItemId[bom.childItemID] || 0;
-        const shortage = Math.max(0, requiredQty - currentStock);
-        const isSufficient = currentStock >= requiredQty;
-
-        return {
-          bomID: bom.bomID,
-          childItemID: bom.childItemID,
-          childItemName: bom.childItemName,
-          unitQty: bom.bomQty,
-          requiredQty,
-          currentStock,
-          shortage,
-          isSufficient
-        };
-      });
-
-      return {
-        stepID: step.stepID,
-        stepName: step.stepName,
-        seqNo: step.seqNo,
-        stepType: step.stepType,
-        items
-      };
-    });
-  }, [selectedMaster, assignedSteps, stepBomsMap, targetQty, stockByItemId]);
-
-  // Compute overall calculation summary
-  const summary = useMemo(() => {
-    let totalItemsCount = 0;
-    let shortageItemsCount = 0;
-
-    mrpDetails.forEach(step => {
-      step.items.forEach(item => {
-        totalItemsCount++;
-        if (!item.isSufficient) {
-          shortageItemsCount++;
-        }
-      });
-    });
-
-    const isFeasible = shortageItemsCount === 0;
-
-    return {
-      totalItemsCount,
-      shortageItemsCount,
-      isFeasible
-    };
-  }, [mrpDetails]);
-
-  const isLoading = mastersLoading || stepsLoading || bomsLoading || lotsLoading || fetchingBoms;
+    await fetchProcessMasters();
+    await fetchSimulation();
+  }, [fetchProcessMasters, fetchSimulation]);
 
   return {
     processMasters,
