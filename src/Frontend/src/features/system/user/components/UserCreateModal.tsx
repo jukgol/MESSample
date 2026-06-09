@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { RoleDto } from '../../../../api/generated-api';
+import type { RoleDto } from '../../../../api/data-contracts';
 
 interface UserCreateModalProps {
   isOpen: boolean;

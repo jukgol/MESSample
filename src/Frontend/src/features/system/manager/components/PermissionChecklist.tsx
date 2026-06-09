@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { RoleDto, PermissionDto } from '../../../../api/generated-api';
+import type { RoleDto, PermissionDto } from '../../../../api/data-contracts';
 import { Save, Info } from 'lucide-react';
 
 interface PermissionChecklistProps {

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { UserInfo } from '../api/generated-api';
+import type { UserInfo } from '../api/data-contracts';
 
 interface AuthState {
   isAuthenticated: boolean;

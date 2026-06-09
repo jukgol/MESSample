@@ -1460,6 +1460,152 @@
         }
       }
     },
+    "/api/mrp/masters": {
+      "get": {
+        "tags": [
+          "Mrp"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProcessMasterDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProcessMasterDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProcessMasterDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mrp/simulation": {
+      "post": {
+        "tags": [
+          "Mrp"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MrpSimulationRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MrpSimulationRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MrpSimulationRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/MrpSimulationResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MrpSimulationResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MrpSimulationResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/Navigator": {
       "get": {
         "tags": [
@@ -3496,6 +3642,119 @@
           "status": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MrpItemDetailDto": {
+        "type": "object",
+        "properties": {
+          "bomID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childItemID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childItemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "unitQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requiredQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "currentStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shortage": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isSufficient": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MrpSimulationRequestDto": {
+        "type": "object",
+        "properties": {
+          "processMasterID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "targetQty": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "MrpSimulationResultDto": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/MrpSummaryDto"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MrpStepDetailDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MrpStepDetailDto": {
+        "type": "object",
+        "properties": {
+          "stepID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stepName": {
+            "type": "string",
+            "nullable": true
+          },
+          "seqNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stepType": {
+            "type": "string",
+            "nullable": true
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MrpItemDetailDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MrpSummaryDto": {
+        "type": "object",
+        "properties": {
+          "totalItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shortageItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isFeasible": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

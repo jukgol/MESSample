@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../../api/client';
-import type { UserListDto } from '../../../../api/generated-api';
+import type { UserListDto } from '../../../../api/data-contracts';
 
 export const useUsers = () => {
   const [users, setUsers] = useState<UserListDto[]>([]);

@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-api": "swagger-typescript-api generate -p ../api/swagger.json -o ./src/api -n generated-api.ts --axios --single-http-client"
+    "generate-api": "swagger-typescript-api generate -p ../api/swagger.json -o ./src/api -n generated-api.ts --axios --modular --module-name-first-tag"
   },
   "dependencies": {
     "@xyflow/react": "^12.11.0",

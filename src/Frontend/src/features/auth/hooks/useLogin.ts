@@ -8,7 +8,7 @@ export const useLogin = () => {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const navigate = useNavigate();
   const login = useAuthStore((state) => state.login);
 
@@ -24,10 +24,10 @@ export const useLogin = () => {
     e.preventDefault();
     setErrorMsg('');
     setIsLoading(true);
-    
+
     try {
       const response = await api.api.authLoginCreate({ userId, password });
-      
+
       if (response.data.success && response.data.token && response.data.user) {
         // 로그인 성공 시 정보를 localStorage에 저장 (테스트용 평문 저장)
         localStorage.setItem('last_login_id', userId);
@@ -35,7 +35,7 @@ export const useLogin = () => {
 
         // 글로벌 상태에 토큰 및 사용자 정보 저장
         login(response.data.token, response.data.user);
-        
+
         // 대시보드로 이동
         navigate('/dashboard');
       } else {

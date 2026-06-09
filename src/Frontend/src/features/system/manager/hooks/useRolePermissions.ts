@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { api } from '../../../../api/client';
-import type { RoleDto, PermissionDto } from '../../../../api/generated-api';
+import type { RoleDto, PermissionDto } from '../../../../api/data-contracts';
 
 export const useRolePermissions = () => {
   const [roles, setRoles] = useState<RoleDto[]>([]);

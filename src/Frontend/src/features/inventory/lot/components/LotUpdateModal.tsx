@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { LotDto } from '../../../../api/generated-api';
+import type { LotDto } from '../../../../api/data-contracts';
 
 interface LotUpdateModalProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { UserListDto, RoleDto } from '../../../../api/generated-api';
+import type { UserListDto, RoleDto } from '../../../../api/data-contracts';
 
 interface UserUpdateModalProps {
   isOpen: boolean;

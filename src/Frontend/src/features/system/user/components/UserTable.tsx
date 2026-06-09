@@ -1,5 +1,5 @@
 import React from 'react';
-import type { UserListDto } from '../../../../api/generated-api';
+import type { UserListDto } from '../../../../api/data-contracts';
 import { Edit2, Trash2, CheckCircle2, XCircle } from 'lucide-react';
 
 interface UserTableProps {

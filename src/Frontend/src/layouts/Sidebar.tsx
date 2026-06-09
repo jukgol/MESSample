@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { 
-  Package, 
-  Settings, 
-  History, 
-  LayoutDashboard, 
+import {
+  Package,
+  Settings,
+  History,
+  LayoutDashboard,
   ChevronRight,
   Database,
   Truck,
@@ -32,14 +32,14 @@ const Sidebar = () => {
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const menuItems: MenuItem[] = [
-    { 
-      title: 'Dashboard', 
-      icon: <LayoutDashboard size={20} />, 
-      path: '/dashboard' 
+    {
+      title: 'Dashboard',
+      icon: <LayoutDashboard size={20} />,
+      path: '/dashboard'
     },
-    { 
-      title: '기준 정보', 
-      icon: <Database size={20} />, 
+    {
+      title: '기준 정보',
+      icon: <Database size={20} />,
       path: '/dashboard/masterdata',
       allowedRoles: ['ADMIN'],
       children: [
@@ -50,9 +50,9 @@ const Sidebar = () => {
         { title: 'BOM 레시피 관리', path: '/dashboard/masterdata/boms', icon: <Settings size={16} />, allowedRoles: ['ADMIN'] },
       ]
     },
-    { 
-      title: '재고 관리', 
-      icon: <ClipboardList size={20} />, 
+    {
+      title: '재고 관리',
+      icon: <ClipboardList size={20} />,
       path: '/dashboard/inventory',
       allowedRoles: ['ADMIN'],
       children: [
@@ -61,18 +61,18 @@ const Sidebar = () => {
         { title: '출하 관리', path: '/dashboard/inventory/shipments', icon: <Truck size={16} />, allowedRoles: ['ADMIN'] },
       ]
     },
-    { 
-      title: '공정 관리', 
-      icon: <Settings size={20} />, 
-      path: '/dashboard/masterdata',
+    {
+      title: '공정 관리',
+      icon: <Settings size={20} />,
+      path: '/dashboard/process-manager',
       allowedRoles: ['ADMIN', 'OPERATOR'],
       children: [
-        { title: '작업 지시 (WO)', path: '/dashboard/masterdata/workorder', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
+        { title: '작업 지시 (WO)', path: '/dashboard/process-manager/workorder', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
       ]
     },
-    { 
-      title: '로그 / 이력', 
-      icon: <History size={20} />, 
+    {
+      title: '로그 / 이력',
+      icon: <History size={20} />,
       path: '/dashboard/log-monitor',
       allowedRoles: ['ADMIN', 'QC', 'VIEWER'],
       children: [
@@ -120,7 +120,7 @@ const Sidebar = () => {
 
     // 2. 하위 메뉴가 있을 경우 하위 메뉴 권한 확인
     if (item.children) {
-      const filteredChildren = item.children.filter(child => 
+      const filteredChildren = item.children.filter(child =>
         !child.allowedRoles || child.allowedRoles.includes(roleCode)
       );
 
@@ -148,12 +148,12 @@ const Sidebar = () => {
                   {user.userName || user.userId}님 접속중
                 </span>
               </div>
-              <button 
+              <button
                 onClick={logout}
-                style={{ 
-                  background: 'transparent', 
-                  border: 'none', 
-                  color: 'var(--text-secondary)', 
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer',
                   padding: '4px',
                   display: 'flex',
@@ -175,14 +175,14 @@ const Sidebar = () => {
                 <LogOut size={14} />
               </button>
             </div>
-            
+
             {/* 권한 뱃지 표시 */}
-            <div style={{ 
+            <div style={{
               alignSelf: 'flex-start',
-              fontSize: '0.7rem', 
-              padding: '2px 8px', 
-              borderRadius: '10px', 
-              backgroundColor: 'rgba(99, 102, 241, 0.15)', 
+              fontSize: '0.7rem',
+              padding: '2px 8px',
+              borderRadius: '10px',
+              backgroundColor: 'rgba(99, 102, 241, 0.15)',
               color: 'var(--accent-primary)',
               border: '1px solid rgba(99, 102, 241, 0.2)',
               marginTop: '1px',
@@ -193,7 +193,7 @@ const Sidebar = () => {
           </div>
         )}
       </div>
-      
+
       <nav className="sidebar-nav">
         {filteredMenuItems.map((item) => {
           const hasChildren = !!item.children;
@@ -202,37 +202,37 @@ const Sidebar = () => {
           return (
             <div key={item.path} className="menu-group">
               {hasChildren ? (
-                <div 
+                <div
                   onClick={() => toggleExpand(item.title)}
                   className="menu-item"
                   style={{ cursor: 'pointer' }}
                 >
                   <span className="icon">{item.icon}</span>
                   <span className="title">{item.title}</span>
-                  <ChevronRight 
-                    size={14} 
-                    className="arrow" 
-                    style={{ 
+                  <ChevronRight
+                    size={14}
+                    className="arrow"
+                    style={{
                       transition: 'transform 0.2s ease',
                       transform: isExpanded ? 'rotate(90deg)' : 'none'
                     }}
                   />
                 </div>
               ) : (
-                <NavLink 
-                  to={item.path} 
+                <NavLink
+                  to={item.path}
                   className={({ isActive }) => `menu-item ${isActive ? 'active' : ''}`}
                 >
                   <span className="icon">{item.icon}</span>
                   <span className="title">{item.title}</span>
                 </NavLink>
               )}
-              
+
               {hasChildren && isExpanded && (
                 <div className="submenu">
                   {item.children?.map((child) => (
-                    <NavLink 
-                      key={child.path} 
+                    <NavLink
+                      key={child.path}
                       to={child.path}
                       className={({ isActive }) => `submenu-item ${isActive ? 'active' : ''}`}
                     >

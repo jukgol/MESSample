@@ -1,5 +1,5 @@
 import React from 'react';
-import type { RoleDto } from '../../../../api/generated-api';
+import type { RoleDto } from '../../../../api/data-contracts';
 import { Shield } from 'lucide-react';
 
 interface RoleListProps {

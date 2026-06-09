@@ -8,7 +8,7 @@ import UserDeleteModal from '../components/UserDeleteModal';
 import UserActionBar from '../components/UserActionBar';
 import UserSearchBar from '../components/UserSearchBar';
 import { api } from '../../../../api/client';
-import type { UserListDto, RoleDto } from '../../../../api/generated-api';
+import type { UserListDto, RoleDto } from '../../../../api/data-contracts';
 
 const UserList: React.FC = () => {
   const { users, loading, error, fetchUsers, createUser, updateUser, deleteUser } = useUsers();

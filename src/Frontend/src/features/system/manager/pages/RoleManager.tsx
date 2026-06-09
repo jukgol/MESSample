@@ -3,7 +3,7 @@ import { useRolePermissions } from '../hooks/useRolePermissions';
 import RoleHeader from '../components/RoleHeader';
 import RoleList from '../components/RoleList';
 import PermissionChecklist from '../components/PermissionChecklist';
-import type { RoleDto } from '../../../../api/generated-api';
+import type { RoleDto } from '../../../../api/data-contracts';
 
 const RoleManager: React.FC = () => {
   const { roles, permissions, loading, error, updateRolePermissions } = useRolePermissions();

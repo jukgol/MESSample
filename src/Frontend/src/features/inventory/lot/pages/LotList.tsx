@@ -8,7 +8,7 @@ import LotUpdateModal from '../components/LotUpdateModal';
 import LotDeleteModal from '../components/LotDeleteModal';
 import LotActionBar from '../components/LotActionBar';
 import LotSearchBar from '../components/LotSearchBar';
-import type { LotDto } from '../../../../api/generated-api';
+import type { LotDto } from '../../../../api/data-contracts';
 
 const LotList: React.FC = () => {
   const { lots, loading: lotsLoading, error: lotsError, fetchLots, createLot, updateLot, deleteLot, generateDummyLots, deleteAllLots } = useLots();
