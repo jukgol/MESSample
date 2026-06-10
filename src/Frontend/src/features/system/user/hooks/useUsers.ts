@@ -23,7 +23,7 @@ export const useUsers = () => {
 
   const createUser = async (userData: any) => {
     try {
-      setError(null);
+      setError(null);      
       await api.api.adminUsersCreate(userData);
       await fetchUsers();
       return true;

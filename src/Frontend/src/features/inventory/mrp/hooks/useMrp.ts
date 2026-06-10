@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import apiClient from '../../../../api/client';
+import { api } from '../../../../api/client';
 import type { ProcessMaster } from '../../../masterdata/master/hooks/useProcessMasters';
 
 export interface MrpItemDetail {
@@ -65,15 +65,15 @@ const mapMrpDetails = (steps: any[] | undefined): MrpStepDetail[] => {
     stepType: step.stepType || step.StepType,
     items: Array.isArray(step.items || step.Items)
       ? (step.items || step.Items).map((item: any) => ({
-          bomID: item.bomID || item.bomId || item.BomID,
-          childItemID: item.childItemID || item.childItemId || item.ChildItemID,
-          childItemName: item.childItemName || item.ChildItemName,
-          unitQty: item.unitQty || item.UnitQty,
-          requiredQty: item.requiredQty || item.RequiredQty,
-          currentStock: item.currentStock || item.CurrentStock || 0,
-          shortage: item.shortage || item.Shortage || 0,
-          isSufficient: item.isSufficient ?? item.IsSufficient ?? false
-        }))
+        bomID: item.bomID || item.bomId || item.BomID,
+        childItemID: item.childItemID || item.childItemId || item.ChildItemID,
+        childItemName: item.childItemName || item.ChildItemName,
+        unitQty: item.unitQty || item.UnitQty,
+        requiredQty: item.requiredQty || item.RequiredQty,
+        currentStock: item.currentStock || item.CurrentStock || 0,
+        shortage: item.shortage || item.Shortage || 0,
+        isSufficient: item.isSufficient ?? item.IsSufficient ?? false
+      }))
       : []
   }));
 };
@@ -99,7 +99,7 @@ export const useMrp = () => {
   const fetchProcessMasters = useCallback(async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.get('/mrp/masters');
+      const response = await api.api.mrpMastersList();
       setProcessMasters(Array.isArray(response.data) ? response.data.map(mapProcessMaster) : []);
     } catch (err) {
       console.error('MRP 공정 마스터 목록 조회 실패:', err);
@@ -118,10 +118,11 @@ export const useMrp = () => {
 
     try {
       setIsLoading(true);
-      const response = await apiClient.post<MrpSimulationResponse>('/mrp/simulation', {
+      const response = await api.api.mrpSimulationCreate({
         processMasterID: selectedMaster.processID,
         targetQty
       });
+
       const data = response.data;
 
       setSummary(mapSummary(data.summary || data.Summary));

@@ -1,9 +1,44 @@
 import { useAuthStore } from '../store/useAuthStore';
 import { HttpClient } from './http-client';
+import type { AxiosInstance } from 'axios'; // 👈 AxiosInstance 타입 추가
 
 /**
- * 백엔드 API 호출을 위한 기본 설정으로 HttpClient 인스턴스 생성
+ * 📌 Axios 인스턴스에 토큰 및 인증 에러 인터셉터를 붙여주는 공통 함수
  */
+const attachInterceptors = (instance: AxiosInstance) => {
+  // 요청 인터셉터 추가
+  instance.interceptors.request.use((config) => {
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  });
+
+  // 응답 인터셉터 추가
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401 || !error.response) {
+        const isLoginPath = window.location.pathname.includes('/login');
+
+        if (!isLoginPath) {
+          if (!error.response) {
+            console.error('서버에 연결할 수 없습니다. 로그아웃 처리합니다.');
+          } else {
+            console.warn('인증 세션이 만료되었습니다. 로그아웃 처리합니다.');
+          }
+
+          useAuthStore.getState().logout();
+          window.location.href = '/login';
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+};
+
+// 기본 httpClient 설정
 const httpClient = new HttpClient({
   baseURL: '/',
   headers: {
@@ -12,37 +47,9 @@ const httpClient = new HttpClient({
 });
 
 const apiClient = httpClient.instance;
+// 기본 apiClient에도 인터셉터 적용
+attachInterceptors(apiClient);
 
-// 요청 인터셉터 추가: 로컬 스토리지(Zustand)에서 토큰을 가져와 헤더에 추가
-apiClient.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().token;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// 응답 인터셉터 추가: 401 에러(인증 만료) 또는 서버 연결 실패 시 로그아웃 처리
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401 || !error.response) {
-      const isLoginPath = window.location.pathname.includes('/login');
-
-      if (!isLoginPath) {
-        if (!error.response) {
-          console.error('서버에 연결할 수 없습니다. 로그아웃 처리합니다.');
-        } else {
-          console.warn('인증 세션이 만료되었습니다. 로그아웃 처리합니다.');
-        }
-
-        useAuthStore.getState().logout();
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
 
 // ==========================================
 // 📌 태그별 모듈 동적 자동 병합
@@ -66,7 +73,15 @@ for (const filePath in modules) {
     const ExportedItem = moduleExports[key];
 
     if (typeof ExportedItem === 'function' && ExportedItem.prototype) {
-      const instance = new ExportedItem(httpClient);
+
+      // 💡 변경 포인트 1: 기존에 생성된 주소(httpClient) 대신, 새 설정 객체를 전달하여 생성합니다.
+      const instance = new ExportedItem({
+        baseURL: '/',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      // 💡 변경 포인트 2: 이 모듈이 내부적으로 새로 만든 Axios 가방(instance.instance)에 인터셉터를 심어줍니다.
+      attachInterceptors(instance.instance);
 
       // 화살표 함수로 정의된 인스턴스 메서드와 프로토타입에 정의된 메서드를 모두 바인딩합니다.
       const methodNames = new Set([
