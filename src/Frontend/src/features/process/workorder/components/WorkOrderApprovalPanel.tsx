@@ -24,9 +24,9 @@ const WorkOrderApprovalPanel: React.FC<WorkOrderApprovalPanelProps> = ({
           style={{
             width: '100%',
             padding: '0.85rem 1rem',
-            background: 'rgba(255, 255, 255, 0.06)',
-            border: '1px solid var(--border-color)',
-            borderRadius: '8px',
+            background: 'transparent',
+            border: 'none',
+            borderRadius: 0,
             color: 'white',
             outline: 'none',
             fontSize: '0.95rem',
@@ -38,7 +38,19 @@ const WorkOrderApprovalPanel: React.FC<WorkOrderApprovalPanelProps> = ({
         type="button"
         onClick={onApprove}
         disabled={disabled}
-        style={{ borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '0.5rem', height: 46 }}
+        style={{
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.5rem',
+          height: 46,
+          opacity: disabled ? 0.45 : 1,
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          background: disabled ? 'rgba(255, 255, 255, 0.08)' : undefined,
+          border: disabled ? '1px solid var(--border-color)' : undefined,
+          color: disabled ? 'var(--text-secondary)' : undefined,
+          boxShadow: disabled ? 'none' : undefined
+        }}
       >
         <CheckCircle2 size={18} />
         승인

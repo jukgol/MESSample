@@ -25,6 +25,7 @@ const WorkOrderPage: React.FC = () => {
   const currentUser = useAuthStore((state) => state.user);
 
   const [selectedMasterId, setSelectedMasterId] = useState<number | null>(null);
+  const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
   const [orderQty, setOrderQty] = useState(10);
   const [message, setMessage] = useState('');
   const operatorName = currentUser?.userName || '';
@@ -33,12 +34,27 @@ const WorkOrderPage: React.FC = () => {
     return masters.find((master) => master.processID === selectedMasterId) || null;
   }, [masters, selectedMasterId]);
 
+  const hasUnavailableStep = useMemo(() => {
+    return (preview?.steps || []).some((step) => !step.isAvailable);
+  }, [preview]);
+
+  const canApprove = useMemo(() => {
+    const steps = preview?.steps || [];
+    return Boolean(selectedMasterId) && steps.length > 0 && !hasUnavailableStep;
+  }, [hasUnavailableStep, preview, selectedMasterId]);
+
   const handleRefresh = async () => {
     const nextMasters = await fetchMasters();
 
     if (!selectedMasterId && nextMasters.length > 0) {
       setSelectedMasterId(nextMasters[0].processID || null);
     }
+  };
+
+  const handleSelectMaster = (id: number) => {
+    setSelectedMasterId(id);
+    setSelectedStepId(null);
+    setMessage('');
   };
 
   const handleApprove = async () => {
@@ -69,6 +85,15 @@ const WorkOrderPage: React.FC = () => {
     }
   }, [selectedMasterId, orderQty, fetchPreview]);
 
+  useEffect(() => {
+    const steps = preview?.steps || [];
+    const hasSelectedStep = steps.some((step) => step.stepID === selectedStepId);
+
+    if (!hasSelectedStep) {
+      setSelectedStepId(null);
+    }
+  }, [preview, selectedStepId]);
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', minHeight: 0 }}>
       <WorkOrderHeader />
@@ -85,7 +110,7 @@ const WorkOrderPage: React.FC = () => {
           <WorkOrderMasterList
             masters={masters}
             selectedMasterId={selectedMasterId}
-            onSelectMaster={setSelectedMasterId}
+            onSelectMaster={handleSelectMaster}
           />
         }
         middle={
@@ -98,6 +123,8 @@ const WorkOrderPage: React.FC = () => {
             <WorkOrderStepGrid
               steps={preview?.steps || []}
               loading={loading}
+              selectedStepId={selectedStepId}
+              onSelectStep={(step) => setSelectedStepId(step.stepID || null)}
             />
           </>
         }
@@ -106,7 +133,7 @@ const WorkOrderPage: React.FC = () => {
             <WorkOrderApprovalPanel
               operatorName={operatorName}
               onApprove={handleApprove}
-              disabled={approving || loading || !selectedMasterId}
+              disabled={approving || loading || !canApprove}
             />
             <WorkOrderMessage message={message} />
           </>

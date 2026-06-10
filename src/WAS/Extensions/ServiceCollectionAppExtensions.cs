@@ -29,6 +29,10 @@ namespace WAS.Extensions
             services.AddScoped<WorkOrderService>();
             services.AddScoped<IWorkOrderService>(sp => LoggingProxy<IWorkOrderService>.Create(sp.GetRequiredService<WorkOrderService>(), sp.GetRequiredService<ILogger<WorkOrderService>>()));
 
+            services.AddSingleton<IProcessMonitoringStateStore, ProcessMonitoringStateStore>();
+            services.AddScoped<ProcessMonitoringService>();
+            services.AddScoped<IProcessMonitoringService>(sp => LoggingProxy<IProcessMonitoringService>.Create(sp.GetRequiredService<ProcessMonitoringService>(), sp.GetRequiredService<ILogger<ProcessMonitoringService>>()));
+
             services.AddScoped<ItemTypeService>();
             services.AddScoped<IItemTypeService>(sp => LoggingProxy<IItemTypeService>.Create(sp.GetRequiredService<ItemTypeService>(), sp.GetRequiredService<ILogger<ItemTypeService>>()));
 
