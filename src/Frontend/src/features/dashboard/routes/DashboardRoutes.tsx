@@ -11,6 +11,7 @@ import DashboardHome from '../pages/DashboardHome';
 import UserList from '../../system/user/pages/UserList';
 import RoleManager from '../../system/manager/pages/RoleManager';
 import WorkOrderPage from '../../process/workorder/pages/WorkOrderPage';
+import ProcessMonitoringPage from '../../process/monitoring/pages/ProcessMonitoringPage';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 // Placeholder components for other routes
@@ -58,6 +59,7 @@ const DashboardRoutes = () => {
         {hasAccess(['ADMIN', 'OPERATOR']) && (
           <>
             <Route path="/process-manager/workorder" element={<WorkOrderPage />} />
+            <Route path="/process-manager/monitoring" element={<ProcessMonitoringPage />} />
           </>
         )}
 

@@ -13,7 +13,8 @@ import {
   LogOut,
   Layers,
   Users,
-  Calculator
+  Calculator,
+  Activity
 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -68,6 +69,7 @@ const Sidebar = () => {
       allowedRoles: ['ADMIN', 'OPERATOR'],
       children: [
         { title: '작업 지시 (WO)', path: '/dashboard/process-manager/workorder', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
+        { title: '모니터링', path: '/dashboard/process-manager/monitoring', icon: <Activity size={16} />, allowedRoles: ['ADMIN', 'OPERATOR'] },
       ]
     },
     {

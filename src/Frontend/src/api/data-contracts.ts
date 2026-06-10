@@ -67,6 +67,92 @@ export interface CreateTableRequest {
   sql?: string | null;
 }
 
+export interface CurrentProcessInputStateDto {
+  /** @format int32 */
+  processInputID?: number;
+  /** @format int32 */
+  processStepExecutionID?: number;
+  /** @format int32 */
+  lotID?: number;
+  lotNo?: string | null;
+  /** @format int32 */
+  itemID?: number;
+  itemName?: string | null;
+  /** @format int32 */
+  inputQty?: number;
+  /** @format int32 */
+  usedQty?: number;
+  /** @format int32 */
+  remainQty?: number;
+  /** @format date-time */
+  inputAt?: string;
+}
+
+export interface CurrentProcessOutputStateDto {
+  /** @format int32 */
+  processOutputID?: number;
+  /** @format int32 */
+  processStepExecutionID?: number;
+  /** @format int32 */
+  lotID?: number;
+  lotNo?: string | null;
+  /** @format int32 */
+  itemID?: number;
+  itemName?: string | null;
+  /** @format int32 */
+  targetQty?: number;
+  /** @format int32 */
+  outputQty?: number;
+  outputType?: string | null;
+  /** @format date-time */
+  outputAt?: string;
+}
+
+export interface CurrentProcessStepStateDto {
+  /** @format int32 */
+  processStepExecutionID?: number;
+  /** @format int32 */
+  processStepID?: number;
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  equipmentID?: string | null;
+  /** @format int32 */
+  workerUserID?: number | null;
+  workerName?: string | null;
+  status?: string | null;
+  /** @format date-time */
+  startedAt?: string | null;
+  /** @format date-time */
+  endedAt?: string | null;
+  /** @format date-time */
+  lastUpdatedAt?: string;
+  inputs?: CurrentProcessInputStateDto[] | null;
+  outputs?: CurrentProcessOutputStateDto[] | null;
+}
+
+export interface CurrentWorkOrderStateDto {
+  /** @format int32 */
+  workOrderID?: number;
+  workOrderNo?: string | null;
+  /** @format int32 */
+  processMasterID?: number;
+  processMasterName?: string | null;
+  /** @format int32 */
+  orderQty?: number;
+  /** @format int32 */
+  workerUserID?: number | null;
+  workerName?: string | null;
+  status?: string | null;
+  /** @format date-time */
+  approvedAt?: string;
+  /** @format date-time */
+  startedAt?: string | null;
+  /** @format date-time */
+  lastUpdatedAt?: string;
+  steps?: CurrentProcessStepStateDto[] | null;
+}
+
 export interface DbUserDto {
   userId?: string | null;
   userName?: string | null;
@@ -233,6 +319,49 @@ export interface ProblemDetails {
   [key: string]: any;
 }
 
+export interface ProcessInputCreateDto {
+  /** @format int32 */
+  lotID?: number;
+  /** @format int32 */
+  itemID?: number;
+  /** @format int32 */
+  inputQty?: number;
+  /** @format int32 */
+  usedQty?: number;
+  /** @format int32 */
+  remainQty?: number | null;
+}
+
+export interface ProcessInputDto {
+  /** @format int32 */
+  processInputID?: number;
+  /** @format int32 */
+  processStepExecutionID?: number;
+  /** @format int32 */
+  lotID?: number;
+  lotNo?: string | null;
+  /** @format int32 */
+  itemID?: number;
+  itemName?: string | null;
+  /** @format int32 */
+  inputQty?: number;
+  /** @format int32 */
+  usedQty?: number;
+  /** @format int32 */
+  remainQty?: number;
+  /** @format date-time */
+  inputAt?: string;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface ProcessInputQuantityUpdateDto {
+  /** @format int32 */
+  usedQty?: number;
+  /** @format int32 */
+  remainQty?: number;
+}
+
 export interface ProcessMasterCreateDto {
   processCode?: string | null;
   processName?: string | null;
@@ -252,6 +381,45 @@ export interface ProcessMasterDto {
 export interface ProcessMasterUpdateDto {
   processName?: string | null;
   description?: string | null;
+}
+
+export interface ProcessOutputCreateDto {
+  /** @format int32 */
+  lotID?: number;
+  /** @format int32 */
+  itemID?: number;
+  /** @format int32 */
+  targetQty?: number;
+  /** @format int32 */
+  outputQty?: number;
+  outputType?: string | null;
+}
+
+export interface ProcessOutputDto {
+  /** @format int32 */
+  processOutputID?: number;
+  /** @format int32 */
+  processStepExecutionID?: number;
+  /** @format int32 */
+  lotID?: number;
+  lotNo?: string | null;
+  /** @format int32 */
+  itemID?: number;
+  itemName?: string | null;
+  /** @format int32 */
+  targetQty?: number;
+  /** @format int32 */
+  outputQty?: number;
+  outputType?: string | null;
+  /** @format date-time */
+  outputAt?: string;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface ProcessOutputQuantityUpdateDto {
+  /** @format int32 */
+  outputQty?: number;
 }
 
 export interface ProcessStepCreateDto {
@@ -277,6 +445,50 @@ export interface ProcessStepDto {
   processMasterName?: string | null;
   /** @format date-time */
   createdAt?: string;
+}
+
+export interface ProcessStepExecutionCreateDto {
+  /** @format int32 */
+  workOrderID?: number;
+  /** @format int32 */
+  processStepID?: number;
+  equipmentID?: string | null;
+  /** @format int32 */
+  workerUserID?: number | null;
+  status?: string | null;
+}
+
+export interface ProcessStepExecutionDto {
+  /** @format int32 */
+  processStepExecutionID?: number;
+  /** @format int32 */
+  workOrderID?: number;
+  workOrderNo?: string | null;
+  /** @format int32 */
+  processMasterID?: number;
+  processMasterName?: string | null;
+  /** @format int32 */
+  orderQty?: number;
+  /** @format int32 */
+  processStepID?: number;
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  equipmentID?: string | null;
+  /** @format int32 */
+  workerUserID?: number | null;
+  workerName?: string | null;
+  status?: string | null;
+  /** @format date-time */
+  startedAt?: string | null;
+  /** @format date-time */
+  endedAt?: string | null;
+  /** @format date-time */
+  approvedAt?: string;
+  /** @format date-time */
+  createdAt?: string;
+  /** @format date-time */
+  updatedAt?: string | null;
 }
 
 export interface ProcessStepUpdateDto {
