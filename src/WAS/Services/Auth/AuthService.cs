@@ -28,12 +28,12 @@ namespace WAS.Services.Auth
             var user = users.FirstOrDefault();
 
             // 2. 검증: 사용자가 없거나, 비밀번호가 틀렸거나, 비활성 상태인 경우
-            if (user == null || user.PASSWORD != request.Password)
+            if (user == null || user!.PASSWORD != request.Password)
             {
                 return new LoginResponse { Success = false, Message = "아이디 또는 비밀번호가 올바르지 않습니다." };
             }
 
-            if (user.IS_ACTIVE != "Y")
+            if (user!.IS_ACTIVE != "Y")
             {
                 return new LoginResponse { Success = false, Message = "비활성화된 계정입니다. 관리자에게 문의하세요." };
             }
