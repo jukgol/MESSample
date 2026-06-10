@@ -23,10 +23,10 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
   if (!selectedItem) {
     return (
       <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', padding: '3rem', textAlign: 'center', minHeight: '400px' }}>
-         <Info size={40} style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }} />
-        <h3 style={{ fontSize: '1.2rem', margin: '0 0 0.5rem' }}>?좏깮??異쒕젰 ?덈ぉ ?놁쓬</h3>
+        <Info size={40} style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }} />
+        <h3 style={{ fontSize: '1.2rem', margin: '0 0 0.5rem' }}>선택된 출력 품목 없음</h3>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '300px', margin: 0 }}>
-          ?쇱そ ?덈ぉ 紐⑸줉?먯꽌 ?꾩쓽???덈ぉ???좏깮?섏뿬 ?대떦 ?덈ぉ??BOM ?덉떆??援ъ“瑜?議고쉶?섍굅???뺤쓽??二쇱꽭??
+          왼쪽 품목 목록에서 상위 품목을 선택하여 해당 품목의 BOM 레시피 구조를 조회하거나 정의해 주세요.
         </p>
       </div>
     );
@@ -34,29 +34,29 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
 
   return (
     <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1.5rem', gap: '1.5rem' }}>
-      {/* ?곸꽭 ?곸뿭 ?ㅻ뜑 */}
+      {/* 상세 영역 헤더 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ 
-              fontSize: '0.75rem', 
-              padding: '2px 8px', 
-              background: 'rgba(99,102,241,0.15)', 
+            <span style={{
+              fontSize: '0.75rem',
+              padding: '2px 8px',
+              background: 'rgba(99,102,241,0.15)',
               color: 'var(--accent-primary)',
               borderRadius: '4px',
               fontWeight: '600'
             }}>
-              異쒕젰 ?덈ぉ
+              출력 품목
             </span>
             <h2 style={{ fontSize: '1.3rem', margin: 0 }}>{selectedItem.name}</h2>
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '4px 0 0' }}>
-            ID: {selectedItem.id} | 援щ텇: {selectedItem.category} | ?⑥쐞: {selectedItem.unit} | ?ㅻ챸: {selectedItem.spec}
+            ID: {selectedItem.id} | 구분: {selectedItem.category} | 단위: {selectedItem.unit} | 설명: {selectedItem.spec}
           </p>
         </div>
       </div>
 
-      {/* ?뚯씠釉?/ 由ъ뒪???곸뿭 */}
+      {/* 테이블 / 리스트 영역 */}
       <div style={{ flex: 1, overflowY: 'auto', overflowX: 'auto' }}>
         {error ? (
           <div style={{ color: '#ef4444', padding: '1rem', textAlign: 'center', background: 'rgba(239, 68, 68, 0.1)', borderRadius: '8px' }}>
@@ -65,18 +65,18 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
         ) : loading ? (
           <div style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 className="animate-spin" style={{ margin: '0 auto 1rem' }} size={32} />
-            BOM ?뺣낫瑜?遺덈윭?ㅻ뒗 以묒엯?덈떎...
+            BOM 정보를 불러오는 중입니다...
           </div>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                 <th style={{ padding: '0.8rem 1rem' }}>BOM ID</th>
-                <th style={{ padding: '0.8rem 1rem' }}>?낅젰 ?덈ぉ ID</th>
+                <th style={{ padding: '0.8rem 1rem' }}>입력 품목 ID</th>
                 <th style={{ padding: '0.8rem 1rem' }}>입력 품목명</th>
-                <th style={{ padding: '0.8rem 1rem' }}>?ъ엯 怨듭젙</th>
-                <th style={{ padding: '0.8rem 1rem', textAlign: 'right' }}>?뚯슂??(BomQty)</th>
-                <th style={{ padding: '0.8rem 1rem', textAlign: 'center' }}>?묒뾽</th>
+                <th style={{ padding: '0.8rem 1rem' }}>투입 공정</th>
+                <th style={{ padding: '0.8rem 1rem', textAlign: 'right' }}>소요량 (BomQty)</th>
+                <th style={{ padding: '0.8rem 1rem', textAlign: 'center' }}>작업</th>
               </tr>
             </thead>
             <tbody>
@@ -90,7 +90,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                       {bom.childItemID}
                     </td>
                     <td style={{ padding: '0.9rem 1rem', fontWeight: '500' }}>
-                      {bom.childItemName || `?덈ぉ #${bom.childItemID}`}
+                      {bom.childItemName || `품목 #${bom.childItemID}`}
                     </td>
                     <td style={{ padding: '0.9rem 1rem' }}>
                       {bom.processStepID ? (
@@ -103,10 +103,10 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                           color: '#818cf8',
                           fontWeight: '600'
                         }}>
-                          {bom.processStepName || `怨듭젙 #${bom.processStepID}`}
+                          {bom.processStepName || `공정 #${bom.processStepID}`}
                         </span>
                       ) : (
-                        <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.85rem' }}>?곌껐 ?놁쓬</span>
+                        <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '0.85rem' }}>연결 없음</span>
                       )}
                     </td>
                     <td style={{ padding: '0.9rem 1rem', fontWeight: '600', color: 'var(--accent-primary)', textAlign: 'right', fontSize: '1rem' }}>
@@ -126,7 +126,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                             display: 'flex',
                             alignItems: 'center'
                           }}
-                          title="?뚯슂???섏젙"
+                          title="소요량 수정"
                         >
                           <Edit size={14} />
                         </button>
@@ -142,7 +142,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
                             display: 'flex',
                             alignItems: 'center'
                           }}
-                          title="BOM?먯꽌 ?댁젣"
+                          title="BOM에서 해제"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -153,7 +153,7 @@ const BomDetailTable: React.FC<BomDetailTableProps> = ({
               ) : (
                 <tr>
                   <td colSpan={6} style={{ padding: '3rem 1rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    ?뺤쓽???낅젰 援ъ꽦 ?붿냼(BOM)媛 ?놁뒿?덈떎. ?덉떆?쇰? ?깅줉?섎젮硫??곷떒 ?≪뀡諛붿쓽 "援ъ꽦 ?붿냼 異붽?" 踰꾪듉???대┃?섏꽭??
+                    정의된 입력 구성 요소(BOM)가 없습니다. 레시피를 등록하려면 상단 액션바의 "구성 요소 추가" 버튼을 클릭하세요.
                   </td>
                 </tr>
               )}
