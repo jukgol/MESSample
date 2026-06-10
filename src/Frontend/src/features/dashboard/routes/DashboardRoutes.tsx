@@ -10,6 +10,7 @@ import MrpContainerPage from '../../inventory/mrp/pages/MrpContainerPage';
 import DashboardHome from '../pages/DashboardHome';
 import UserList from '../../system/user/pages/UserList';
 import RoleManager from '../../system/manager/pages/RoleManager';
+import WorkOrderPage from '../../process/workorder/pages/WorkOrderPage';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 // Placeholder components for other routes
@@ -56,7 +57,7 @@ const DashboardRoutes = () => {
         {/* 공정 관리 - ADMIN, OPERATOR */}
         {hasAccess(['ADMIN', 'OPERATOR']) && (
           <>
-            <Route path="/masterdata/workorder" element={<Placeholder title="작업 지시 (WO)" />} />
+            <Route path="/process-manager/workorder" element={<WorkOrderPage />} />
           </>
         )}
 

@@ -328,3 +328,53 @@ export interface UserListDto {
   roleCode?: string | null;
   isActive?: string | null;
 }
+
+export interface WorkOrderCreateRequestDto {
+  /** @format int32 */
+  processMasterID?: number;
+  /** @format int32 */
+  orderQty?: number;
+  /** @format int32 */
+  workerUserID?: number | null;
+  workerName?: string | null;
+}
+
+export interface WorkOrderCreateResultDto {
+  workOrderNo?: string | null;
+  /** @format int32 */
+  processMasterID?: number;
+  /** @format int32 */
+  orderQty?: number;
+  /** @format int32 */
+  workerUserID?: number | null;
+  workerName?: string | null;
+  isApproved?: boolean;
+  /** @format date-time */
+  approvedAt?: string;
+  steps?: WorkOrderStepAvailabilityDto[] | null;
+}
+
+export interface WorkOrderPreviewDto {
+  /** @format int32 */
+  processMasterID?: number;
+  /** @format int32 */
+  orderQty?: number;
+  isAvailable?: boolean;
+  steps?: WorkOrderStepAvailabilityDto[] | null;
+}
+
+export interface WorkOrderPreviewRequestDto {
+  /** @format int32 */
+  processMasterID?: number;
+  /** @format int32 */
+  orderQty?: number;
+}
+
+export interface WorkOrderStepAvailabilityDto {
+  /** @format int32 */
+  stepID?: number;
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  isAvailable?: boolean;
+}
