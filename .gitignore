@@ -103,3 +103,10 @@ src/tabledata/
 
 # Python local environments
 src/TestTool/.*/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/

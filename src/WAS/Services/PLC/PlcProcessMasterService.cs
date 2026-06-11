@@ -18,5 +18,12 @@ namespace WAS.Services.PLC
         {
             return await _scriptExecutor.ExecuteQueryAsync<PlcProcessMasterDto>("App/ProcessMaster/GET_PROCESS_MASTER_LIST");
         }
+
+        public async Task<IEnumerable<PlcProcessStepDto>> GetProcessStepsByMasterAsync(int processMasterId)
+        {
+            return await _scriptExecutor.ExecuteQueryAsync<PlcProcessStepDto>(
+                "PLC/ProcessStep/GET_PROCESS_STEP_LIST_BY_MASTER",
+                new { ProcessMasterId = processMasterId });
+        }
     }
 }

@@ -40,5 +40,28 @@ namespace WAS.Controllers.PLC
                 return StatusCode(500, new { Message = "Failed to get process master list." });
             }
         }
+
+        [HttpGet("{processMasterId:int}/steps")]
+        [ProducesResponseType(typeof(IEnumerable<PlcProcessStepDto>), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(500)]
+        public async Task<ActionResult<IEnumerable<PlcProcessStepDto>>> GetProcessStepsByMaster(int processMasterId)
+        {
+            if (processMasterId <= 0)
+            {
+                return BadRequest(new { Message = "processMasterId must be greater than zero." });
+            }
+
+            try
+            {
+                var steps = await _plcProcessMasterService.GetProcessStepsByMasterAsync(processMasterId);
+                return Ok(steps);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get PLC process step list. ProcessMasterId: {ProcessMasterId}", processMasterId);
+                return StatusCode(500, new { Message = "Failed to get process step list." });
+            }
+        }
     }
 }

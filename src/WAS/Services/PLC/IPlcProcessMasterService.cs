@@ -7,5 +7,6 @@ namespace WAS.Services.PLC
     public interface IPlcProcessMasterService
     {
         Task<IEnumerable<PlcProcessMasterDto>> GetProcessMastersAsync();
+        Task<IEnumerable<PlcProcessStepDto>> GetProcessStepsByMasterAsync(int processMasterId);
     }
 }
