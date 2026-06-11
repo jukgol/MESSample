@@ -8,7 +8,7 @@ INSERT INTO PROCESS_STEP_EXECUTION (
 )
 SELECT wo.work_order_id,
        ps.step_id,
-       NULL,
+       ps.equipment_id,
        wo.worker_user_id,
        'WAITING',
        CURRENT_TIMESTAMP

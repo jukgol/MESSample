@@ -6009,6 +6009,10 @@
             "type": "string",
             "nullable": true
           },
+          "equipmentID": {
+            "type": "string",
+            "nullable": true
+          },
           "description": {
             "type": "string",
             "nullable": true
@@ -6301,6 +6305,10 @@
             "type": "string",
             "nullable": true
           },
+          "equipmentID": {
+            "type": "string",
+            "nullable": true
+          },
           "description": {
             "type": "string",
             "nullable": true
@@ -6329,6 +6337,10 @@
             "format": "int32"
           },
           "stepType": {
+            "type": "string",
+            "nullable": true
+          },
+          "equipmentID": {
             "type": "string",
             "nullable": true
           },
@@ -6473,6 +6485,10 @@
             "format": "int32"
           },
           "stepType": {
+            "type": "string",
+            "nullable": true
+          },
+          "equipmentID": {
             "type": "string",
             "nullable": true
           },

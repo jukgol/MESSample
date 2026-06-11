@@ -38,6 +38,7 @@ namespace WAS.Services.App
                 StepName = dto.StepName,
                 SeqNo = dto.SeqNo,
                 StepType = dto.StepType,
+                EquipmentId = string.IsNullOrWhiteSpace(dto.EquipmentID) ? null : dto.EquipmentID.Trim(),
                 Description = dto.Description,
                 ProcessMasterId = dto.ProcessMasterID
             });
@@ -51,6 +52,7 @@ namespace WAS.Services.App
                 StepName = dto.StepName,
                 SeqNo = dto.SeqNo,
                 StepType = dto.StepType,
+                EquipmentId = string.IsNullOrWhiteSpace(dto.EquipmentID) ? null : dto.EquipmentID.Trim(),
                 Description = dto.Description,
                 ProcessMasterId = dto.ProcessMasterID
             });
