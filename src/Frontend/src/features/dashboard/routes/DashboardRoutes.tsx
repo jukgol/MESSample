@@ -13,6 +13,9 @@ import RoleManager from '../../system/manager/pages/RoleManager';
 import WorkOrderPage from '../../process/workorder/pages/WorkOrderPage';
 import ProcessMonitoringPage from '../../process/monitoring/pages/ProcessMonitoringPage';
 import { useAuthStore } from '../../../store/useAuthStore';
+import WorkOrderHistoryList from '../../history/pages/WorkOrderHistoryList';
+import LotRelationHistoryList from '../../history/pages/LotRelationHistoryList';
+import LotTraceHistoryList from '../../history/pages/LotTraceHistoryList';
 
 // Placeholder components for other routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -65,10 +68,14 @@ const DashboardRoutes = () => {
 
         {/* 로그 / 이력 */}
         {hasAccess(['ADMIN', 'VIEWER']) && (
-          <Route path="/log-monitor/process" element={<Placeholder title="공정 이력" />} />
+          <>
+            <Route path="/history/work-orders" element={<WorkOrderHistoryList />} />
+            <Route path="/history/lot-relations" element={<LotRelationHistoryList />} />
+            <Route path="/history/lot-trace" element={<LotTraceHistoryList />} />
+          </>
         )}
         {hasAccess(['ADMIN', 'QC']) && (
-          <Route path="/log-monitor/qc" element={<Placeholder title="품질 검사 (QC)" />} />
+          <Route path="/history/qc" element={<Placeholder title="품질 검사 (QC)" />} />
         )}
 
         {/* 404 Redirect */}

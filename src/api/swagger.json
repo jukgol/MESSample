@@ -583,6 +583,211 @@
         }
       }
     },
+    "/api/History/work-orders": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkOrderHistoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkOrderHistoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkOrderHistoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/History/lot-relations": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotRelationHistoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotRelationHistoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotRelationHistoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/History/lots/{lotId}/trace": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "parameters": [
+          {
+            "name": "lotId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotTraceHistoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotTraceHistoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotTraceHistoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Item": {
       "get": {
         "tags": [
@@ -5218,6 +5423,180 @@
           "status": {
             "type": "string",
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LotRelationHistoryDto": {
+        "type": "object",
+        "properties": {
+          "lotRelationID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentLotID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "parentLotNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "parentItemID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "parentItemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "childLotID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childLotNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "childItemID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childItemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationType": {
+            "type": "string",
+            "nullable": true
+          },
+          "inputQty": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "outputQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "processStepExecutionID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "workOrderNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "stepName": {
+            "type": "string",
+            "nullable": true
+          },
+          "refType": {
+            "type": "string",
+            "nullable": true
+          },
+          "refID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LotTraceHistoryDto": {
+        "type": "object",
+        "properties": {
+          "lotRelationID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentLotID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "parentLotNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "parentItemID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "parentItemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "childLotID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childLotNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "childItemID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "childItemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "relationType": {
+            "type": "string",
+            "nullable": true
+          },
+          "inputQty": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "outputQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "processStepExecutionID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "workOrderNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "stepName": {
+            "type": "string",
+            "nullable": true
+          },
+          "refType": {
+            "type": "string",
+            "nullable": true
+          },
+          "refID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "direction": {
+            "type": "string",
+            "nullable": true
+          },
+          "traceDepth": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

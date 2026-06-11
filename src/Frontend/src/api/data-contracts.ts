@@ -240,9 +240,80 @@ export interface LotDto {
   lotNo?: string | null;
   /** @format int32 */
   qty?: number;
+  /** @format int32 */
+  currentQty?: number;
+  /** @format int32 */
+  reservedQty?: number;
+  /** @format int32 */
+  availableQty?: number;
   /** @format date-time */
   receivedAt?: string;
   status?: string | null;
+}
+
+export interface LotRelationHistoryDto {
+  /** @format int32 */
+  lotRelationID?: number;
+  /** @format int32 */
+  parentLotID?: number | null;
+  parentLotNo?: string | null;
+  /** @format int32 */
+  parentItemID?: number | null;
+  parentItemName?: string | null;
+  /** @format int32 */
+  childLotID?: number;
+  childLotNo?: string | null;
+  /** @format int32 */
+  childItemID?: number;
+  childItemName?: string | null;
+  relationType?: string | null;
+  /** @format int32 */
+  inputQty?: number | null;
+  /** @format int32 */
+  outputQty?: number;
+  /** @format int32 */
+  processStepExecutionID?: number | null;
+  workOrderNo?: string | null;
+  stepName?: string | null;
+  refType?: string | null;
+  /** @format int32 */
+  refID?: number | null;
+  /** @format date-time */
+  createdAt?: string;
+}
+
+export interface LotTraceHistoryDto {
+  /** @format int32 */
+  lotRelationID?: number;
+  /** @format int32 */
+  parentLotID?: number | null;
+  parentLotNo?: string | null;
+  /** @format int32 */
+  parentItemID?: number | null;
+  parentItemName?: string | null;
+  /** @format int32 */
+  childLotID?: number;
+  childLotNo?: string | null;
+  /** @format int32 */
+  childItemID?: number;
+  childItemName?: string | null;
+  relationType?: string | null;
+  /** @format int32 */
+  inputQty?: number | null;
+  /** @format int32 */
+  outputQty?: number;
+  /** @format int32 */
+  processStepExecutionID?: number | null;
+  workOrderNo?: string | null;
+  stepName?: string | null;
+  refType?: string | null;
+  /** @format int32 */
+  refID?: number | null;
+  /** @format date-time */
+  createdAt?: string;
+  direction?: string | null;
+  /** @format int32 */
+  traceDepth?: number;
 }
 
 export interface LotUpdateDto {
@@ -307,6 +378,27 @@ export interface NavItemDto {
 export interface PermissionDto {
   code?: string | null;
   name?: string | null;
+}
+
+export interface PlcProcessMasterDto {
+  /** @format int32 */
+  processID?: number;
+  processCode?: string | null;
+  processName?: string | null;
+  description?: string | null;
+}
+
+export interface PlcProcessStepDto {
+  /** @format int32 */
+  stepID?: number;
+  stepName?: string | null;
+  /** @format int32 */
+  seqNo?: number;
+  stepType?: string | null;
+  description?: string | null;
+  /** @format int32 */
+  processMasterID?: number;
+  processMasterName?: string | null;
 }
 
 export interface ProblemDetails {

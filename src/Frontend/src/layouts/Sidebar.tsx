@@ -75,11 +75,13 @@ const Sidebar = () => {
     {
       title: '로그 / 이력',
       icon: <History size={20} />,
-      path: '/dashboard/log-monitor',
+      path: '/dashboard/history',
       allowedRoles: ['ADMIN', 'QC', 'VIEWER'],
       children: [
-        { title: '공정 이력', path: '/dashboard/log-monitor/process', icon: <History size={16} />, allowedRoles: ['ADMIN', 'VIEWER'] },
-        { title: '품질 검사 (QC)', path: '/dashboard/log-monitor/qc', icon: <ShieldCheck size={16} />, allowedRoles: ['ADMIN', 'QC'] },
+        { title: '작업지시 이력', path: '/dashboard/history/work-orders', icon: <ClipboardList size={16} />, allowedRoles: ['ADMIN', 'VIEWER'] },
+        { title: 'LOT 관계 이력', path: '/dashboard/history/lot-relations', icon: <Layers size={16} />, allowedRoles: ['ADMIN', 'VIEWER'] },
+        { title: 'LOT 추적 이력', path: '/dashboard/history/lot-trace', icon: <Activity size={16} />, allowedRoles: ['ADMIN', 'VIEWER'] },
+        { title: '품질 검사 (QC)', path: '/dashboard/history/qc', icon: <ShieldCheck size={16} />, allowedRoles: ['ADMIN', 'QC'] },
       ]
     },
     {
