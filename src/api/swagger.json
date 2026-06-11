@@ -5199,6 +5199,18 @@
             "type": "integer",
             "format": "int32"
           },
+          "currentQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reservedQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "availableQty": {
+            "type": "integer",
+            "format": "int32"
+          },
           "receivedAt": {
             "type": "string",
             "format": "date-time"
