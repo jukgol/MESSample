@@ -1,5 +1,6 @@
 using WAS.Data;
 using WAS.Extensions;
+using WAS.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 // 프로젝트 서비스 일괄 등록
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddProjectServices(builder.Configuration); // 전체 프로젝트 서비스 일괄 등록
 
 builder.Services.AddEndpointsApiExplorer();
@@ -33,6 +35,7 @@ app.UseDefaultFiles();
 app.UseStaticFiles();
 
 app.MapControllers();
+app.MapHub<ProcessMonitoringHub>("/hubs/process-monitoring");
 
 // 서버 시작 시 DB 프로시저 자동 등록 및 권한 캐시 초기화
 using (var scope = app.Services.CreateScope())

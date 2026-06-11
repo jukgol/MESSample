@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models.PLC;
-using System;
 using System.Text.Json;
+using WAS.Services.PLC;
 
 namespace WAS.Controllers.PLC
 {
@@ -11,37 +11,31 @@ namespace WAS.Controllers.PLC
     [AllowAnonymous]
     public class PlcEquipmentDataController : ControllerBase
     {
-        private readonly ILogger<PlcEquipmentDataController> _logger;
+        private readonly IPlcEquipmentDataService _plcEquipmentDataService;
 
-        public PlcEquipmentDataController(ILogger<PlcEquipmentDataController> logger)
+        public PlcEquipmentDataController(IPlcEquipmentDataService plcEquipmentDataService)
         {
-            _logger = logger;
+            _plcEquipmentDataService = plcEquipmentDataService;
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(PlcEquipmentDataReceiveResponseDto), 200)]
         [ProducesResponseType(400)]
-        public ActionResult<PlcEquipmentDataReceiveResponseDto> ReceiveEquipmentData([FromBody] JsonElement payload)
+        public async Task<ActionResult<PlcEquipmentDataReceiveResponseDto>> ReceiveEquipmentData([FromBody] JsonElement payload)
         {
             if (payload.ValueKind == JsonValueKind.Undefined || payload.ValueKind == JsonValueKind.Null)
             {
                 return BadRequest(new { Message = "PLC payload is required." });
             }
 
-            _logger.LogInformation("PLC equipment data received: {Payload}", payload.GetRawText());
-
-            return Ok(new PlcEquipmentDataReceiveResponseDto
-            {
-                Success = true,
-                ReceivedAt = DateTime.UtcNow,
-                Message = "PLC equipment data received."
-            });
+            var result = await _plcEquipmentDataService.HandleEquipmentDataAsync(payload);
+            return Ok(result);
         }
 
         [HttpPost("state")]
         [ProducesResponseType(typeof(PlcEquipmentStateResponseDto), 200)]
         [ProducesResponseType(400)]
-        public ActionResult<PlcEquipmentStateResponseDto> ReceiveEquipmentState([FromBody] PlcEquipmentStateRequestDto dto)
+        public async Task<ActionResult<PlcEquipmentStateResponseDto>> ReceiveEquipmentState([FromBody] PlcEquipmentStateRequestDto dto)
         {
             if (dto == null)
             {
@@ -62,21 +56,8 @@ namespace WAS.Controllers.PLC
                 return BadRequest(new { Message = "state must be STARTED or STOPPED." });
             }
 
-            var equipmentId = dto.EquipmentID.Trim();
-            _logger.LogInformation(
-                "PLC equipment state received. EquipmentID: {EquipmentID}, State: {State}, OccurredAt: {OccurredAt}",
-                equipmentId,
-                state,
-                dto.OccurredAt);
-
-            return Ok(new PlcEquipmentStateResponseDto
-            {
-                Success = true,
-                EquipmentID = equipmentId,
-                State = state,
-                ReceivedAt = DateTime.UtcNow,
-                Message = "PLC equipment state received."
-            });
+            var result = await _plcEquipmentDataService.HandleEquipmentStateAsync(dto);
+            return Ok(result);
         }
     }
 }

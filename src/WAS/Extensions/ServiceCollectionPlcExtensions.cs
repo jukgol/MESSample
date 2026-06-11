@@ -14,6 +14,8 @@ namespace WAS.Extensions
                 sp.GetRequiredService<PlcProcessMasterService>(),
                 sp.GetRequiredService<ILogger<PlcProcessMasterService>>()));
 
+            services.AddScoped<IPlcEquipmentDataService, PlcEquipmentDataService>();
+
             return services;
         }
     }
