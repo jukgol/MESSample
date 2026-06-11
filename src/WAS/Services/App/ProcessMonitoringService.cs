@@ -1,6 +1,8 @@
 using Shared.Models.App;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace WAS.Services.App
@@ -9,11 +11,19 @@ namespace WAS.Services.App
     {
         private readonly IScriptExecutor _scriptExecutor;
         private readonly IProcessMonitoringStateStore _stateStore;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly string _statToolBaseUrl;
 
-        public ProcessMonitoringService(IScriptExecutor scriptExecutor, IProcessMonitoringStateStore stateStore)
+        public ProcessMonitoringService(
+            IScriptExecutor scriptExecutor,
+            IProcessMonitoringStateStore stateStore,
+            IHttpClientFactory httpClientFactory,
+            IConfiguration configuration)
         {
             _scriptExecutor = scriptExecutor;
             _stateStore = stateStore;
+            _httpClientFactory = httpClientFactory;
+            _statToolBaseUrl = configuration["StatTool:BaseUrl"] ?? "http://localhost:9090";
         }
 
         public async Task<IEnumerable<CurrentWorkOrderStateDto>> GetCurrentWorkOrdersAsync()
@@ -181,6 +191,51 @@ namespace WAS.Services.App
                 });
 
             await RefreshWorkOrderByOutputAsync(outputId);
+        }
+
+        public Task<StatToolSignalResponseDto> SendStatToolStartAsync(StatToolSignalRequestDto? dto)
+        {
+            return SendStatToolSignalAsync("start", dto);
+        }
+
+        public Task<StatToolSignalResponseDto> SendStatToolStopAsync(StatToolSignalRequestDto? dto)
+        {
+            return SendStatToolSignalAsync("stop", dto);
+        }
+
+        private async Task<StatToolSignalResponseDto> SendStatToolSignalAsync(string command, StatToolSignalRequestDto? dto)
+        {
+            var targetId = string.IsNullOrWhiteSpace(dto?.EquipmentId) ? null : dto.EquipmentId.Trim();
+            var path = string.IsNullOrEmpty(targetId)
+                ? $"/{command}"
+                : $"/{command}?id={Uri.EscapeDataString(targetId)}";
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                client.Timeout = TimeSpan.FromSeconds(3);
+
+                var response = await client.PostAsync(new Uri(new Uri(_statToolBaseUrl), path), null);
+                var message = await response.Content.ReadAsStringAsync();
+
+                return new StatToolSignalResponseDto
+                {
+                    Success = response.IsSuccessStatusCode,
+                    Command = command,
+                    TargetId = targetId,
+                    Message = string.IsNullOrWhiteSpace(message) ? response.ReasonPhrase ?? string.Empty : message
+                };
+            }
+            catch (Exception)
+            {
+                return new StatToolSignalResponseDto
+                {
+                    Success = false,
+                    Command = command,
+                    TargetId = targetId,
+                    Message = "StatTool signal server is not reachable."
+                };
+            }
         }
 
         private async Task RefreshWorkOrderByExecutionAsync(int executionId)

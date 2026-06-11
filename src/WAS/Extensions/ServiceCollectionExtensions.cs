@@ -6,6 +6,7 @@ namespace WAS.Extensions
         {
             // DB 및 어드민 관리 서비스 등록
             services.AddAdminServices(configuration);
+            services.AddHttpClient();
 
             // 비즈니스 앱 서비스 등록
             services.AddAppServices();

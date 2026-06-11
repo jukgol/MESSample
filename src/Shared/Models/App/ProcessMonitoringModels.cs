@@ -93,6 +93,19 @@ namespace Shared.Models.App
         public int OutputQty { get; set; }
     }
 
+    public class StatToolSignalRequestDto
+    {
+        public string? EquipmentId { get; set; }
+    }
+
+    public class StatToolSignalResponseDto
+    {
+        public bool Success { get; set; }
+        public string Command { get; set; } = string.Empty;
+        public string? TargetId { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+
     public class ProcessMonitoringWorkOrderRefDto
     {
         public int WorkOrderID { get; set; }

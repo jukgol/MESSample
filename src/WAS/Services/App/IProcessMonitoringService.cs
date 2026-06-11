@@ -22,5 +22,7 @@ namespace WAS.Services.App
         Task<IEnumerable<ProcessOutputDto>> GetOutputsAsync(int executionId);
         Task CreateOutputAsync(int executionId, ProcessOutputCreateDto dto);
         Task UpdateOutputQuantityAsync(int outputId, ProcessOutputQuantityUpdateDto dto);
+        Task<StatToolSignalResponseDto> SendStatToolStartAsync(StatToolSignalRequestDto? dto);
+        Task<StatToolSignalResponseDto> SendStatToolStopAsync(StatToolSignalRequestDto? dto);
     }
 }
