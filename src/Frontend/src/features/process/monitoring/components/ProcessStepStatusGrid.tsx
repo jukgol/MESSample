@@ -66,24 +66,41 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                 </div>
               </div>
 
-              <span
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  color: meta.color,
-                  background: meta.bg,
-                  border: `1px solid ${meta.border}`,
-                  borderRadius: '8px',
-                  padding: '0.3rem 0.5rem',
-                  fontSize: '0.78rem',
-                  fontWeight: 700,
-                  whiteSpace: 'nowrap'
-                }}
-              >
-                {meta.icon}
-                {meta.label}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <button
+                  onClick={() => alert(`테스트: ${step.stepName}`)}
+                  style={{
+                    padding: '0.25rem 0.5rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: 'white',
+                    backgroundColor: '#4f46e5',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  테스트
+                </button>
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    color: meta.color,
+                    background: meta.bg,
+                    border: `1px solid ${meta.border}`,
+                    borderRadius: '8px',
+                    padding: '0.3rem 0.5rem',
+                    fontSize: '0.78rem',
+                    fontWeight: 700,
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {meta.icon}
+                  {meta.label}
+                </span>
+              </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
