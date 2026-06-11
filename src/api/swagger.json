@@ -3355,7 +3355,7 @@
         }
       }
     },
-    "/api/process-monitoring/stattool/start": {
+    "/api/process-monitoring/starttool/start": {
       "post": {
         "tags": [
           "ProcessMonitoring"
@@ -3364,17 +3364,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StatToolSignalRequestDto"
+                "$ref": "#/components/schemas/StartToolSignalRequestDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/StatToolSignalRequestDto"
+                "$ref": "#/components/schemas/StartToolSignalRequestDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/StatToolSignalRequestDto"
+                "$ref": "#/components/schemas/StartToolSignalRequestDto"
               }
             }
           }
@@ -3385,17 +3385,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               }
             }
@@ -3405,17 +3405,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               }
             }
@@ -3443,7 +3443,7 @@
         }
       }
     },
-    "/api/process-monitoring/stattool/stop": {
+    "/api/process-monitoring/starttool/stop": {
       "post": {
         "tags": [
           "ProcessMonitoring"
@@ -3452,17 +3452,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StatToolSignalRequestDto"
+                "$ref": "#/components/schemas/StartToolSignalRequestDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/StatToolSignalRequestDto"
+                "$ref": "#/components/schemas/StartToolSignalRequestDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/StatToolSignalRequestDto"
+                "$ref": "#/components/schemas/StartToolSignalRequestDto"
               }
             }
           }
@@ -3473,17 +3473,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               }
             }
@@ -3493,17 +3493,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/StatToolSignalResponseDto"
+                  "$ref": "#/components/schemas/StartToolSignalResponseDto"
                 }
               }
             }
@@ -6508,7 +6508,7 @@
         },
         "additionalProperties": false
       },
-      "StatToolSignalRequestDto": {
+      "StartToolSignalRequestDto": {
         "type": "object",
         "properties": {
           "equipmentId": {
@@ -6518,7 +6518,7 @@
         },
         "additionalProperties": false
       },
-      "StatToolSignalResponseDto": {
+      "StartToolSignalResponseDto": {
         "type": "object",
         "properties": {
           "success": {

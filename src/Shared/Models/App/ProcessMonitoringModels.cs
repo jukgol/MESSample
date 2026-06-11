@@ -93,12 +93,12 @@ namespace Shared.Models.App
         public int OutputQty { get; set; }
     }
 
-    public class StatToolSignalRequestDto
+    public class StartToolSignalRequestDto
     {
         public string? EquipmentId { get; set; }
     }
 
-    public class StatToolSignalResponseDto
+    public class StartToolSignalResponseDto
     {
         public bool Success { get; set; }
         public string Command { get; set; } = string.Empty;
