@@ -207,10 +207,7 @@ class ProcessGridPanel(ttk.LabelFrame):
             is_running = eq.get("is_running", True)
             
             master_name = eq.get("process_master_name", eq.get("equipment_name", eq_id))
-            suffix = ""
-            if "-" in eq_id:
-                suffix = f" ({eq_id.split('-')[-1]})"
-            card_title = f" {master_name}{suffix} "
+            card_title = f" {master_name} ({eq_id}) "
             
             # Card
             card = ttk.LabelFrame(self.scrollable_frame, text=card_title, padding=8)

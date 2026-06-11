@@ -76,7 +76,8 @@ const ProductProcessList: React.FC = () => {
       seqNo: step.seqNo,
       stepType: step.stepType,
       description: step.description === '-' ? '' : step.description,
-      processMasterID: selectedMaster.processID
+      processMasterID: selectedMaster.processID,
+      equipmentID: step.equipmentID
     });
 
     if (!success) {
@@ -91,7 +92,8 @@ const ProductProcessList: React.FC = () => {
       seqNo: step.seqNo,
       stepType: step.stepType,
       description: step.description === '-' ? '' : step.description,
-      processMasterID: null
+      processMasterID: null,
+      equipmentID: step.equipmentID
     });
 
     if (!success) {

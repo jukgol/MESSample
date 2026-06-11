@@ -137,7 +137,9 @@ class AppState:
             # API로부터 스텝 리스트를 성공적으로 받아온 경우
             last_added_id = None
             for step in steps:
-                step_code = f"{eq['equipment_id']}-{step.get('stepID', step.get('seqNo'))}"
+                step_code = step.get('equipmentID') or step.get('equipmentId')
+                if not step_code:
+                    step_code = f"{eq['equipment_id']}-{step.get('stepID', step.get('seqNo'))}"
                 
                 # 중복 등록 방지
                 if any(created["equipment_id"] == step_code for created in self.created_equipments):

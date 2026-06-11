@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useProcessSteps } from '../hooks/useProcessSteps';
 import type { ProcessStep } from '../hooks/useProcessSteps';
-import { Search, Plus, RotateCw, Database } from 'lucide-react';
+import { Search, Plus, RotateCw, Database, Cpu } from 'lucide-react';
 
 // Split Components
 import ProcessStepHeader from '../components/ProcessStepHeader';
@@ -36,12 +36,13 @@ const ProcessStepList: React.FC = () => {
       const nameMatch = step.stepName?.toLowerCase().includes(searchLower) ?? false;
       const typeMatch = step.stepType?.toLowerCase().includes(searchLower) ?? false;
       const idMatch = step.stepID?.toString().includes(searchLower) ?? false;
-      return nameMatch || typeMatch || idMatch;
+      const equipmentMatch = step.equipmentID?.toLowerCase().includes(searchLower) ?? false;
+      return nameMatch || typeMatch || idMatch || equipmentMatch;
     });
   }, [processSteps, searchTerm]);
 
   // 등록 처리
-  const handleCreateSubmit = async (form: { stepName: string; seqNo: number; stepType: string; description: string }) => {
+  const handleCreateSubmit = async (form: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID?: string | null }) => {
     const success = await createProcessStep(form);
     if (success) {
       setIsCreateOpen(false);
@@ -59,6 +60,36 @@ const ProcessStepList: React.FC = () => {
     if (confirm('해당 공정 단계를 삭제하시겠습니까?')) {
       await deleteProcessStep(id);
     }
+  };
+
+  // 자동 설비 등록 처리
+  const handleAutoAssignEquipment = async () => {
+    if (processSteps.length === 0) {
+      alert('자동 등록할 공정 단계가 없습니다.');
+      return;
+    }
+    if (!confirm('모든 공정 단계에 자동으로 설비 ID를 부여하시겠습니까?')) {
+      return;
+    }
+
+    let successCount = 0;
+    for (const step of processSteps) {
+      const prefix = step.stepType === '생산' ? 'PRD' : step.stepType === '포장' ? 'PKG' : step.stepType === '검사' ? 'INSP' : 'ETC';
+      const autoEquipmentID = `EQ-${prefix}-${step.seqNo}`;
+
+      const success = await updateProcessStep(step.stepID, {
+        stepName: step.stepName,
+        seqNo: step.seqNo,
+        stepType: step.stepType,
+        description: step.description === '-' ? '' : step.description,
+        processMasterID: step.processMasterID,
+        equipmentID: autoEquipmentID
+      });
+      if (success) {
+        successCount++;
+      }
+    }
+    alert(`총 ${processSteps.length}개 중 ${successCount}개 공정의 설비 자동 등록을 완료했습니다.`);
   };
 
   return (
@@ -86,6 +117,22 @@ const ProcessStepList: React.FC = () => {
           style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.6rem 1.2rem', borderRadius: '8px' }}
         >
           <Plus size={16} /> 공정 신규 등록
+        </button>
+        <button
+          onClick={handleAutoAssignEquipment}
+          disabled={loading || processSteps.length === 0}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            background: 'rgba(16,185,129,0.15)',
+            border: '1px solid rgba(16,185,129,0.3)',
+            color: '#10b981',
+            padding: '0.6rem 1.2rem',
+            borderRadius: '8px'
+          }}
+        >
+          <Cpu size={16} /> 자동 설비 등록
         </button>
       </div>
 

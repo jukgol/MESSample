@@ -45,6 +45,7 @@ const ProcessStepTable: React.FC<ProcessStepTableProps> = ({
                     <th style={{ padding: '1rem' }}>공정 단계명</th>
                     <th style={{ padding: '1rem' }}>공정 유형</th>
                     <th style={{ padding: '1rem' }}>소속 공정</th>
+                    <th style={{ padding: '1rem' }}>설비 ID</th>
                     <th style={{ padding: '1rem', textAlign: 'center' }}>관리</th>
                   </tr>
                 </thead>
@@ -69,6 +70,9 @@ const ProcessStepTable: React.FC<ProcessStepTableProps> = ({
                         </td>
                         <td style={{ padding: '1rem', color: step.processMasterName ? 'white' : 'var(--text-secondary)' }}>
                           {step.processMasterName || '미연결'}
+                        </td>
+                        <td style={{ padding: '1rem', color: step.equipmentID ? 'white' : 'var(--text-secondary)' }}>
+                          {step.equipmentID || '미지정'}
                         </td>
                         <td style={{ padding: '1rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -110,7 +114,7 @@ const ProcessStepTable: React.FC<ProcessStepTableProps> = ({
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={6} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                      <td colSpan={7} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                         등록된 공정 단계가 없습니다.
                       </td>
                     </tr>

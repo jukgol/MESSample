@@ -10,7 +10,7 @@ interface StepUpdateMappingModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedStep: ProcessStep | null;
-  onUpdateStep: (id: number, dto: { stepName: string; seqNo: number; stepType: string; description: string }) => Promise<boolean>;
+  onUpdateStep: (id: number, dto: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID?: string | null }) => Promise<boolean>;
 }
 
 const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
@@ -35,7 +35,8 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
     stepName: '',
     seqNo: 10,
     stepType: '생산',
-    description: ''
+    description: '',
+    equipmentID: ''
   });
 
   // 상태 관리
@@ -61,7 +62,8 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
         stepName: selectedStep.stepName,
         seqNo: selectedStep.seqNo,
         stepType: selectedStep.stepType,
-        description: selectedStep.description === '-' ? '' : selectedStep.description
+        description: selectedStep.description === '-' ? '' : selectedStep.description,
+        equipmentID: selectedStep.equipmentID || ''
       });
       setIsSelectorOpen(false);
       setSelectorMode(null);
@@ -96,7 +98,8 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
       stepName: updateForm.stepName,
       seqNo: Number(updateForm.seqNo),
       stepType: updateForm.stepType,
-      description: updateForm.description
+      description: updateForm.description,
+      equipmentID: updateForm.equipmentID.trim() || null
     });
     if (success) {
       onClose();
@@ -367,6 +370,24 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
                   <option value="기타" style={{ background: '#1e1e24' }}>기타</option>
                 </select>
               </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+              <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>설비 ID (Equipment ID)</label>
+              <input
+                type="text"
+                placeholder="예: EQ-001 (선택 사항)"
+                value={updateForm.equipmentID}
+                onChange={(e) => setUpdateForm({ ...updateForm, equipmentID: e.target.value })}
+                style={{
+                  padding: '0.8rem',
+                  background: 'rgba(0,0,0,0.4)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '8px',
+                  color: 'white',
+                  outline: 'none'
+                }}
+              />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', flex: 1 }}>

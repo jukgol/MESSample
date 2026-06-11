@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 interface StepCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (form: { stepName: string; seqNo: number; stepType: string; description: string }) => Promise<void>;
+  onSubmit: (form: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID: string | null }) => Promise<void>;
   defaultSeq: number;
 }
 
@@ -17,7 +17,8 @@ const StepCreateModal: React.FC<StepCreateModalProps> = ({
     stepName: '',
     seqNo: 10,
     stepType: '생산',
-    description: ''
+    description: '',
+    equipmentID: ''
   });
 
   useEffect(() => {
@@ -26,7 +27,8 @@ const StepCreateModal: React.FC<StepCreateModalProps> = ({
         stepName: '',
         seqNo: defaultSeq,
         stepType: '생산',
-        description: ''
+        description: '',
+        equipmentID: ''
       });
     }
   }, [isOpen, defaultSeq]);
@@ -39,7 +41,10 @@ const StepCreateModal: React.FC<StepCreateModalProps> = ({
       alert('공정 단계명은 필수 입력 항목입니다.');
       return;
     }
-    await onSubmit(form);
+    await onSubmit({
+      ...form,
+      equipmentID: form.equipmentID.trim() || null
+    });
   };
 
   return (
@@ -118,6 +123,24 @@ const StepCreateModal: React.FC<StepCreateModalProps> = ({
                 <option value="기타" style={{ background: '#1e1e24' }}>기타</option>
               </select>
             </div>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>설비 ID (Equipment ID)</label>
+            <input
+              type="text"
+              placeholder="예: EQ-001 (선택 사항)"
+              value={form.equipmentID}
+              onChange={(e) => setForm({ ...form, equipmentID: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none'
+              }}
+            />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
