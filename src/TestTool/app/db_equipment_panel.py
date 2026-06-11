@@ -6,87 +6,96 @@ from app.state import AppState
 
 class DbEquipmentPanel(ttk.LabelFrame):
     def __init__(self, parent: tk.Widget, state: AppState) -> None:
-        super().__init__(parent, text=" DB 공정 목록 ", padding=10)
+        super().__init__(parent, text=" DB 공정 템플릿 목록 (가로 스크롤) ", padding=10)
         self.state = state
+        self.cards = {}
         
-        self.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
+        self.pack(side=tk.TOP, fill=tk.X, pady=(0, 10))
         self._create_widgets()
         
         # Subscribe
-        self.state.subscribe_db_equipments_loaded(self._load_tree_data)
-        self.state.subscribe_created_equipments_changed(self._update_create_button_state)
+        self.state.subscribe_db_equipments_loaded(self._load_cards_data)
+        self.state.subscribe_created_equipments_changed(self._update_all_buttons_state)
 
     def _create_widgets(self) -> None:
-        # Table Treeview
-        db_cols = ("ID", "전체 공정", "공정", "사용여부", "상태")
-        self.db_tree = ttk.Treeview(self, columns=db_cols, show="headings", height=12)
-        for col in db_cols:
-            self.db_tree.heading(col, text=col)
-            self.db_tree.column(col, width=60, anchor=tk.CENTER)
-        self.db_tree.column("전체 공정", width=120, anchor=tk.W)
-        self.db_tree.pack(fill=tk.BOTH, expand=True, pady=(0, 10))
+        # Create canvas for horizontal scrolling
+        bg_color = ttk.Style().lookup("TFrame", "background") or "#f0f0f0"
+        self.canvas = tk.Canvas(self, borderwidth=0, highlightthickness=0, height=105, bg=bg_color)
+        self.scrollbar = ttk.Scrollbar(self, orient="horizontal", command=self.canvas.xview)
         
-        # Bind treeview select change
-        self.db_tree.bind("<<TreeviewSelect>>", lambda e: self._update_create_button_state())
-
-        # Create Button
-        self.btn_create = ttk.Button(
-            self, 
-            text="선택 공정 생성", 
-            command=self._create_equipment,
-            style="Accent.TButton"
-        )
-        self.btn_create.pack(fill=tk.X)
+        self.scrollable_frame = ttk.Frame(self.canvas)
         
-        self.lbl_create_status = ttk.Label(self, text="", style="Caption.TLabel")
-        self.lbl_create_status.pack(anchor=tk.W, pady=(5, 0))
-
-    def _load_tree_data(self) -> None:
-        for item in self.db_tree.get_children():
-            self.db_tree.delete(item)
-
-        for eq in self.state.dummy_equipments:
-            self.db_tree.insert(
-                "",
-                tk.END,
-                iid=eq["equipment_id"], # iid를 equipment_id로 지정하여 찾기 쉽게 함
-                values=(
-                    eq["equipment_id"],
-                    eq["equipment_name"],
-                    eq["process"],
-                    eq["use_yn"],
-                    eq["status"],
-                )
+        self.scrollable_frame.bind(
+            "<Configure>",
+            lambda e: self.canvas.configure(
+                scrollregion=self.canvas.bbox("all")
             )
-            
-        self._update_create_button_state()
-
-    def _get_selected_tree_id(self) -> str | None:
-        selected_items = self.db_tree.selection()
-        if not selected_items:
-            return None
-        return selected_items[0]
-
-    def _update_create_button_state(self) -> None:
-        selected_id = self._get_selected_tree_id()
-        if not selected_id:
-            self.btn_create.state(["disabled"])
-            self.lbl_create_status.config(text="목록에서 공정을 선택해 주세요.")
-            return
-
-        # EQP-001 같은 마스터 ID가 들어가 있거나 하위 스텝(EQP-001-)이 생성되어 있는지 체크
-        is_already_created = any(
-            eq["equipment_id"] == selected_id or eq["equipment_id"].startswith(f"{selected_id}-")
-            for eq in self.state.created_equipments
         )
-        if is_already_created:
-            self.btn_create.state(["disabled"])
-            self.lbl_create_status.config(text="이미 생성된 공정(또는 스텝)입니다.", foreground="red")
-        else:
-            self.btn_create.state(["!disabled"])
-            self.lbl_create_status.config(text="")
+        
+        self.canvas_window = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+        self.canvas.configure(xscrollcommand=self.scrollbar.set)
+        
+        # Pack canvas and scrollbar
+        self.scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        self.canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        
+        # Bind mouse wheel for horizontal scroll on DB panel
+        def _on_mousewheel(event):
+            self.canvas.xview_scroll(int(-1 * (event.delta / 120)), "units")
+            
+        self.canvas.bind("<MouseWheel>", _on_mousewheel)
+        self.scrollable_frame.bind("<MouseWheel>", _on_mousewheel)
 
-    def _create_equipment(self) -> None:
-        selected_id = self._get_selected_tree_id()
-        if selected_id:
-            self.state.create_equipment(selected_id)
+    def _load_cards_data(self) -> None:
+        # Clear existing
+        for child in self.scrollable_frame.winfo_children():
+            child.destroy()
+        self.cards.clear()
+        
+        # Rebuild DB template cards horizontally
+        for i, eq in enumerate(self.state.dummy_equipments):
+            eq_id = eq["equipment_id"]
+            
+            # DB Card
+            card = ttk.Frame(self.scrollable_frame, padding=6, relief="groove", borderwidth=1)
+            card.grid(row=0, column=i, padx=5, pady=2, sticky="ns")
+            
+            # Title (Step Type / Line)
+            lbl_title = ttk.Label(card, text=eq["equipment_name"], font=("Malgun Gothic", 9, "bold"))
+            lbl_title.pack(anchor=tk.W, pady=(0, 2))
+            
+            # Code Label
+            lbl_code = ttk.Label(card, text=f"코드: {eq_id}", style="Caption.TLabel")
+            lbl_code.pack(anchor=tk.W, pady=(0, 4))
+            
+            # Add Button
+            btn_add = ttk.Button(
+                card,
+                text="스텝 추가 +",
+                width=10,
+                command=lambda eid=eq_id: self.state.create_equipment(eid),
+                style="Accent.TButton"
+            )
+            btn_add.pack(fill=tk.X)
+            
+            self.cards[eq_id] = btn_add
+            
+            # Bind wheel
+            for w in [card, lbl_title, lbl_code]:
+                w.bind("<MouseWheel>", lambda e: self.canvas.xview_scroll(int(-1 * (e.delta / 120)), "units"))
+                
+        self._update_all_buttons_state()
+
+    def _update_all_buttons_state(self) -> None:
+        for eq_id, btn in self.cards.items():
+            # Check if this ID or step with prefix is already created
+            is_already_created = any(
+                eq["equipment_id"] == eq_id or eq["equipment_id"].startswith(f"{eq_id}-")
+                for eq in self.state.created_equipments
+            )
+            if is_already_created:
+                btn.state(["disabled"])
+                btn.config(text="추가 완료")
+            else:
+                btn.state(["!disabled"])
+                btn.config(text="스텝 추가 +")

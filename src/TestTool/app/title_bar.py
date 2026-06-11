@@ -12,8 +12,9 @@ class TitleBar(ttk.Frame):
         self.pack(fill=tk.X)
         self._create_widgets()
         
-        # Subscribe to connection status changes
+        # Subscribe to connection status changes and signal received events
         self.state.subscribe_connection_status_changed(self._update_status_bulb)
+        self.state.subscribe_signal_received(self._on_signal_received)
 
     def _create_widgets(self) -> None:
         # Left side (Title & Description)
@@ -44,9 +45,33 @@ class TitleBar(ttk.Frame):
         self.btn_reconnect = ttk.Button(conn_frame, text="재연결", command=self._reconnect_api, width=8)
         self.btn_reconnect.pack(side=tk.LEFT)
 
+        # Middle-right side (Signal server status & Last received API)
+        signal_frame = ttk.Frame(self)
+        signal_frame.pack(side=tk.RIGHT, padx=20)
+
+        self.lbl_server_info = ttk.Label(
+            signal_frame, 
+            text="로컬 신호 포트: 9090 (대기 중)", 
+            font=("Malgun Gothic", 9, "bold"), 
+            foreground="darkgreen"
+        )
+        self.lbl_server_info.pack(anchor=tk.E)
+
+        self.lbl_last_signal = ttk.Label(
+            signal_frame, 
+            text="최근 수신 신호: 없음", 
+            style="Caption.TLabel"
+        )
+        self.lbl_last_signal.pack(anchor=tk.E)
+
     def _update_status_bulb(self, is_connected: bool) -> None:
         color = "green2" if is_connected else "red"
         self.canvas_status.itemconfig(self.status_bulb, fill=color)
+
+    def _on_signal_received(self, path: str, target_id: str | None, time_str: str) -> None:
+        target = f" ({target_id})" if target_id else " (전체)"
+        text = f"최근 수신 신호: {path}{target} [{time_str}]"
+        self.after(0, lambda: self.lbl_last_signal.config(text=text, foreground="blue2"))
 
     def _reconnect_api(self) -> None:
         from tkinter import messagebox

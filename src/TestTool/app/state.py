@@ -46,6 +46,7 @@ class AppState:
         self.on_created_equipments_changed_callbacks: list[callable] = []
         self.on_selected_detail_changed_callbacks: list[callable] = []
         self.on_connection_status_changed_callbacks: list[callable] = []
+        self.on_signal_received_callbacks: list[callable] = []
 
     def fetch_api_equipments(self) -> bool:
         url = "http://localhost:5175/api/plc/process-master"
@@ -87,6 +88,18 @@ class AppState:
 
     def subscribe_connection_status_changed(self, callback: callable) -> None:
         self.on_connection_status_changed_callbacks.append(callback)
+
+    def subscribe_signal_received(self, callback: callable) -> None:
+        self.on_signal_received_callbacks.append(callback)
+
+    def notify_signal_received(self, path: str, target_id: str | None) -> None:
+        import datetime
+        time_str = datetime.datetime.now().strftime("%H:%M:%S")
+        for cb in self.on_signal_received_callbacks:
+            try:
+                cb(path, target_id, time_str)
+            except Exception:
+                pass
 
     # State modification and notification
     def _notify_db_equipments_loaded(self) -> None:
@@ -141,6 +154,10 @@ class AppState:
                     "progress_status": "대기",
                     "ok_count": 0,
                     "ng_count": 0,
+                    "received_qty": 0,
+                    "consumed_qty": 0,
+                    "interval_sec": 5,
+                    "is_running": False,
                     "step_id": step.get("stepID"),
                     "seq_no": step.get("seqNo"),
                     "description": step.get("description", "")
@@ -160,12 +177,26 @@ class AppState:
                 "progress_status": "대기",
                 "ok_count": 0,
                 "ng_count": 0,
+                "received_qty": 0,
+                "consumed_qty": 0,
+                "interval_sec": 5,
+                "is_running": False,
             }
             self.created_equipments.append(new_eq)
             self.select_detail(equipment_id)
         
         for cb in self.on_created_equipments_changed_callbacks:
             cb()
+
+    def update_step_value(self, equipment_id: str, key: str, value: any) -> None:
+        eq = next((item for item in self.created_equipments if item["equipment_id"] == equipment_id), None)
+        if eq and key in eq:
+            eq[key] = value
+            # Do NOT notify everyone if we want to avoid total redraw. Or notify but we can handle partial updates.
+            # We will still run callbacks if needed, but we can have a smaller notification if we want.
+            # Let's call the normal callbacks to keep simple flow, but implement partial update in UI.
+            for cb in self.on_created_equipments_changed_callbacks:
+                cb()
 
     def remove_equipment(self, equipment_id: str) -> None:
         self.created_equipments = [eq for eq in self.created_equipments if eq["equipment_id"] != equipment_id]
@@ -174,3 +205,4 @@ class AppState:
             
         for cb in self.on_created_equipments_changed_callbacks:
             cb()
+
