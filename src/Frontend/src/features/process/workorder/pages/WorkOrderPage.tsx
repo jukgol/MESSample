@@ -1,11 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import WorkOrderActionBar from '../components/WorkOrderActionBar';
-import WorkOrderApprovalPanel from '../components/WorkOrderApprovalPanel';
 import WorkOrderConfigPanel from '../components/WorkOrderConfigPanel';
 import WorkOrderErrorAlert from '../components/WorkOrderErrorAlert';
 import WorkOrderHeader from '../components/WorkOrderHeader';
 import WorkOrderHistoryList from '../components/WorkOrderHistoryList';
-import WorkOrderLayout from '../components/WorkOrderLayout';
 import WorkOrderMasterList from '../components/WorkOrderMasterList';
 import WorkOrderMessage from '../components/WorkOrderMessage';
 import WorkOrderStepGrid from '../components/WorkOrderStepGrid';
@@ -147,12 +145,9 @@ const WorkOrderPage: React.FC = () => {
         <WorkOrderTabs activeTab={activeTab} onChange={handleTabChange} />
         <div
           style={{
-            border: '1px solid var(--border-color)',
-            borderTop: 'none',
-            borderBottomLeftRadius: '8px',
-            borderBottomRightRadius: '8px',
-            background: 'var(--panel-bg)',
-            padding: '1rem',
+            border: 'none',
+            background: 'transparent',
+            padding: '0.5rem 0',
             minHeight: 0
           }}
         >
@@ -162,45 +157,65 @@ const WorkOrderPage: React.FC = () => {
           />
 
           {activeTab === 'issue' ? (
-            <WorkOrderLayout
-              top={
-                <WorkOrderMasterList
-                  masters={masters}
-                  selectedMasterId={selectedMasterId}
-                  onSelectMaster={handleSelectMaster}
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+              {/* 브라우저 헤더 및 탭 영역 */}
+              <WorkOrderMasterList
+                masters={masters}
+                selectedMasterId={selectedMasterId}
+                onSelectMaster={handleSelectMaster}
+              />
+
+              {/* 브라우저 바디 영역 */}
+              <div
+                style={{
+                  background: '#141b27',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderTop: 'none',
+                  borderBottomLeftRadius: '16px',
+                  borderBottomRightRadius: '16px',
+                  padding: '1.5rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '1.25rem',
+                  minHeight: 0,
+                  boxShadow: '0 10px 32px rgba(0, 0, 0, 0.3)'
+                }}
+              >
+                <WorkOrderConfigPanel
+                  selectedMaster={selectedMaster}
+                  orderQty={orderQty}
+                  onOrderQtyChange={setOrderQty}
+                  operatorName={operatorName}
+                  onApprove={handleApprove}
+                  disabled={approving || loading || !canApprove}
                 />
-              }
-              middle={
-                <>
-                  <WorkOrderConfigPanel
-                    selectedMaster={selectedMaster}
-                    orderQty={orderQty}
-                    onOrderQtyChange={setOrderQty}
-                  />
-                  <WorkOrderStepGrid
-                    steps={preview?.steps || []}
-                    loading={loading}
-                    selectedStepId={selectedStepId}
-                    onSelectStep={(step) => setSelectedStepId(step.stepID || null)}
-                  />
-                </>
-              }
-              bottom={
-                <>
-                  <WorkOrderApprovalPanel
-                    operatorName={operatorName}
-                    onApprove={handleApprove}
-                    disabled={approving || loading || !canApprove}
-                  />
-                  {hasActiveWorkOrder && (
-                    <WorkOrderMessage message="해당 공정 라인은 이미 진행 중인 작업지시가 있어 승인할 수 없습니다." />
-                  )}
-                  <WorkOrderMessage message={message} />
-                </>
-              }
-            />
+                
+                <WorkOrderStepGrid
+                  steps={preview?.steps || []}
+                  loading={loading}
+                  selectedStepId={selectedStepId}
+                  onSelectStep={(step) => setSelectedStepId(step.stepID || null)}
+                />
+
+                {hasActiveWorkOrder && (
+                  <WorkOrderMessage message="해당 공정 라인은 이미 진행 중인 작업지시가 있어 승인할 수 없습니다." />
+                )}
+                
+                <WorkOrderMessage message={message} />
+              </div>
+            </div>
           ) : (
-            <WorkOrderHistoryList history={history} loading={historyLoading} />
+            <div
+              style={{
+                background: '#141b27',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '16px',
+                padding: '1.5rem',
+                boxShadow: '0 10px 32px rgba(0, 0, 0, 0.3)'
+              }}
+            >
+              <WorkOrderHistoryList history={history} loading={historyLoading} />
+            </div>
           )}
         </div>
       </section>

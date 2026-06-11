@@ -20,10 +20,11 @@ const WorkOrderTabs: React.FC<WorkOrderTabsProps> = ({ activeTab, onChange }) =>
       aria-label="작업지시 탭"
       style={{
         display: 'flex',
-        alignItems: 'flex-end',
-        gap: '0.25rem',
-        borderBottom: '1px solid var(--border-color)',
-        paddingLeft: '0.25rem'
+        alignItems: 'center',
+        gap: '0.5rem',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        paddingBottom: '0.75rem',
+        marginBottom: '0.5rem'
       }}
     >
       {tabs.map((tab) => {
@@ -38,27 +39,24 @@ const WorkOrderTabs: React.FC<WorkOrderTabsProps> = ({ activeTab, onChange }) =>
             onClick={() => onChange(tab.id)}
             title={tab.label}
             style={{
-              position: 'relative',
-              bottom: -1,
-              minWidth: 132,
-              height: 42,
+              minWidth: 120,
+              height: 38,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '0.45rem',
-              borderTopLeftRadius: '8px',
-              borderTopRightRadius: '8px',
-              borderBottomLeftRadius: 0,
-              borderBottomRightRadius: 0,
-              border: isActive ? '1px solid var(--border-color)' : '1px solid rgba(255, 255, 255, 0.08)',
-              borderBottom: isActive ? '1px solid var(--panel-bg)' : '1px solid var(--border-color)',
-              padding: '0 1rem',
+              gap: '0.5rem',
+              borderRadius: '20px',
+              border: isActive ? '1px solid rgba(99, 102, 241, 0.3)' : '1px solid transparent',
+              padding: '0 1.25rem',
               color: isActive ? 'white' : 'var(--text-secondary)',
-              background: isActive ? 'var(--panel-bg)' : 'rgba(255, 255, 255, 0.04)',
-              boxShadow: isActive ? '0 -4px 16px rgba(0, 0, 0, 0.12)' : 'none',
-              fontWeight: 800,
-              transform: 'none',
-              zIndex: isActive ? 2 : 1
+              background: isActive 
+                ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.15))' 
+                : 'rgba(255, 255, 255, 0.03)',
+              boxShadow: isActive ? '0 4px 15px rgba(99, 102, 241, 0.15)' : 'none',
+              fontWeight: 600,
+              fontSize: '0.9rem',
+              cursor: 'pointer',
+              transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
             }}
           >
             {tab.icon}

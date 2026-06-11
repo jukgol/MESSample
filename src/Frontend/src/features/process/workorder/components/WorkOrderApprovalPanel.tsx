@@ -13,10 +13,10 @@ const WorkOrderApprovalPanel: React.FC<WorkOrderApprovalPanelProps> = ({
   disabled
 }) => {
   return (
-    <section className="workorder-panel" style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) auto', gap: '1rem', alignItems: 'end' }}>
-      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <UserRound size={15} />
+    <section className="premium-card" style={{ padding: '1.25rem 1.5rem', display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) auto', gap: '1.5rem', alignItems: 'end', borderRadius: '14px', background: 'rgba(255, 255, 255, 0.02)', borderColor: 'rgba(255, 255, 255, 0.05)', boxShadow: 'none' }}>
+      <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.85rem', fontWeight: 600 }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--accent-primary)' }}>
+          <UserRound size={16} />
           작업자
         </span>
         <input
@@ -26,13 +26,14 @@ const WorkOrderApprovalPanel: React.FC<WorkOrderApprovalPanelProps> = ({
           readOnly
           style={{
             width: '100%',
-            padding: '0.85rem 1rem',
-            background: 'transparent',
-            border: 'none',
-            borderRadius: 0,
+            padding: '0.75rem 1rem',
+            background: 'rgba(11, 14, 20, 0.4)',
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            borderRadius: '10px',
             color: 'white',
             outline: 'none',
-            fontSize: '0.95rem',
+            fontSize: '1rem',
+            fontWeight: 700,
             cursor: 'default'
           }}
         />
@@ -42,17 +43,23 @@ const WorkOrderApprovalPanel: React.FC<WorkOrderApprovalPanelProps> = ({
         onClick={onApprove}
         disabled={disabled}
         style={{
-          borderRadius: '8px',
+          borderRadius: '12px',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
-          height: 46,
+          gap: '0.6rem',
+          height: 48,
+          padding: '0 2rem',
+          fontSize: '1rem',
+          fontWeight: 700,
           opacity: disabled ? 0.45 : 1,
           cursor: disabled ? 'not-allowed' : 'pointer',
-          background: disabled ? 'rgba(255, 255, 255, 0.08)' : undefined,
-          border: disabled ? '1px solid var(--border-color)' : undefined,
-          color: disabled ? 'var(--text-secondary)' : undefined,
-          boxShadow: disabled ? 'none' : undefined
+          background: disabled 
+            ? 'rgba(255, 255, 255, 0.08)' 
+            : 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+          border: disabled ? '1px solid rgba(255, 255, 255, 0.08)' : 'none',
+          color: disabled ? 'var(--text-secondary)' : 'white',
+          boxShadow: disabled ? 'none' : '0 4px 15px rgba(99, 102, 241, 0.3)',
+          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
         }}
       >
         <CheckCircle2 size={18} />
