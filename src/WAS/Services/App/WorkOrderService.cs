@@ -27,6 +27,11 @@ namespace WAS.Services.App
             return await _scriptExecutor.ExecuteQueryAsync<ProcessMasterDto>("App/WorkOrder/GET_WORK_ORDER_MASTERS");
         }
 
+        public async Task<IEnumerable<WorkOrderHistoryDto>> GetHistoryAsync()
+        {
+            return await _scriptExecutor.ExecuteQueryAsync<WorkOrderHistoryDto>("App/WorkOrder/GET_WORK_ORDER_HISTORY");
+        }
+
         public async Task<WorkOrderPreviewDto> GetPreviewAsync(WorkOrderPreviewRequestDto request)
         {
             var steps = await BuildStepAvailabilityAsync(request.ProcessMasterID, request.OrderQty);

@@ -4,13 +4,16 @@ import { api } from '../../../../api/client';
 import type {
   ProcessMasterDto,
   WorkOrderCreateResultDto,
+  WorkOrderHistoryDto,
   WorkOrderPreviewDto
 } from '../../../../api/data-contracts';
 
 export const useWorkOrder = () => {
   const [masters, setMasters] = useState<ProcessMasterDto[]>([]);
+  const [history, setHistory] = useState<WorkOrderHistoryDto[]>([]);
   const [preview, setPreview] = useState<WorkOrderPreviewDto | null>(null);
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [approving, setApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,6 +32,24 @@ export const useWorkOrder = () => {
       return [];
     } finally {
       setLoading(false);
+    }
+  }, []);
+
+  const fetchHistory = useCallback(async () => {
+    try {
+      setHistoryLoading(true);
+      setError(null);
+      const response = await api.api.workOrderHistoryList();
+      const nextHistory = response.data || [];
+      setHistory(nextHistory);
+      return nextHistory;
+    } catch (err) {
+      console.error('Work order history load failed:', err);
+      setError('작업 이력을 불러오지 못했습니다.');
+      setHistory([]);
+      return [];
+    } finally {
+      setHistoryLoading(false);
     }
   }, []);
 
@@ -79,11 +100,14 @@ export const useWorkOrder = () => {
 
   return {
     masters,
+    history,
     preview,
     loading,
+    historyLoading,
     approving,
     error,
     fetchMasters,
+    fetchHistory,
     fetchPreview,
     approveWorkOrder
   };

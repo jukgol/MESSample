@@ -7,6 +7,7 @@ namespace WAS.Services.App
     public interface IWorkOrderService
     {
         Task<IEnumerable<ProcessMasterDto>> GetMastersAsync();
+        Task<IEnumerable<WorkOrderHistoryDto>> GetHistoryAsync();
         Task<WorkOrderPreviewDto> GetPreviewAsync(WorkOrderPreviewRequestDto request);
         Task<WorkOrderCreateResultDto> CreateAsync(WorkOrderCreateRequestDto request);
     }

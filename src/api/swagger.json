@@ -4247,6 +4247,64 @@
         }
       }
     },
+    "/api/work-order/history": {
+      "get": {
+        "tags": [
+          "WorkOrder"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkOrderHistoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkOrderHistoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkOrderHistoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/work-order/preview": {
       "post": {
         "tags": [
@@ -5855,6 +5913,48 @@
               "$ref": "#/components/schemas/WorkOrderStepAvailabilityDto"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "WorkOrderHistoryDto": {
+        "type": "object",
+        "properties": {
+          "workOrderID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "workOrderNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "processMasterID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "processMasterName": {
+            "type": "string",
+            "nullable": true
+          },
+          "orderQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "workerName": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "nullable": true
+          },
+          "approvedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false

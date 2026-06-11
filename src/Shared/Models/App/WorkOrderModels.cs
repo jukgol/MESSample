@@ -45,6 +45,19 @@ namespace Shared.Models.App
         public List<WorkOrderStepAvailabilityDto> Steps { get; set; } = new();
     }
 
+    public class WorkOrderHistoryDto
+    {
+        public int WorkOrderID { get; set; }
+        public string WorkOrderNo { get; set; } = string.Empty;
+        public int ProcessMasterID { get; set; }
+        public string ProcessMasterName { get; set; } = string.Empty;
+        public int OrderQty { get; set; }
+        public string WorkerName { get; set; } = string.Empty;
+        public string Status { get; set; } = string.Empty;
+        public DateTime ApprovedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
     public class WorkOrderStepRowDto
     {
         public int StepID { get; set; }

@@ -100,3 +100,6 @@ src/tabledata/
 
 # AI Agent History
 .aiinfo/
+
+# Python local environments
+src/TestTool/.*/

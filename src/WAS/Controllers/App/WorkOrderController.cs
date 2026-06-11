@@ -39,6 +39,23 @@ namespace WAS.Controllers.App
             }
         }
 
+        [HttpGet("history")]
+        [HasPermission(Permissions.ProcessView)]
+        [ProducesResponseType(typeof(IEnumerable<WorkOrderHistoryDto>), 200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<IEnumerable<WorkOrderHistoryDto>>> GetHistory()
+        {
+            try
+            {
+                var history = await _workOrderService.GetHistoryAsync();
+                return Ok(history);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"Work order history query failed: {ex.Message}" });
+            }
+        }
+
         [HttpPost("preview")]
         [HasPermission(Permissions.ProcessView)]
         [ProducesResponseType(typeof(WorkOrderPreviewDto), 200)]

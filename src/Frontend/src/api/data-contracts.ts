@@ -566,6 +566,23 @@ export interface WorkOrderCreateResultDto {
   steps?: WorkOrderStepAvailabilityDto[] | null;
 }
 
+export interface WorkOrderHistoryDto {
+  /** @format int32 */
+  workOrderID?: number;
+  workOrderNo?: string | null;
+  /** @format int32 */
+  processMasterID?: number;
+  processMasterName?: string | null;
+  /** @format int32 */
+  orderQty?: number;
+  workerName?: string | null;
+  status?: string | null;
+  /** @format date-time */
+  approvedAt?: string;
+  /** @format date-time */
+  createdAt?: string;
+}
+
 export interface WorkOrderPreviewDto {
   /** @format int32 */
   processMasterID?: number;

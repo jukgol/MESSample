@@ -15,6 +15,7 @@ import {
   ProcessMasterDto,
   WorkOrderCreateRequestDto,
   WorkOrderCreateResultDto,
+  WorkOrderHistoryDto,
   WorkOrderPreviewDto,
   WorkOrderPreviewRequestDto,
 } from "./data-contracts";
@@ -33,6 +34,20 @@ export class WorkOrder<
   workOrderMastersList = (params: RequestParams = {}) =>
     this.request<ProcessMasterDto[], ProblemDetails>({
       path: `/api/work-order/masters`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags WorkOrder
+   * @name WorkOrderHistoryList
+   * @request GET:/api/work-order/history
+   */
+  workOrderHistoryList = (params: RequestParams = {}) =>
+    this.request<WorkOrderHistoryDto[], ProblemDetails>({
+      path: `/api/work-order/history`,
       method: "GET",
       format: "json",
       ...params,
