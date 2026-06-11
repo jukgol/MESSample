@@ -609,6 +609,17 @@ export interface SchemaPrivilegeDto {
   name?: string | null;
 }
 
+export interface StartToolSignalRequestDto {
+  equipmentId?: string | null;
+}
+
+export interface StartToolSignalResponseDto {
+  success?: boolean;
+  command?: string | null;
+  targetId?: string | null;
+  message?: string | null;
+}
+
 export interface TableDataResponse {
   columns?: string[] | null;
   rows?: any[] | null;

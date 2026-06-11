@@ -22,6 +22,8 @@ import {
   ProcessOutputQuantityUpdateDto,
   ProcessStepExecutionCreateDto,
   ProcessStepExecutionDto,
+  StartToolSignalRequestDto,
+  StartToolSignalResponseDto,
 } from "./data-contracts";
 import { ContentType, HttpClient, RequestParams } from "./http-client";
 
@@ -250,6 +252,64 @@ export class ProcessMonitoring<
       method: "PATCH",
       body: data,
       type: ContentType.Json,
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
+   * @name ProcessMonitoringStarttoolStartCreate
+   * @request POST:/api/process-monitoring/starttool/start
+   */
+  processMonitoringStarttoolStartCreate = (
+    data: StartToolSignalRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      StartToolSignalResponseDto,
+      ProblemDetails | StartToolSignalResponseDto
+    >({
+      path: `/api/process-monitoring/starttool/start`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
+   * @name ProcessMonitoringStarttoolStopCreate
+   * @request POST:/api/process-monitoring/starttool/stop
+   */
+  processMonitoringStarttoolStopCreate = (
+    data: StartToolSignalRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      StartToolSignalResponseDto,
+      ProblemDetails | StartToolSignalResponseDto
+    >({
+      path: `/api/process-monitoring/starttool/stop`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
+   * @name ProcessMonitoringStarttoolLaunchCreate
+   * @request POST:/api/process-monitoring/starttool/launch
+   */
+  processMonitoringStarttoolLaunchCreate = (params: RequestParams = {}) =>
+    this.request<StartToolSignalResponseDto, void>({
+      path: `/api/process-monitoring/starttool/launch`,
+      method: "POST",
+      format: "json",
       ...params,
     });
 }

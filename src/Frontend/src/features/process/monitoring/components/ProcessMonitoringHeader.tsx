@@ -1,5 +1,6 @@
 import React from 'react';
-import { Activity, Loader2, RotateCw } from 'lucide-react';
+import { Activity, Loader2, RotateCw, Play } from 'lucide-react';
+import { api } from '../../../../api/client';
 
 interface ProcessMonitoringHeaderProps {
   loading: boolean;
@@ -19,26 +20,60 @@ const ProcessMonitoringHeader: React.FC<ProcessMonitoringHeaderProps> = ({ loadi
         </p>
       </div>
 
-      <button
-        type="button"
-        onClick={onRefresh}
-        disabled={loading}
-        title="새로고침"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          borderRadius: '8px',
-          border: '1px solid var(--border-color)',
-          background: 'rgba(255,255,255,0.05)',
-          color: 'white',
-          padding: '0.6rem 1rem',
-          boxShadow: 'none'
-        }}
-      >
-        {loading ? <Loader2 className="animate-spin" size={16} /> : <RotateCw size={16} />}
-        새로고침
-      </button>
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              const response = await api.api.processMonitoringStarttoolLaunchCreate();
+              if (!response.data?.success) {
+                alert(`TestTool 실행 실패: ${response.data?.message || '오류 발생'}`);
+              }
+            } catch (err) {
+              console.error(err);
+              alert('서버 연결 실패 (TestTool 실행 불가)');
+            }
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            borderRadius: '8px',
+            border: 'none',
+            background: '#6366f1',
+            color: 'white',
+            padding: '0.6rem 1rem',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '0.9rem'
+          }}
+        >
+          <Play size={16} fill="white" />
+          테스트툴 실행
+        </button>
+
+        <button
+          type="button"
+          onClick={onRefresh}
+          disabled={loading}
+          title="새로고침"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            borderRadius: '8px',
+            border: '1px solid var(--border-color)',
+            background: 'rgba(255,255,255,0.05)',
+            color: 'white',
+            padding: '0.6rem 1rem',
+            boxShadow: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          {loading ? <Loader2 className="animate-spin" size={16} /> : <RotateCw size={16} />}
+          새로고침
+        </button>
+      </div>
     </header>
   );
 };

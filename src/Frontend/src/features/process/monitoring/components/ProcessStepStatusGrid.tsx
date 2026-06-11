@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, CircleDashed, PauseCircle, PlayCircle, XCircle } from 'lucide-react';
 import type { CurrentProcessStepStateDto } from '../../../../api/data-contracts';
+import { api } from '../../../../api/client';
 
 interface ProcessStepStatusGridProps {
   steps: CurrentProcessStepStateDto[];
@@ -68,7 +69,21 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
-                  onClick={() => alert(`테스트: ${step.stepName}`)}
+                  onClick={async () => {
+                    try {
+                      const response = await api.api.processMonitoringStarttoolStartCreate({
+                        equipmentId: step.processStepID ? String(step.processStepID) : undefined
+                      });
+                      if (response.data?.success) {
+                        console.log(`신호 전송 성공: ${response.data.message}`);
+                      } else {
+                        alert(`신호 전송 실패: ${response.data?.message || '오류 발생'}`);
+                      }
+                    } catch (err: any) {
+                      console.error(err);
+                      alert('서버 연결 실패');
+                    }
+                  }}
                   style={{
                     padding: '0.25rem 0.5rem',
                     fontSize: '0.75rem',

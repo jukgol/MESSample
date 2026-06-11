@@ -31,8 +31,18 @@ class SignalHandler(BaseHTTPRequestHandler):
         
         if path == "/start":
             if target_id:
-                # Start specific step
-                app_state.update_step_value(target_id, "is_running", True)
+                # Start specific step (matches eq_id, ends with -id, or step_id)
+                for eq in app_state.created_equipments:
+                    eq_id = eq["equipment_id"]
+                    is_match = (eq_id == target_id) or (eq_id.endswith(f"-{target_id}"))
+                    try:
+                        if eq.get("step_id") is not None and int(eq.get("step_id")) == int(target_id):
+                            is_match = True
+                    except (ValueError, TypeError):
+                        pass
+                    
+                    if is_match:
+                        app_state.update_step_value(eq_id, "is_running", True)
             else:
                 # Start all steps
                 for eq in app_state.created_equipments:
@@ -41,8 +51,18 @@ class SignalHandler(BaseHTTPRequestHandler):
             self._send_response(200, f"Started step: {target_id if target_id else 'All'}")
         elif path == "/stop":
             if target_id:
-                # Stop specific step
-                app_state.update_step_value(target_id, "is_running", False)
+                # Stop specific step (matches eq_id, ends with -id, or step_id)
+                for eq in app_state.created_equipments:
+                    eq_id = eq["equipment_id"]
+                    is_match = (eq_id == target_id) or (eq_id.endswith(f"-{target_id}"))
+                    try:
+                        if eq.get("step_id") is not None and int(eq.get("step_id")) == int(target_id):
+                            is_match = True
+                    except (ValueError, TypeError):
+                        pass
+                    
+                    if is_match:
+                        app_state.update_step_value(eq_id, "is_running", False)
             else:
                 # Stop all steps
                 for eq in app_state.created_equipments:
