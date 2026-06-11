@@ -9,6 +9,7 @@ namespace WAS.Extensions
 
             // 비즈니스 앱 서비스 등록
             services.AddAppServices();
+            services.AddPlcServices();
 
             // CORS 정책 등록
             services.AddCorsServices();
