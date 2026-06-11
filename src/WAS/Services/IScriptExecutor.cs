@@ -12,6 +12,6 @@ namespace WAS.Services
         Task<IEnumerable<T>> ExecuteQueryAsync<T>(string queryName, object? parameters = null);
 
         // 단일 SQL 문 실행 (Dapper 기반)
-        Task ExecuteNonQueryAsync(string sql, object? parameters = null);
+        Task<int> ExecuteNonQueryAsync(string sql, object? parameters = null);
     }
 }

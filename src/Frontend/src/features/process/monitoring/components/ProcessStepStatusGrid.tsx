@@ -73,7 +73,7 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                     const isRunning = step.status === 'RUNNING';
                     try {
                       const reqDto = {
-                        equipmentId: step.processStepID ? String(step.processStepID) : undefined
+                        equipmentId: step.equipmentID || undefined
                       };
                       const response = isRunning
                         ? await api.api.processMonitoringStarttoolStopCreate(reqDto)
@@ -133,6 +133,70 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                 <strong style={{ color: 'white' }}>{step.workerName || '-'}</strong>
               </div>
             </div>
+
+            {((step.inputs && step.inputs.length > 0) || (step.outputs && step.outputs.length > 0)) && (
+              <div style={{
+                marginTop: '0.5rem',
+                paddingTop: '0.6rem',
+                borderTop: '1px dashed rgba(255,255,255,0.08)',
+                fontSize: '0.78rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
+              }}>
+                {step.inputs && step.inputs.length > 0 && (
+                  <div>
+                    <div style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#a78bfa' }}></span>
+                      투입 LOT ({step.inputs.length})
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                      {step.inputs.map(input => (
+                        <div key={input.processInputID} style={{ 
+                          background: 'rgba(167, 139, 250, 0.08)', 
+                          border: '1px solid rgba(167, 139, 250, 0.2)', 
+                          borderRadius: '4px', 
+                          padding: '0.15rem 0.35rem', 
+                          color: '#c084fc',
+                          fontSize: '0.72rem',
+                          display: 'flex',
+                          gap: '0.35rem'
+                        }}>
+                          <span style={{ fontWeight: 600 }}>{input.lotNo || '무명LOT'}</span>
+                          <span style={{ opacity: 0.8, color: '#e9d5ff' }}>{input.usedQty}개</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {step.outputs && step.outputs.length > 0 && (
+                  <div>
+                    <div style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#34d399' }}></span>
+                      생산 LOT ({step.outputs.length})
+                    </div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                      {step.outputs.map(output => (
+                        <div key={output.processOutputID} style={{ 
+                          background: 'rgba(52, 211, 153, 0.08)', 
+                          border: '1px solid rgba(52, 211, 153, 0.2)', 
+                          borderRadius: '4px', 
+                          padding: '0.15rem 0.35rem', 
+                          color: '#34d399',
+                          fontSize: '0.72rem',
+                          display: 'flex',
+                          gap: '0.35rem'
+                        }}>
+                          <span style={{ fontWeight: 600 }}>{output.lotNo || '무명LOT'}</span>
+                          <span style={{ opacity: 0.8, color: '#a7f3d0' }}>{output.outputQty}개</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </article>
         );
       })}

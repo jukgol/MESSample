@@ -111,6 +111,15 @@ namespace Shared.Models.App
         public int WorkOrderID { get; set; }
     }
 
+    public class ProcessInputInjectionDiagnosticsDto
+    {
+        public int ExecutionCount { get; set; }
+        public int BomMappingCount { get; set; }
+        public int AvailableLotMappingCount { get; set; }
+        public int ExistingInputCount { get; set; }
+        public int InsertCandidateCount { get; set; }
+    }
+
     public class CurrentWorkOrderStateDto
     {
         public int WorkOrderID { get; set; }

@@ -302,6 +302,26 @@ export class ProcessMonitoring<
    * No description
    *
    * @tags ProcessMonitoring
+   * @name ProcessMonitoringStarttoolInputAllCreate
+   * @request POST:/api/process-monitoring/starttool/input-all
+   */
+  processMonitoringStarttoolInputAllCreate = (
+    query?: {
+      workOrderNo?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<StartToolSignalResponseDto, ProblemDetails | void>({
+      path: `/api/process-monitoring/starttool/input-all`,
+      method: "POST",
+      query: query,
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
    * @name ProcessMonitoringStarttoolLaunchCreate
    * @request POST:/api/process-monitoring/starttool/launch
    */

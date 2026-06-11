@@ -24,5 +24,7 @@ namespace WAS.Services.App
         Task UpdateOutputQuantityAsync(int outputId, ProcessOutputQuantityUpdateDto dto);
         Task<StartToolSignalResponseDto> SendStartToolStartAsync(StartToolSignalRequestDto? dto);
         Task<StartToolSignalResponseDto> SendStartToolStopAsync(StartToolSignalRequestDto? dto);
+        Task<int> InjectAllInputsAsync(string workOrderNo);
+        Task<ProcessInputInjectionDiagnosticsDto> GetInputInjectionDiagnosticsAsync(string workOrderNo);
     }
 }

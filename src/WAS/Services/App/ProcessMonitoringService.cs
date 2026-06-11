@@ -277,5 +277,32 @@ namespace WAS.Services.App
             }
         }
 
+        public async Task<int> InjectAllInputsAsync(string workOrderNo)
+        {
+            var insertedCount = await _scriptExecutor.ExecuteNonQueryAsync(
+                "App/ProcessMonitoring/INJECT_DUMMY_INPUTS",
+                new { WorkOrderNo = workOrderNo });
+
+            var executions = await _scriptExecutor.ExecuteQueryAsync<ProcessStepExecutionDto>(
+                "App/ProcessMonitoring/GET_CURRENT_EXECUTIONS_BY_WORK_ORDER_NO",
+                new { WorkOrderNo = workOrderNo });
+
+            var firstExecution = executions.FirstOrDefault();
+            if (firstExecution != null)
+            {
+                await AddWorkOrderToCurrentStateAsync(firstExecution.WorkOrderID);
+            }
+
+            return insertedCount;
+        }
+
+        public async Task<ProcessInputInjectionDiagnosticsDto> GetInputInjectionDiagnosticsAsync(string workOrderNo)
+        {
+            var rows = await _scriptExecutor.ExecuteQueryAsync<ProcessInputInjectionDiagnosticsDto>(
+                "App/ProcessMonitoring/GET_INPUT_INJECTION_DIAGNOSTICS",
+                new { WorkOrderNo = workOrderNo });
+
+            return rows.FirstOrDefault() ?? new ProcessInputInjectionDiagnosticsDto();
+        }
     }
 }

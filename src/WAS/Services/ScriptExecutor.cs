@@ -89,7 +89,7 @@ namespace WAS.Services
             }
         }
 
-        public async Task ExecuteNonQueryAsync(string queryName, object? parameters = null)
+        public async Task<int> ExecuteNonQueryAsync(string queryName, object? parameters = null)
         {
             using var connection = _db.CreateConnection();
             string sql = await GetQuerySqlAsync(queryName);
@@ -110,7 +110,7 @@ namespace WAS.Services
                     if (oraConn.State != ConnectionState.Open) oraConn.Open();
                 }
 
-                await connection.ExecuteAsync(sql, dapperParams);
+                return await connection.ExecuteAsync(sql, dapperParams);
             }
             catch (Exception ex)
             {

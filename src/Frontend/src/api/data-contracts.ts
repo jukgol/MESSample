@@ -380,6 +380,29 @@ export interface PermissionDto {
   name?: string | null;
 }
 
+export interface PlcEquipmentDataReceiveResponseDto {
+  success?: boolean;
+  /** @format date-time */
+  receivedAt?: string;
+  message?: string | null;
+}
+
+export interface PlcEquipmentStateRequestDto {
+  equipmentID?: string | null;
+  state?: string | null;
+  /** @format date-time */
+  occurredAt?: string | null;
+}
+
+export interface PlcEquipmentStateResponseDto {
+  success?: boolean;
+  equipmentID?: string | null;
+  state?: string | null;
+  /** @format date-time */
+  receivedAt?: string;
+  message?: string | null;
+}
+
 export interface PlcProcessMasterDto {
   /** @format int32 */
   processID?: number;
@@ -395,6 +418,7 @@ export interface PlcProcessStepDto {
   /** @format int32 */
   seqNo?: number;
   stepType?: string | null;
+  equipmentID?: string | null;
   description?: string | null;
   /** @format int32 */
   processMasterID?: number;
@@ -519,6 +543,7 @@ export interface ProcessStepCreateDto {
   /** @format int32 */
   seqNo?: number;
   stepType?: string | null;
+  equipmentID?: string | null;
   description?: string | null;
   /** @format int32 */
   processMasterID?: number | null;
@@ -531,6 +556,7 @@ export interface ProcessStepDto {
   /** @format int32 */
   seqNo?: number;
   stepType?: string | null;
+  equipmentID?: string | null;
   description?: string | null;
   /** @format int32 */
   processMasterID?: number | null;
@@ -588,6 +614,7 @@ export interface ProcessStepUpdateDto {
   /** @format int32 */
   seqNo?: number;
   stepType?: string | null;
+  equipmentID?: string | null;
   description?: string | null;
   /** @format int32 */
   processMasterID?: number | null;

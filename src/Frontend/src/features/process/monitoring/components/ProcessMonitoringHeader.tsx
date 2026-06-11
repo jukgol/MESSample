@@ -5,9 +5,14 @@ import { api } from '../../../../api/client';
 interface ProcessMonitoringHeaderProps {
   loading: boolean;
   onRefresh: () => void;
+  selectedWorkOrderNo?: string | null;
 }
 
-const ProcessMonitoringHeader: React.FC<ProcessMonitoringHeaderProps> = ({ loading, onRefresh }) => {
+const ProcessMonitoringHeader: React.FC<ProcessMonitoringHeaderProps> = ({ 
+  loading, 
+  onRefresh, 
+  selectedWorkOrderNo 
+}) => {
   return (
     <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
       <div>
@@ -21,6 +26,44 @@ const ProcessMonitoringHeader: React.FC<ProcessMonitoringHeaderProps> = ({ loadi
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <button
+          type="button"
+          disabled={!selectedWorkOrderNo}
+          onClick={async () => {
+            if (!selectedWorkOrderNo) return;
+            try {
+              const response = await api.api.processMonitoringStarttoolInputAllCreate({
+                workOrderNo: selectedWorkOrderNo
+              });
+              if (response.data?.success) {
+                onRefresh();
+              } else {
+                alert(`자재 투입 실패: ${response.data?.message || '오류 발생'}`);
+              }
+            } catch (err) {
+              console.error(err);
+              alert('서버 연결 실패 (자재 투입 불가)');
+            }
+          }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            borderRadius: '8px',
+            border: 'none',
+            background: selectedWorkOrderNo ? '#10b981' : '#374151',
+            color: 'white',
+            padding: '0.6rem 1rem',
+            cursor: selectedWorkOrderNo ? 'pointer' : 'not-allowed',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            opacity: selectedWorkOrderNo ? 1 : 0.6
+          }}
+        >
+          <Play size={16} fill="white" />
+          자재 투입
+        </button>
+
         <button
           type="button"
           onClick={async () => {

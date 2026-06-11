@@ -109,9 +109,10 @@ namespace WAS.Services.App
                     StepID = group.Key.StepID,
                     StepName = group.Key.StepName,
                     SeqNo = group.Key.SeqNo,
-                    IsAvailable = group
-                        .Where(row => row.BomID.HasValue && row.BomQty.HasValue)
-                        .All(row => row.CurrentStock >= row.BomQty!.Value * orderQty)
+                    IsAvailable = group.Any(row => row.BomID.HasValue && row.BomQty.HasValue)
+                        && group
+                            .Where(row => row.BomID.HasValue && row.BomQty.HasValue)
+                            .All(row => row.CurrentStock >= row.BomQty!.Value * orderQty)
                 })
                 .ToList();
         }

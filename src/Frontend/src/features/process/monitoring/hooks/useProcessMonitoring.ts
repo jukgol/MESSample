@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { api } from '../../../../api/client';
 import type { CurrentWorkOrderStateDto } from '../../../../api/data-contracts';
-import { HubConnectionBuilder } from '@microsoft/signalr';
+import { HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import { useAuthStore } from '../../../../store/useAuthStore';
 
 export const useProcessMonitoring = () => {
@@ -54,6 +54,7 @@ export const useProcessMonitoring = () => {
       .withUrl('/hubs/process-monitoring', {
         accessTokenFactory: () => token
       })
+      .configureLogging(LogLevel.Warning)
       .withAutomaticReconnect()
       .build();
 
@@ -91,7 +92,13 @@ export const useProcessMonitoring = () => {
 
     connection.start()
       .then(() => console.log('SignalR Hub Connected!'))
-      .catch((err) => console.error('SignalR Hub Connection Error:', err));
+      .catch((err) => {
+        // 컴포넌트 언마운트나 페이지 이동으로 인한 정상적인 연결 중단(AbortError)은 로그를 남기지 않습니다.
+        if (err && (err.name === 'AbortError' || String(err).includes('stopped during negotiation'))) {
+          return;
+        }
+        console.error('SignalR Hub Connection Error:', err);
+      });
 
     return () => {
       connection.stop();
