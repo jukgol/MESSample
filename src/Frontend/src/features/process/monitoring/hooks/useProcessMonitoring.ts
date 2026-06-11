@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useEffect } from 'react';
 import { api } from '../../../../api/client';
 import type { CurrentWorkOrderStateDto } from '../../../../api/data-contracts';
+import { HubConnectionBuilder } from '@microsoft/signalr';
+import { useAuthStore } from '../../../../store/useAuthStore';
 
 export const useProcessMonitoring = () => {
   const [currentWorkOrders, setCurrentWorkOrders] = useState<CurrentWorkOrderStateDto[]>([]);
@@ -42,6 +44,58 @@ export const useProcessMonitoring = () => {
 
   const selectWorkOrder = useCallback((workOrderId: number) => {
     setSelectedWorkOrderId(workOrderId);
+  }, []);
+
+  useEffect(() => {
+    const token = useAuthStore.getState().token;
+    if (!token) return;
+
+    const connection = new HubConnectionBuilder()
+      .withUrl('/hubs/process-monitoring', {
+        accessTokenFactory: () => token
+      })
+      .withAutomaticReconnect()
+      .build();
+
+    connection.on('PlcEquipmentStateChanged', (data: any) => {
+      console.log('실시간 장비 상태 변경 수신:', data);
+      const rawEqId = data.equipmentID || data.EquipmentID || data.equipmentId;
+      const rawState = data.state || data.State;
+      
+      if (!rawEqId) return;
+      const targetEqId = String(rawEqId).trim().toUpperCase();
+      const isStarted = String(rawState).toUpperCase() === 'STARTED';
+
+      setCurrentWorkOrders((prevWorkOrders) => {
+        return prevWorkOrders.map((workOrder) => {
+          const hasTargetStep = workOrder.steps?.some(
+            step => step.equipmentID && step.equipmentID.trim().toUpperCase() === targetEqId
+          );
+          if (!hasTargetStep) return workOrder;
+
+          return {
+            ...workOrder,
+            steps: workOrder.steps?.map((step) => {
+              if (step.equipmentID && step.equipmentID.trim().toUpperCase() === targetEqId) {
+                return {
+                  ...step,
+                  status: isStarted ? 'RUNNING' : 'PAUSED'
+                };
+              }
+              return step;
+            })
+          };
+        });
+      });
+    });
+
+    connection.start()
+      .then(() => console.log('SignalR Hub Connected!'))
+      .catch((err) => console.error('SignalR Hub Connection Error:', err));
+
+    return () => {
+      connection.stop();
+    };
   }, []);
 
   return {

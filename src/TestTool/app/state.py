@@ -190,13 +190,35 @@ class AppState:
         for cb in self.on_created_equipments_changed_callbacks:
             cb()
 
+    def _report_state_to_was(self, equipment_id: str, state: str) -> None:
+        import datetime
+        url = "http://localhost:5175/api/plc/equipment-data/state"
+        payload = {
+            "EquipmentID": equipment_id,
+            "State": state,
+            "OccurredAt": datetime.datetime.utcnow().isoformat() + "Z"
+        }
+        try:
+            req = urllib.request.Request(
+                url, 
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=3) as response:
+                pass
+        except Exception as e:
+            print(f"[TestTool] Failed to report state to WAS: {e}")
+
     def update_step_value(self, equipment_id: str, key: str, value: any) -> None:
         eq = next((item for item in self.created_equipments if item["equipment_id"] == equipment_id), None)
         if eq and key in eq:
+            old_value = eq[key]
             eq[key] = value
-            # Do NOT notify everyone if we want to avoid total redraw. Or notify but we can handle partial updates.
-            # We will still run callbacks if needed, but we can have a smaller notification if we want.
-            # Let's call the normal callbacks to keep simple flow, but implement partial update in UI.
+            
+            if key == "is_running" and old_value != value:
+                self._report_state_to_was(equipment_id, "STARTED" if value else "STOPPED")
+                
             for cb in self.on_created_equipments_changed_callbacks:
                 cb()
 

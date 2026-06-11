@@ -111,7 +111,7 @@ class ProcessGridPanel(ttk.LabelFrame):
             return
 
         new_state = not eq.get("is_running", True)
-        eq["is_running"] = new_state
+        self.state.update_step_value(eq_id, "is_running", new_state)
 
         if new_state:
             # Start timer

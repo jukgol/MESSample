@@ -11,6 +11,7 @@
     "generate-api": "swagger-typescript-api generate -p ../api/swagger.json -o ./src/api -n generated-api.ts --axios --modular --module-name-first-tag"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "@xyflow/react": "^12.11.0",
     "axios": "^1.15.1",
     "lucide-react": "^1.8.0",

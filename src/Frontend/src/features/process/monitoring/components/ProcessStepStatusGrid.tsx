@@ -70,14 +70,19 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <button
                   onClick={async () => {
+                    const isRunning = step.status === 'RUNNING';
                     try {
-                      const response = await api.api.processMonitoringStarttoolStartCreate({
+                      const reqDto = {
                         equipmentId: step.processStepID ? String(step.processStepID) : undefined
-                      });
+                      };
+                      const response = isRunning
+                        ? await api.api.processMonitoringStarttoolStopCreate(reqDto)
+                        : await api.api.processMonitoringStarttoolStartCreate(reqDto);
+
                       if (response.data?.success) {
-                        console.log(`신호 전송 성공: ${response.data.message}`);
+                        console.log(`${isRunning ? '정지' : '시작'} 신호 전송 성공: ${response.data.message}`);
                       } else {
-                        alert(`신호 전송 실패: ${response.data?.message || '오류 발생'}`);
+                        alert(`${isRunning ? '정지' : '시작'} 신호 전송 실패: ${response.data?.message || '오류 발생'}`);
                       }
                     } catch (err: any) {
                       console.error(err);
@@ -89,13 +94,13 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                     fontSize: '0.75rem',
                     fontWeight: 600,
                     color: 'white',
-                    backgroundColor: '#4f46e5',
+                    backgroundColor: step.status === 'RUNNING' ? '#ef4444' : '#4f46e5',
                     border: 'none',
                     borderRadius: '6px',
                     cursor: 'pointer',
                   }}
                 >
-                  테스트
+                  {step.status === 'RUNNING' ? '정지' : '테스트'}
                 </button>
                 <span
                   style={{
