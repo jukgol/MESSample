@@ -18,19 +18,19 @@ namespace WAS.Services.App
 
         public async Task<IEnumerable<CurrentWorkOrderStateDto>> GetCurrentWorkOrdersAsync()
         {
-            await EnsureCurrentStateLoadedAsync();
+            await Task.CompletedTask;
             return _stateStore.GetCurrentWorkOrders();
         }
 
         public async Task<CurrentWorkOrderStateDto?> GetCurrentWorkOrderAsync(int workOrderId)
         {
-            await EnsureCurrentStateLoadedAsync();
+            await Task.CompletedTask;
             return _stateStore.GetCurrentWorkOrder(workOrderId);
         }
 
         public async Task<CurrentProcessStepStateDto?> GetCurrentStepByEquipmentAsync(string equipmentId)
         {
-            await EnsureCurrentStateLoadedAsync();
+            await Task.CompletedTask;
             return _stateStore.GetCurrentStepByEquipment(equipmentId);
         }
 
@@ -44,6 +44,30 @@ namespace WAS.Services.App
                 "App/ProcessMonitoring/GET_CURRENT_OUTPUTS");
 
             _stateStore.ReplaceAll(executions, inputs, outputs);
+        }
+
+        public async Task AddWorkOrderToCurrentStateAsync(string workOrderNo)
+        {
+            var executions = await _scriptExecutor.ExecuteQueryAsync<ProcessStepExecutionDto>(
+                "App/ProcessMonitoring/GET_CURRENT_EXECUTIONS_BY_WORK_ORDER_NO",
+                new { WorkOrderNo = workOrderNo });
+
+            _stateStore.UpsertWorkOrder(executions, Enumerable.Empty<ProcessInputDto>(), Enumerable.Empty<ProcessOutputDto>());
+        }
+
+        public async Task AddWorkOrderToCurrentStateAsync(int workOrderId)
+        {
+            var executions = await _scriptExecutor.ExecuteQueryAsync<ProcessStepExecutionDto>(
+                "App/ProcessMonitoring/GET_CURRENT_EXECUTIONS_BY_WORK_ORDER_ID",
+                new { WorkOrderId = workOrderId });
+            var inputs = await _scriptExecutor.ExecuteQueryAsync<ProcessInputDto>(
+                "App/ProcessMonitoring/GET_CURRENT_INPUTS_BY_WORK_ORDER_ID",
+                new { WorkOrderId = workOrderId });
+            var outputs = await _scriptExecutor.ExecuteQueryAsync<ProcessOutputDto>(
+                "App/ProcessMonitoring/GET_CURRENT_OUTPUTS_BY_WORK_ORDER_ID",
+                new { WorkOrderId = workOrderId });
+
+            _stateStore.UpsertWorkOrder(executions, inputs, outputs);
         }
 
         public async Task<IEnumerable<ProcessStepExecutionDto>> GetExecutionsByWorkOrderAsync(int workOrderId)
@@ -81,7 +105,7 @@ namespace WAS.Services.App
                     Status = string.IsNullOrWhiteSpace(dto.Status) ? "WAITING" : dto.Status.Trim().ToUpperInvariant()
                 });
 
-            await ReloadCurrentStateAsync();
+            await AddWorkOrderToCurrentStateAsync(dto.WorkOrderID);
         }
 
         public async Task<IEnumerable<ProcessInputDto>> GetInputsAsync(int executionId)
@@ -105,7 +129,7 @@ namespace WAS.Services.App
                     RemainQty = dto.RemainQty ?? dto.InputQty - dto.UsedQty
                 });
 
-            await ReloadCurrentStateAsync();
+            await RefreshWorkOrderByExecutionAsync(executionId);
         }
 
         public async Task UpdateInputQuantityAsync(int inputId, ProcessInputQuantityUpdateDto dto)
@@ -119,7 +143,7 @@ namespace WAS.Services.App
                     RemainQty = dto.RemainQty
                 });
 
-            await ReloadCurrentStateAsync();
+            await RefreshWorkOrderByInputAsync(inputId);
         }
 
         public async Task<IEnumerable<ProcessOutputDto>> GetOutputsAsync(int executionId)
@@ -143,7 +167,7 @@ namespace WAS.Services.App
                     OutputType = string.IsNullOrWhiteSpace(dto.OutputType) ? "GOOD" : dto.OutputType.Trim().ToUpperInvariant()
                 });
 
-            await ReloadCurrentStateAsync();
+            await RefreshWorkOrderByExecutionAsync(executionId);
         }
 
         public async Task UpdateOutputQuantityAsync(int outputId, ProcessOutputQuantityUpdateDto dto)
@@ -156,15 +180,47 @@ namespace WAS.Services.App
                     OutputQty = dto.OutputQty
                 });
 
-            await ReloadCurrentStateAsync();
+            await RefreshWorkOrderByOutputAsync(outputId);
         }
 
-        private async Task EnsureCurrentStateLoadedAsync()
+        private async Task RefreshWorkOrderByExecutionAsync(int executionId)
         {
-            if (!_stateStore.GetCurrentWorkOrders().Any())
+            var rows = await _scriptExecutor.ExecuteQueryAsync<ProcessMonitoringWorkOrderRefDto>(
+                "App/ProcessMonitoring/GET_WORK_ORDER_ID_BY_EXECUTION",
+                new { ExecutionId = executionId });
+            var workOrderId = rows.FirstOrDefault()?.WorkOrderID;
+
+            if (workOrderId.HasValue)
             {
-                await ReloadCurrentStateAsync();
+                await AddWorkOrderToCurrentStateAsync(workOrderId.Value);
             }
         }
+
+        private async Task RefreshWorkOrderByInputAsync(int inputId)
+        {
+            var rows = await _scriptExecutor.ExecuteQueryAsync<ProcessMonitoringWorkOrderRefDto>(
+                "App/ProcessMonitoring/GET_WORK_ORDER_ID_BY_INPUT",
+                new { InputId = inputId });
+            var workOrderId = rows.FirstOrDefault()?.WorkOrderID;
+
+            if (workOrderId.HasValue)
+            {
+                await AddWorkOrderToCurrentStateAsync(workOrderId.Value);
+            }
+        }
+
+        private async Task RefreshWorkOrderByOutputAsync(int outputId)
+        {
+            var rows = await _scriptExecutor.ExecuteQueryAsync<ProcessMonitoringWorkOrderRefDto>(
+                "App/ProcessMonitoring/GET_WORK_ORDER_ID_BY_OUTPUT",
+                new { OutputId = outputId });
+            var workOrderId = rows.FirstOrDefault()?.WorkOrderID;
+
+            if (workOrderId.HasValue)
+            {
+                await AddWorkOrderToCurrentStateAsync(workOrderId.Value);
+            }
+        }
+
     }
 }

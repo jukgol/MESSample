@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { api } from '../../../../api/client';
 import type {
   ProcessMasterDto,
@@ -67,7 +68,9 @@ export const useWorkOrder = () => {
       return response.data || null;
     } catch (err) {
       console.error('Work order approval failed:', err);
-      setError('작업지시 승인에 실패했습니다.');
+      const axiosError = err as AxiosError<{ message?: string; Message?: string }>;
+      const serverMessage = axiosError.response?.data?.message || axiosError.response?.data?.Message;
+      setError(serverMessage || '작업지시 승인에 실패했습니다.');
       return null;
     } finally {
       setApproving(false);

@@ -9,10 +9,17 @@ namespace WAS.Services.App
     public class WorkOrderService : IWorkOrderService
     {
         private readonly IScriptExecutor _scriptExecutor;
+        private readonly IProcessMonitoringService _processMonitoringService;
+        private readonly IProcessMonitoringStateStore _processMonitoringStateStore;
 
-        public WorkOrderService(IScriptExecutor scriptExecutor)
+        public WorkOrderService(
+            IScriptExecutor scriptExecutor,
+            IProcessMonitoringService processMonitoringService,
+            IProcessMonitoringStateStore processMonitoringStateStore)
         {
             _scriptExecutor = scriptExecutor;
+            _processMonitoringService = processMonitoringService;
+            _processMonitoringStateStore = processMonitoringStateStore;
         }
 
         public async Task<IEnumerable<ProcessMasterDto>> GetMastersAsync()
@@ -35,6 +42,15 @@ namespace WAS.Services.App
 
         public async Task<WorkOrderCreateResultDto> CreateAsync(WorkOrderCreateRequestDto request)
         {
+            var hasActiveWorkOrder = _processMonitoringStateStore
+                .GetCurrentWorkOrders()
+                .Any(workOrder => workOrder.ProcessMasterID == request.ProcessMasterID);
+
+            if (hasActiveWorkOrder)
+            {
+                throw new InvalidOperationException("해당 공정 라인은 이미 진행 중인 작업지시가 있습니다.");
+            }
+
             var steps = await BuildStepAvailabilityAsync(request.ProcessMasterID, request.OrderQty);
             var isApproved = steps.All(step => step.IsAvailable);
             var approvedAt = DateTime.Now;
@@ -53,6 +69,12 @@ namespace WAS.Services.App
                         WorkerName = request.WorkerName.Trim(),
                         IsAvailable = "Y"
                     });
+
+                await _scriptExecutor.ExecuteNonQueryAsync(
+                    "App/WorkOrder/CREATE_WORK_ORDER_STEP_EXECUTIONS",
+                    new { WorkOrderNo = workOrderNo });
+
+                await _processMonitoringService.AddWorkOrderToCurrentStateAsync(workOrderNo);
             }
 
             return new WorkOrderCreateResultDto
@@ -88,5 +110,6 @@ namespace WAS.Services.App
                 })
                 .ToList();
         }
+
     }
 }

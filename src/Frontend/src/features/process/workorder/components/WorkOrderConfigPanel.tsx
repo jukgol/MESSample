@@ -13,7 +13,7 @@ const WorkOrderConfigPanel: React.FC<WorkOrderConfigPanelProps> = ({
   onOrderQtyChange
 }) => {
   return (
-    <section className="premium-card" style={{ borderRadius: '8px', padding: '1.25rem', display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px', gap: '1rem', alignItems: 'end' }}>
+    <section className="workorder-panel" style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) 180px', gap: '1rem', alignItems: 'end' }}>
       <div>
         <h2 style={{ margin: 0, color: 'white', fontSize: '1.15rem' }}>{selectedMaster?.processName || '공정 선택'}</h2>
         <p style={{ margin: '0.35rem 0 0', color: 'var(--text-secondary)', fontSize: '0.88rem' }}>

@@ -8,6 +8,7 @@ import WorkOrderLayout from '../components/WorkOrderLayout';
 import WorkOrderMasterList from '../components/WorkOrderMasterList';
 import WorkOrderMessage from '../components/WorkOrderMessage';
 import WorkOrderStepGrid from '../components/WorkOrderStepGrid';
+import WorkOrderTabs, { type WorkOrderTab } from '../components/WorkOrderTabs';
 import { useWorkOrder } from '../hooks/useWorkOrder';
 import { useAuthStore } from '../../../../store/useAuthStore';
 
@@ -28,6 +29,7 @@ const WorkOrderPage: React.FC = () => {
   const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
   const [orderQty, setOrderQty] = useState(10);
   const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState<WorkOrderTab>('issue');
   const operatorName = currentUser?.userName || '';
 
   const selectedMaster = useMemo(() => {
@@ -71,7 +73,7 @@ const WorkOrderPage: React.FC = () => {
     const result = await approveWorkOrder(selectedMasterId, orderQty, operatorName.trim());
     if (!result) return;
 
-    setMessage(result.isApproved ? `승인 완료: ${result.workOrderNo}` : '자재 부족으로 승인되지 않았습니다.');
+    setMessage(result.isApproved ? `공정이 진행중입니다. 작업지시: ${result.workOrderNo}` : '자재 부족으로 승인되지 않았습니다.');
     await fetchPreview(selectedMasterId, orderQty);
   };
 
@@ -97,48 +99,70 @@ const WorkOrderPage: React.FC = () => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', minHeight: 0 }}>
       <WorkOrderHeader />
-
       <WorkOrderErrorAlert message={error} />
 
-      <WorkOrderActionBar
-        onRefresh={handleRefresh}
-        loading={loading}
-      />
+      <section style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <WorkOrderTabs activeTab={activeTab} onChange={setActiveTab} />
+        <div
+          style={{
+            border: '1px solid var(--border-color)',
+            borderTop: 'none',
+            borderBottomLeftRadius: '8px',
+            borderBottomRightRadius: '8px',
+            background: 'var(--panel-bg)',
+            padding: '1rem',
+            minHeight: 0
+          }}
+        >
+          {activeTab === 'issue' ? (
+            <>
+              <WorkOrderActionBar
+                onRefresh={handleRefresh}
+                loading={loading}
+              />
 
-      <WorkOrderLayout
-        top={
-          <WorkOrderMasterList
-            masters={masters}
-            selectedMasterId={selectedMasterId}
-            onSelectMaster={handleSelectMaster}
-          />
-        }
-        middle={
-          <>
-            <WorkOrderConfigPanel
-              selectedMaster={selectedMaster}
-              orderQty={orderQty}
-              onOrderQtyChange={setOrderQty}
-            />
-            <WorkOrderStepGrid
-              steps={preview?.steps || []}
-              loading={loading}
-              selectedStepId={selectedStepId}
-              onSelectStep={(step) => setSelectedStepId(step.stepID || null)}
-            />
-          </>
-        }
-        bottom={
-          <>
-            <WorkOrderApprovalPanel
-              operatorName={operatorName}
-              onApprove={handleApprove}
-              disabled={approving || loading || !canApprove}
-            />
-            <WorkOrderMessage message={message} />
-          </>
-        }
-      />
+              <WorkOrderLayout
+                top={
+                  <WorkOrderMasterList
+                    masters={masters}
+                    selectedMasterId={selectedMasterId}
+                    onSelectMaster={handleSelectMaster}
+                  />
+                }
+                middle={
+                  <>
+                    <WorkOrderConfigPanel
+                      selectedMaster={selectedMaster}
+                      orderQty={orderQty}
+                      onOrderQtyChange={setOrderQty}
+                    />
+                    <WorkOrderStepGrid
+                      steps={preview?.steps || []}
+                      loading={loading}
+                      selectedStepId={selectedStepId}
+                      onSelectStep={(step) => setSelectedStepId(step.stepID || null)}
+                    />
+                  </>
+                }
+                bottom={
+                  <>
+                    <WorkOrderApprovalPanel
+                      operatorName={operatorName}
+                      onApprove={handleApprove}
+                      disabled={approving || loading || !canApprove}
+                    />
+                    <WorkOrderMessage message={message} />
+                  </>
+                }
+              />
+            </>
+          ) : (
+            <section style={{ padding: '0.25rem', color: 'var(--text-secondary)' }}>
+              작업 이력 화면은 다음 단계에서 연결합니다.
+            </section>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

@@ -9,6 +9,8 @@ namespace WAS.Services.App
         Task<IEnumerable<CurrentWorkOrderStateDto>> GetCurrentWorkOrdersAsync();
         Task<CurrentWorkOrderStateDto?> GetCurrentWorkOrderAsync(int workOrderId);
         Task<CurrentProcessStepStateDto?> GetCurrentStepByEquipmentAsync(string equipmentId);
+        Task AddWorkOrderToCurrentStateAsync(string workOrderNo);
+        Task AddWorkOrderToCurrentStateAsync(int workOrderId);
         Task ReloadCurrentStateAsync();
         Task<IEnumerable<ProcessStepExecutionDto>> GetExecutionsByWorkOrderAsync(int workOrderId);
         Task<IEnumerable<ProcessStepExecutionDto>> GetAllExecutionsAsync();

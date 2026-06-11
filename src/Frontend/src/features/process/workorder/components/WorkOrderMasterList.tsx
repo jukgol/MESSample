@@ -22,6 +22,7 @@ const WorkOrderMasterList: React.FC<WorkOrderMasterListProps> = ({
           <button
             key={master.processID}
             type="button"
+            className="workorder-selectable"
             onClick={() => master.processID && onSelectMaster(master.processID)}
             style={{
               minWidth: '260px',
@@ -31,7 +32,8 @@ const WorkOrderMasterList: React.FC<WorkOrderMasterListProps> = ({
               border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
               background: isSelected ? 'rgba(99, 102, 241, 0.18)' : 'rgba(255, 255, 255, 0.04)',
               boxShadow: 'none',
-              transform: 'none'
+              transform: 'none',
+              transition: 'background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem' }}>

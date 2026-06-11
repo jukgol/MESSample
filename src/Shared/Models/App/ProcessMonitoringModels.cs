@@ -93,6 +93,11 @@ namespace Shared.Models.App
         public int OutputQty { get; set; }
     }
 
+    public class ProcessMonitoringWorkOrderRefDto
+    {
+        public int WorkOrderID { get; set; }
+    }
+
     public class CurrentWorkOrderStateDto
     {
         public int WorkOrderID { get; set; }

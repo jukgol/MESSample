@@ -13,9 +13,12 @@ const WorkOrderApprovalPanel: React.FC<WorkOrderApprovalPanelProps> = ({
   disabled
 }) => {
   return (
-    <section className="premium-card" style={{ borderRadius: '8px', padding: '1.25rem', display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) auto', gap: '1rem', alignItems: 'end' }}>
+    <section className="workorder-panel" style={{ padding: '1.25rem', display: 'grid', gridTemplateColumns: 'minmax(220px, 1fr) auto', gap: '1rem', alignItems: 'end' }}>
       <label style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}><UserRound size={15} /> 작업자</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <UserRound size={15} />
+          작업자
+        </span>
         <input
           type="text"
           placeholder="로그인 사용자"

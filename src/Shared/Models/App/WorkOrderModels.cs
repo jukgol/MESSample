@@ -54,4 +54,5 @@ namespace Shared.Models.App
         public int? BomQty { get; set; }
         public int CurrentStock { get; set; }
     }
+
 }

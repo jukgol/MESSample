@@ -9,6 +9,10 @@ namespace WAS.Services.App
         CurrentWorkOrderStateDto? GetCurrentWorkOrder(int workOrderId);
         CurrentProcessStepStateDto? GetCurrentStepByEquipment(string equipmentId);
         CurrentProcessStepStateDto? GetCurrentStepByExecution(int executionId);
+        void UpsertWorkOrder(
+            IEnumerable<ProcessStepExecutionDto> executions,
+            IEnumerable<ProcessInputDto> inputs,
+            IEnumerable<ProcessOutputDto> outputs);
         void ReplaceAll(
             IEnumerable<ProcessStepExecutionDto> executions,
             IEnumerable<ProcessInputDto> inputs,

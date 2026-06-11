@@ -69,92 +69,141 @@ namespace WAS.Services.App
                 _byEquipment.Clear();
                 _byExecution.Clear();
 
-                var inputLookup = inputs
-                    .GroupBy(input => input.ProcessStepExecutionID)
-                    .ToDictionary(group => group.Key, group => group.ToList());
+                UpsertWorkOrderCore(executions, inputs, outputs);
+            }
+        }
 
-                var outputLookup = outputs
-                    .GroupBy(output => output.ProcessStepExecutionID)
-                    .ToDictionary(group => group.Key, group => group.ToList());
+        public void UpsertWorkOrder(
+            IEnumerable<ProcessStepExecutionDto> executions,
+            IEnumerable<ProcessInputDto> inputs,
+            IEnumerable<ProcessOutputDto> outputs)
+        {
+            lock (_lock)
+            {
+                UpsertWorkOrderCore(executions, inputs, outputs);
+            }
+        }
 
-                foreach (var execution in executions.OrderBy(row => row.SeqNo))
+        private void UpsertWorkOrderCore(
+            IEnumerable<ProcessStepExecutionDto> executions,
+            IEnumerable<ProcessInputDto> inputs,
+            IEnumerable<ProcessOutputDto> outputs)
+        {
+            var executionList = executions.OrderBy(row => row.SeqNo).ToList();
+            if (executionList.Count == 0)
+            {
+                return;
+            }
+
+            var workOrderId = executionList[0].WorkOrderID;
+            RemoveWorkOrderIndexes(workOrderId);
+
+            var inputLookup = inputs
+                .GroupBy(input => input.ProcessStepExecutionID)
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+            var outputLookup = outputs
+                .GroupBy(output => output.ProcessStepExecutionID)
+                .ToDictionary(group => group.Key, group => group.ToList());
+
+            CurrentWorkOrderStateDto? workOrder = null;
+
+            foreach (var execution in executionList)
+            {
+                workOrder ??= new CurrentWorkOrderStateDto
                 {
-                    if (!_byWorkOrder.TryGetValue(execution.WorkOrderID, out var workOrder))
-                    {
-                        workOrder = new CurrentWorkOrderStateDto
+                    WorkOrderID = execution.WorkOrderID,
+                    WorkOrderNo = execution.WorkOrderNo,
+                    ProcessMasterID = execution.ProcessMasterID,
+                    ProcessMasterName = execution.ProcessMasterName,
+                    OrderQty = execution.OrderQty,
+                    WorkerUserID = execution.WorkerUserID,
+                    WorkerName = execution.WorkerName,
+                    Status = ResolveWorkOrderStatus(executionList),
+                    ApprovedAt = execution.ApprovedAt,
+                    StartedAt = execution.StartedAt,
+                    LastUpdatedAt = execution.UpdatedAt ?? execution.StartedAt ?? execution.CreatedAt
+                };
+
+                var step = new CurrentProcessStepStateDto
+                {
+                    ProcessStepExecutionID = execution.ProcessStepExecutionID,
+                    ProcessStepID = execution.ProcessStepID,
+                    StepName = execution.StepName,
+                    SeqNo = execution.SeqNo,
+                    EquipmentID = execution.EquipmentID,
+                    WorkerUserID = execution.WorkerUserID,
+                    WorkerName = execution.WorkerName,
+                    Status = execution.Status,
+                    StartedAt = execution.StartedAt,
+                    EndedAt = execution.EndedAt,
+                    LastUpdatedAt = execution.UpdatedAt ?? execution.StartedAt ?? execution.CreatedAt,
+                    Inputs = inputLookup.TryGetValue(execution.ProcessStepExecutionID, out var stepInputs)
+                        ? stepInputs.Select(input => new CurrentProcessInputStateDto
                         {
-                            WorkOrderID = execution.WorkOrderID,
-                            WorkOrderNo = execution.WorkOrderNo,
-                            ProcessMasterID = execution.ProcessMasterID,
-                            ProcessMasterName = execution.ProcessMasterName,
-                            OrderQty = execution.OrderQty,
-                            WorkerUserID = execution.WorkerUserID,
-                            WorkerName = execution.WorkerName,
-                            Status = ResolveWorkOrderStatus(executions.Where(row => row.WorkOrderID == execution.WorkOrderID)),
-                            ApprovedAt = execution.ApprovedAt,
-                            StartedAt = execution.StartedAt,
-                            LastUpdatedAt = execution.UpdatedAt ?? execution.StartedAt ?? execution.CreatedAt
-                        };
+                            ProcessInputID = input.ProcessInputID,
+                            ProcessStepExecutionID = input.ProcessStepExecutionID,
+                            LotID = input.LotID,
+                            LotNo = input.LotNo,
+                            ItemID = input.ItemID,
+                            ItemName = input.ItemName,
+                            InputQty = input.InputQty,
+                            UsedQty = input.UsedQty,
+                            RemainQty = input.RemainQty,
+                            InputAt = input.InputAt
+                        }).ToList()
+                        : new List<CurrentProcessInputStateDto>(),
+                    Outputs = outputLookup.TryGetValue(execution.ProcessStepExecutionID, out var stepOutputs)
+                        ? stepOutputs.Select(output => new CurrentProcessOutputStateDto
+                        {
+                            ProcessOutputID = output.ProcessOutputID,
+                            ProcessStepExecutionID = output.ProcessStepExecutionID,
+                            LotID = output.LotID,
+                            LotNo = output.LotNo,
+                            ItemID = output.ItemID,
+                            ItemName = output.ItemName,
+                            TargetQty = output.TargetQty,
+                            OutputQty = output.OutputQty,
+                            OutputType = output.OutputType,
+                            OutputAt = output.OutputAt
+                        }).ToList()
+                        : new List<CurrentProcessOutputStateDto>()
+                };
 
-                        _byWorkOrder[execution.WorkOrderID] = workOrder;
-                    }
+                workOrder.Steps.Add(step);
+                workOrder.StartedAt = MinDate(workOrder.StartedAt, step.StartedAt);
+                workOrder.LastUpdatedAt = MaxDate(workOrder.LastUpdatedAt, step.LastUpdatedAt);
 
-                    var step = new CurrentProcessStepStateDto
-                    {
-                        ProcessStepExecutionID = execution.ProcessStepExecutionID,
-                        ProcessStepID = execution.ProcessStepID,
-                        StepName = execution.StepName,
-                        SeqNo = execution.SeqNo,
-                        EquipmentID = execution.EquipmentID,
-                        WorkerUserID = execution.WorkerUserID,
-                        WorkerName = execution.WorkerName,
-                        Status = execution.Status,
-                        StartedAt = execution.StartedAt,
-                        EndedAt = execution.EndedAt,
-                        LastUpdatedAt = execution.UpdatedAt ?? execution.StartedAt ?? execution.CreatedAt,
-                        Inputs = inputLookup.TryGetValue(execution.ProcessStepExecutionID, out var stepInputs)
-                            ? stepInputs.Select(input => new CurrentProcessInputStateDto
-                            {
-                                ProcessInputID = input.ProcessInputID,
-                                ProcessStepExecutionID = input.ProcessStepExecutionID,
-                                LotID = input.LotID,
-                                LotNo = input.LotNo,
-                                ItemID = input.ItemID,
-                                ItemName = input.ItemName,
-                                InputQty = input.InputQty,
-                                UsedQty = input.UsedQty,
-                                RemainQty = input.RemainQty,
-                                InputAt = input.InputAt
-                            }).ToList()
-                            : new List<CurrentProcessInputStateDto>(),
-                        Outputs = outputLookup.TryGetValue(execution.ProcessStepExecutionID, out var stepOutputs)
-                            ? stepOutputs.Select(output => new CurrentProcessOutputStateDto
-                            {
-                                ProcessOutputID = output.ProcessOutputID,
-                                ProcessStepExecutionID = output.ProcessStepExecutionID,
-                                LotID = output.LotID,
-                                LotNo = output.LotNo,
-                                ItemID = output.ItemID,
-                                ItemName = output.ItemName,
-                                TargetQty = output.TargetQty,
-                                OutputQty = output.OutputQty,
-                                OutputType = output.OutputType,
-                                OutputAt = output.OutputAt
-                            }).ToList()
-                            : new List<CurrentProcessOutputStateDto>()
-                    };
-
-                    workOrder.Steps.Add(step);
-                    workOrder.StartedAt = MinDate(workOrder.StartedAt, step.StartedAt);
-                    workOrder.LastUpdatedAt = MaxDate(workOrder.LastUpdatedAt, step.LastUpdatedAt);
-
-                    _byExecution[step.ProcessStepExecutionID] = step;
-                    if (!string.IsNullOrWhiteSpace(step.EquipmentID))
-                    {
-                        _byEquipment[step.EquipmentID] = step;
-                    }
+                _byExecution[step.ProcessStepExecutionID] = step;
+                if (!string.IsNullOrWhiteSpace(step.EquipmentID))
+                {
+                    _byEquipment[step.EquipmentID] = step;
                 }
             }
+
+            if (workOrder != null)
+            {
+                _byWorkOrder[workOrder.WorkOrderID] = workOrder;
+            }
+        }
+
+        private void RemoveWorkOrderIndexes(int workOrderId)
+        {
+            if (!_byWorkOrder.TryGetValue(workOrderId, out var existing))
+            {
+                return;
+            }
+
+            foreach (var step in existing.Steps)
+            {
+                _byExecution.Remove(step.ProcessStepExecutionID);
+                if (!string.IsNullOrWhiteSpace(step.EquipmentID))
+                {
+                    _byEquipment.Remove(step.EquipmentID);
+                }
+            }
+
+            _byWorkOrder.Remove(workOrderId);
         }
 
         private static string ResolveWorkOrderStatus(IEnumerable<ProcessStepExecutionDto> executions)

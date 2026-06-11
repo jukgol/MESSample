@@ -59,6 +59,25 @@ body {
   border-color: rgba(99, 102, 241, 0.3);
 }
 
+.workorder-panel {
+  background: var(--panel-bg);
+  backdrop-filter: var(--glass-effect);
+  -webkit-backdrop-filter: var(--glass-effect);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+}
+
+.workorder-selectable {
+  transition: background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.workorder-selectable:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(129, 140, 248, 0.45) !important;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16) !important;
+  transform: none !important;
+}
+
 .gradient-text {
   background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
   -webkit-background-clip: text;

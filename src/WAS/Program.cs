@@ -43,8 +43,6 @@ using (var scope = app.Services.CreateScope())
     var rolePermissionService = scope.ServiceProvider.GetRequiredService<WAS.Services.App.IRolePermissionService>();
     await rolePermissionService.InitializeCacheAsync();
 
-    var processMonitoringService = scope.ServiceProvider.GetRequiredService<WAS.Services.App.IProcessMonitoringService>();
-    await processMonitoringService.ReloadCurrentStateAsync();
 }
 
 // 애플리케이션 종료 시 이벤트 핸들러 등록

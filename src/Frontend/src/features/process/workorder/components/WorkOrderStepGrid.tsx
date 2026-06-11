@@ -41,9 +41,8 @@ const WorkOrderStepGrid: React.FC<WorkOrderStepGridProps> = ({
                 key={step.stepID}
                 type="button"
                 onClick={() => onSelectStep(step)}
-                className="premium-card"
+                className="workorder-panel workorder-selectable"
                 style={{
-                  borderRadius: '8px',
                   padding: '1rem',
                   minHeight: 128,
                   display: 'flex',
@@ -53,7 +52,7 @@ const WorkOrderStepGrid: React.FC<WorkOrderStepGridProps> = ({
                   textAlign: 'left',
                   background: isSelected ? 'rgba(99, 102, 241, 0.18)' : 'var(--panel-bg)',
                   border: isSelected ? '1px solid var(--accent-primary)' : '1px solid var(--border-color)',
-                  boxShadow: isSelected ? '0 10px 28px rgba(99, 102, 241, 0.22)' : undefined,
+                  boxShadow: isSelected ? '0 10px 28px rgba(99, 102, 241, 0.22)' : 'none',
                   transform: 'none'
                 }}
               >
@@ -63,12 +62,12 @@ const WorkOrderStepGrid: React.FC<WorkOrderStepGridProps> = ({
                   </span>
                   <h3 style={{ margin: 0, fontSize: '1rem', color: 'white', lineHeight: 1.3 }}>{step.stepName}</h3>
                 </div>
-                <span style={statusStyle(step.isAvailable)}>{step.isAvailable ? '가능' : '불가능'}</span>
+                <span style={statusStyle(step.isAvailable)}>{step.isAvailable ? '가능' : '불가'}</span>
               </button>
             );
           })
         ) : (
-          <div className="premium-card" style={{ borderRadius: '8px', padding: '1.25rem', color: 'var(--text-secondary)' }}>
+          <div className="workorder-panel" style={{ padding: '1.25rem', color: 'var(--text-secondary)' }}>
             {loading ? '확인 중입니다.' : '표시할 공정이 없습니다.'}
           </div>
         )}
@@ -76,9 +75,8 @@ const WorkOrderStepGrid: React.FC<WorkOrderStepGridProps> = ({
 
       {selectedStep && (
         <div
-          className="premium-card"
+          className="workorder-panel"
           style={{
-            borderRadius: '8px',
             padding: '1.25rem',
             display: 'grid',
             gridTemplateColumns: 'minmax(220px, 1.2fr) repeat(3, minmax(120px, 0.6fr))',
@@ -112,14 +110,14 @@ const WorkOrderStepGrid: React.FC<WorkOrderStepGridProps> = ({
             ) : (
               <AlertTriangle size={18} style={{ color: '#f97316' }} />
             )}
-            <span style={statusStyle(selectedStep.isAvailable)}>{selectedStep.isAvailable ? '작업 가능' : '작업 불가능'}</span>
+            <span style={statusStyle(selectedStep.isAvailable)}>{selectedStep.isAvailable ? '작업 가능' : '작업 불가'}</span>
           </div>
 
           <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.88rem', paddingTop: '0.25rem', borderTop: '1px solid var(--border-color)' }}>
             <Info size={16} />
             {selectedStep.isAvailable
-              ? '현재 생산 수량 기준으로 필요한 자재가 충족된 공정입니다.'
-              : '현재 생산 수량 기준으로 부족 자재가 있어 승인 시 저장되지 않습니다.'}
+              ? '현재 생산 수량 기준으로 필요한 자재가 충분한 공정입니다.'
+              : '현재 생산 수량 기준으로 부족 자재가 있어 승인 대기됩니다.'}
           </div>
         </div>
       )}
