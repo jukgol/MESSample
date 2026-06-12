@@ -691,6 +691,7 @@ export interface UserInfo {
   userName?: string | null;
   roleCode?: string | null;
   roleName?: string | null;
+  permissions?: string[] | null;
 }
 
 export interface UserListDto {

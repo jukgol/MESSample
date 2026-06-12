@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Shared.Models.Auth;
+using WAS.Services.App;
 
 namespace WAS.Services.Auth
 {
@@ -10,11 +11,13 @@ namespace WAS.Services.Auth
     {
         private readonly IScriptExecutor _scriptExecutor;
         private readonly IConfiguration _configuration;
+        private readonly IRolePermissionService _rolePermissionService;
 
-        public AuthService(IScriptExecutor scriptExecutor, IConfiguration configuration)
+        public AuthService(IScriptExecutor scriptExecutor, IConfiguration configuration, IRolePermissionService rolePermissionService)
         {
             _scriptExecutor = scriptExecutor;
             _configuration = configuration;
+            _rolePermissionService = rolePermissionService;
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -41,6 +44,9 @@ namespace WAS.Services.Auth
             // 3. JWT 토큰 생성
             var token = GenerateJwtToken(user);
 
+            // 역할별 권한 매핑 조회
+            var permissions = await _rolePermissionService.GetPermissionsForRoleAsync((string)user.ROLE_CODE);
+
             return new LoginResponse
             {
                 Success = true,
@@ -51,7 +57,8 @@ namespace WAS.Services.Auth
                     UserId = user.LOGIN_ID,
                     UserName = user.USER_NAME,
                     RoleCode = user.ROLE_CODE,
-                    RoleName = user.ROLE_NAME
+                    RoleName = user.ROLE_NAME,
+                    Permissions = permissions
                 }
             };
         }

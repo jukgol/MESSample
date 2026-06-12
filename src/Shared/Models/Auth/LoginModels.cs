@@ -20,5 +20,6 @@ namespace Shared.Models.Auth
         public string UserName { get; set; } = string.Empty;
         public string RoleCode { get; set; } = string.Empty;
         public string RoleName { get; set; } = string.Empty;
+        public List<string> Permissions { get; set; } = new();
     }
 }

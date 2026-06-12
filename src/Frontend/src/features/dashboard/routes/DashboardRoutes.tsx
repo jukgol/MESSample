@@ -16,6 +16,7 @@ import { useAuthStore } from '../../../store/useAuthStore';
 import WorkOrderHistoryPage from '../../history/workorder/pages/WorkOrderHistoryPage';
 import LotRelationHistoryPage from '../../history/lotrelation/pages/LotRelationHistoryPage';
 import LotTraceHistoryPage from '../../history/lottrace/pages/LotTraceHistoryPage';
+import { hasAccess, PERMISSIONS } from '../../../store/permissions';
 
 // Placeholder components for other routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -27,11 +28,6 @@ const Placeholder = ({ title }: { title: string }) => (
 
 const DashboardRoutes = () => {
   const user = useAuthStore((state) => state.user);
-  const roleCode = user?.roleCode || 'VIEWER';
-
-  const hasAccess = (allowedRoles: string[]) => {
-    return allowedRoles.includes(roleCode);
-  };
 
   return (
     <Routes>
@@ -39,42 +35,65 @@ const DashboardRoutes = () => {
         {/* Dashboard / Root */}
         <Route path="/" element={<DashboardHome />} />
 
-        {/* 기준 정보 & 재고 관리 - ADMIN만 */}
-        {hasAccess(['ADMIN']) && (
+        {(hasAccess(user, { allowedPermissions: [PERMISSIONS.masterDataView] }) ||
+          hasAccess(user, { allowedPermissions: [PERMISSIONS.processView] })) && (
           <>
-            <Route path="/masterdata" element={<Navigate to="items" replace />} />
-            <Route path="/masterdata/items" element={<ItemList />} />
-            <Route path="/masterdata/itemtype" element={<ItemTypeList />} />
-            <Route path="/masterdata/boms" element={<BomManagePage />} />
-            <Route path="/masterdata/steps" element={<ProcessStepList />} />
-            <Route path="/masterdata/product-processes" element={<ProductProcessList />} />
+            <Route path="/masterdata" element={<Navigate to={hasAccess(user, { allowedPermissions: [PERMISSIONS.masterDataView] }) ? 'items' : 'steps'} replace />} />
+            {hasAccess(user, { allowedPermissions: [PERMISSIONS.masterDataView] }) && (
+              <>
+                <Route path="/masterdata/items" element={<ItemList />} />
+                <Route path="/masterdata/itemtype" element={<ItemTypeList />} />
+                <Route path="/masterdata/boms" element={<BomManagePage />} />
+              </>
+            )}
+            {hasAccess(user, { allowedPermissions: [PERMISSIONS.processView] }) && (
+              <>
+                <Route path="/masterdata/steps" element={<ProcessStepList />} />
+                <Route path="/masterdata/product-processes" element={<ProductProcessList />} />
+              </>
+            )}
+          </>
+        )}
 
-            <Route path="/inventory" element={<Navigate to="lots" replace />} />
-            <Route path="/inventory/lots" element={<LotList />} />
-            <Route path="/inventory/mrp" element={<MrpContainerPage />} />
-            <Route path="/inventory/shipments" element={<Placeholder title="출하 관리" />} />
+        {(hasAccess(user, { allowedPermissions: [PERMISSIONS.inventoryView] }) ||
+          hasAccess(user, { allowedPermissions: [PERMISSIONS.masterDataView] })) && (
+          <>
+            <Route path="/inventory" element={<Navigate to={hasAccess(user, { allowedPermissions: [PERMISSIONS.inventoryView] }) ? 'lots' : 'mrp'} replace />} />
+            {hasAccess(user, { allowedPermissions: [PERMISSIONS.inventoryView] }) && (
+              <>
+                <Route path="/inventory/lots" element={<LotList />} />
+                <Route path="/inventory/shipments" element={<Placeholder title="출하 관리" />} />
+              </>
+            )}
+            {hasAccess(user, { allowedPermissions: [PERMISSIONS.masterDataView] }) && (
+              <Route path="/inventory/mrp" element={<MrpContainerPage />} />
+            )}
+          </>
+        )}
+
+        {hasAccess(user, { allowedRoles: ['ADMIN'] }) && (
+          <>
             <Route path="/system/users" element={<UserList />} />
             <Route path="/system/roles" element={<RoleManager />} />
           </>
         )}
 
-        {/* 공정 관리 - ADMIN, OPERATOR */}
-        {hasAccess(['ADMIN', 'OPERATOR']) && (
+        {hasAccess(user, { allowedPermissions: [PERMISSIONS.processView] }) && (
           <>
             <Route path="/process-manager/workorder" element={<WorkOrderPage />} />
             <Route path="/process-manager/monitoring" element={<ProcessMonitoringPage />} />
           </>
         )}
 
-        {/* 로그 / 이력 */}
-        {hasAccess(['ADMIN', 'VIEWER']) && (
+        {hasAccess(user, { allowedPermissions: [PERMISSIONS.processView] }) && (
           <>
             <Route path="/history/work-orders" element={<WorkOrderHistoryPage />} />
             <Route path="/history/lot-relations" element={<LotRelationHistoryPage />} />
             <Route path="/history/lot-trace" element={<LotTraceHistoryPage />} />
           </>
         )}
-        {hasAccess(['ADMIN', 'QC']) && (
+
+        {hasAccess(user, { allowedPermissions: [PERMISSIONS.qcView] }) && (
           <Route path="/history/qc" element={<Placeholder title="품질 검사 (QC)" />} />
         )}
 

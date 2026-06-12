@@ -16,13 +16,14 @@ const AuthGuard = ({ children }: AuthGuardProps) => {
     const verifyToken = async () => {
       if (isAuthenticated) {
         try {
-          // 토큰이 유효한지 확인하기 위해 가벼운 API 호출 (예: 품목 리스트 첫 페이지 등)
-          // 만약 토큰이 만료되었다면 아까 만든 interceptor에서 401을 감지하고 로그아웃 시킬 것입니다.
+          // 토큰이 유효한지 확인하기 위해 가벼운 API 호출
           await apiClient.get('/api/Item');
-        } catch (error) {
-          // interceptor에서 처리되지만, 만약의 경우를 대비해 여기서도 처리
-          console.error('Token verification failed', error);
-          logout(); // 검증 실패 시 로그아웃 처리하여 리다이렉트 유도
+        } catch (error: any) {
+          // 403 Forbidden은 토큰은 유효하지만 리소스 접근 권한이 없음을 뜻하므로 로그아웃 처리하지 않습니다.
+          if (error.response?.status !== 403) {
+            console.error('Token verification failed', error);
+            logout(); // 401 등 진짜 토큰 오류일 때만 로그아웃
+          }
         }
       }
       setIsVerifying(false);
