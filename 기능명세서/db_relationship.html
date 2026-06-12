@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MESample DB 관계도</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --panel: #ffffff;
+      --text: #1b2430;
+      --muted: #64748b;
+      --line: #d8e0ea;
+      --accent: #0f766e;
+      --accent-soft: #e6f5f2;
+      --blue: #2563eb;
+      --blue-soft: #e8f0ff;
+      --green: #15803d;
+      --green-soft: #eaf7ee;
+      --amber: #a16207;
+      --amber-soft: #fff7df;
+      --rose: #be123c;
+      --rose-soft: #fff0f3;
+      --violet: #6d28d9;
+      --violet-soft: #f2edff;
+      --shadow: 0 10px 28px rgba(30, 41, 59, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    header {
+      padding: 28px 32px 18px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 22px 24px 48px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .toolbar input {
+      width: min(460px, 100%);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 13px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    .toolbar input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+    }
+
+    .section {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .map {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(210px, 1fr));
+      gap: 14px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .lane {
+      min-width: 210px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fbfcfe;
+    }
+
+    .lane h3 {
+      margin: 0 0 10px;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .table-card {
+      position: relative;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 10px 9px;
+      margin-bottom: 10px;
+      background: #fff;
+      transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+    }
+
+    .table-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .table-card strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .table-card span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .table-card.auth { border-left: 5px solid var(--blue); }
+    .table-card.master { border-left: 5px solid var(--green); }
+    .table-card.bom { border-left: 5px solid var(--amber); }
+    .table-card.prod { border-left: 5px solid var(--accent); }
+    .table-card.trace { border-left: 5px solid var(--violet); }
+    .table-card.legacy { border-left: 5px solid var(--rose); }
+
+    .table-card.is-active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 22px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      gap: 12px;
+    }
+
+    .flow-step {
+      min-height: 112px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 13px;
+      background: #fff;
+    }
+
+    .flow-step b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .flow-step code {
+      display: inline-block;
+      margin: 0 5px 6px 0;
+      padding: 3px 6px;
+      border-radius: 6px;
+      background: #eef2f7;
+      color: #334155;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 700;
+      z-index: 1;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover,
+    tbody tr.is-active {
+      background: var(--accent-soft);
+    }
+
+    code {
+      font-family: Consolas, "Courier New", monospace;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #eef2f7;
+      color: #334155;
+      white-space: nowrap;
+    }
+
+    .badge.auth { background: var(--blue-soft); color: var(--blue); }
+    .badge.master { background: var(--green-soft); color: var(--green); }
+    .badge.bom { background: var(--amber-soft); color: var(--amber); }
+    .badge.prod { background: var(--accent-soft); color: var(--accent); }
+    .badge.trace { background: var(--violet-soft); color: var(--violet); }
+    .badge.legacy { background: var(--rose-soft); color: var(--rose); }
+
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(260px, 1fr));
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .notes li {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #fff;
+      font-size: 13px;
+    }
+
+    @media (max-width: 980px) {
+      header {
+        padding: 22px 18px 16px;
+      }
+
+      main {
+        padding: 16px;
+      }
+
+      .map {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+      }
+
+      .summary-grid,
+      .flow,
+      .notes {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MESample DB 관계도</h1>
+    <p>기준: <code>src/WAS/Data/Scripts/Migrations</code> 마이그레이션 SQL. 이 파일은 빌드 없이 브라우저에서 바로 열 수 있습니다.</p>
+  </header>
+
+  <main>
+    <div class="toolbar">
+      <input id="search" type="search" placeholder="테이블명, FK 컬럼, 설명 검색">
+    </div>
+
+    <section class="section">
+      <h2>전체 구조</h2>
+      <div class="map" id="tableMap">
+        <div class="lane">
+          <h3>인증/권한</h3>
+          <div class="table-card auth" data-table="USER_ROLE"><strong>USER_ROLE</strong><span>역할 코드, 권한 JSON</span></div>
+          <div class="table-card auth" data-table="USER_INFO"><strong>USER_INFO</strong><span>사용자 계정, 역할</span></div>
+        </div>
+
+        <div class="lane">
+          <h3>기준정보</h3>
+          <div class="table-card master" data-table="ITEM"><strong>ITEM</strong><span>품목 마스터</span></div>
+          <div class="table-card master" data-table="ITEM_TYPE"><strong>ITEM_TYPE</strong><span>품목 유형, FK 없음</span></div>
+          <div class="table-card master" data-table="PROCESS_MASTER"><strong>PROCESS_MASTER</strong><span>공정 흐름 마스터</span></div>
+          <div class="table-card master" data-table="PROCESS_STEP"><strong>PROCESS_STEP</strong><span>공정 단계, 설비 매핑</span></div>
+        </div>
+
+        <div class="lane">
+          <h3>BOM</h3>
+          <div class="table-card bom" data-table="BOM"><strong>BOM <em>폐기</em></strong><span>기존 부모/자식 BOM</span></div>
+          <div class="table-card bom" data-table="BOM_RECIPE"><strong>BOM_RECIPE</strong><span>정규화 레시피 헤더</span></div>
+          <div class="table-card bom" data-table="BOM_INPUT"><strong>BOM_INPUT</strong><span>레시피 투입 품목</span></div>
+          <div class="table-card bom" data-table="BOM_OUTPUT"><strong>BOM_OUTPUT</strong><span>레시피 산출 품목</span></div>
+        </div>
+
+        <div class="lane">
+          <h3>생산 실행</h3>
+          <div class="table-card prod" data-table="WORK_ORDER"><strong>WORK_ORDER</strong><span>작업 지시</span></div>
+          <div class="table-card prod" data-table="PROCESS_STEP_EXECUTION"><strong>PROCESS_STEP_EXECUTION</strong><span>단계별 실행 상태</span></div>
+          <div class="table-card prod" data-table="PROCESS_INPUT"><strong>PROCESS_INPUT</strong><span>실제 투입 LOT/품목</span></div>
+          <div class="table-card prod" data-table="PROCESS_OUTPUT"><strong>PROCESS_OUTPUT</strong><span>실제 산출 LOT/품목</span></div>
+        </div>
+
+        <div class="lane">
+          <h3>재고/추적/이력</h3>
+          <div class="table-card trace" data-table="LOT"><strong>LOT</strong><span>LOT 기본 정보</span></div>
+          <div class="table-card trace" data-table="LOT_STOCK"><strong>LOT_STOCK</strong><span>현재 재고 스냅샷</span></div>
+          <div class="table-card trace" data-table="LOT_STOCK_HISTORY"><strong>LOT_STOCK_HISTORY</strong><span>재고 변경 이력</span></div>
+          <div class="table-card trace" data-table="LOT_TRACE"><strong>LOT_TRACE</strong><span>부모/자식 LOT 계보</span></div>
+          <div class="table-card legacy" data-table="PROCESS_LOG"><strong>PROCESS_LOG</strong><span>초기 공정 이력</span></div>
+          <div class="table-card legacy" data-table="PROCESS_PARAM"><strong>PROCESS_PARAM</strong><span>로그별 파라미터</span></div>
+          <div class="table-card legacy" data-table="QC_RESULT"><strong>QC_RESULT</strong><span>검사 결과</span></div>
+          <div class="table-card legacy" data-table="SHIPMENT"><strong>SHIPMENT</strong><span>출하 기록</span></div>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="metric"><b>22</b><span>업무/관리 테이블</span></div>
+        <div class="metric"><b>29</b><span>명시 FK 관계</span></div>
+        <div class="metric"><b>4</b><span>BOM 관련 테이블</span></div>
+        <div class="metric"><b>1:1</b><span>LOT - LOT_STOCK</span></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>주요 흐름</h2>
+      <div class="flow">
+        <div class="flow-step">
+          <b>1. 기준정보</b>
+          <code>ITEM</code><code>PROCESS_MASTER</code><code>PROCESS_STEP</code>
+        </div>
+        <div class="flow-step">
+          <b>2. BOM 구성</b>
+          <code>BOM_RECIPE</code><code>BOM_INPUT</code><code>BOM_OUTPUT</code>
+        </div>
+        <div class="flow-step">
+          <b>3. 작업 실행</b>
+          <code>WORK_ORDER</code><code>PROCESS_STEP_EXECUTION</code><code>PROCESS_INPUT</code><code>PROCESS_OUTPUT</code>
+        </div>
+        <div class="flow-step">
+          <b>4. 재고/추적</b>
+          <code>LOT</code><code>LOT_STOCK</code><code>LOT_STOCK_HISTORY</code><code>LOT_TRACE</code>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>FK 관계 목록</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>구분</th>
+            <th>자식 테이블</th>
+            <th>부모 테이블</th>
+            <th>FK 컬럼</th>
+            <th>설명</th>
+          </tr>
+        </thead>
+        <tbody id="relationRows"></tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>제약 조건 메모</h2>
+      <ul class="notes">
+        <li><code>BOM</code> 폐기: <code>parent_item_id</code>, <code>child_item_id</code>, <code>process_step_id</code> 조합 유니크</li>
+        <li><code>BOM_RECIPE</code>: <code>recipe_code</code> 유니크</li>
+        <li><code>BOM_INPUT</code>: <code>bom_recipe_id</code>, <code>item_id</code> 조합 유니크</li>
+        <li><code>BOM_OUTPUT</code>: <code>bom_recipe_id</code>, <code>item_id</code> 조합 유니크</li>
+        <li><code>LOT_STOCK</code>: <code>lot_id</code> 유니크, LOT당 현재 재고 행 1개</li>
+        <li><code>WORK_ORDER.work_order_no</code>, <code>ITEM.item_code</code>, <code>PROCESS_MASTER.process_code</code> 유니크</li>
+        <li><code>PROCESS_STEP_EXECUTION.status</code>: <code>WAITING</code>, <code>RUNNING</code>, <code>PAUSED</code>, <code>DONE</code>, <code>FAILED</code>, <code>DELETED</code>, <code>COMPLETED</code></li>
+        <li><code>ITEM_TYPE</code>, <code>TEST_USERS</code>는 현재 업무 FK 관계 없음</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const relations = [
+      ["auth", "USER_INFO", "USER_ROLE", "ROLE_CODE", "사용자 역할"],
+      ["trace", "LOT", "ITEM", "item_id", "LOT의 품목"],
+      ["bom", "BOM", "ITEM", "parent_item_id", "폐기된 기존 BOM의 부모 품목"],
+      ["bom", "BOM", "ITEM", "child_item_id", "폐기된 기존 BOM의 자식 품목"],
+      ["bom", "BOM", "PROCESS_STEP", "process_step_id", "폐기된 기존 BOM의 적용 공정 단계"],
+      ["master", "PROCESS_STEP", "PROCESS_MASTER", "process_master_id", "공정 단계가 속한 공정 마스터"],
+      ["prod", "WORK_ORDER", "PROCESS_MASTER", "process_master_id", "작업 지시 대상 공정"],
+      ["prod", "WORK_ORDER", "USER_INFO", "worker_user_id", "작업자, NULL 허용"],
+      ["prod", "PROCESS_STEP_EXECUTION", "WORK_ORDER", "work_order_id", "작업 지시별 단계 실행"],
+      ["prod", "PROCESS_STEP_EXECUTION", "PROCESS_STEP", "process_step_id", "실행 대상 공정 단계"],
+      ["prod", "PROCESS_STEP_EXECUTION", "USER_INFO", "worker_user_id", "단계 작업자, NULL 허용"],
+      ["prod", "PROCESS_INPUT", "PROCESS_STEP_EXECUTION", "process_step_execution_id", "실행 단계의 투입"],
+      ["prod", "PROCESS_INPUT", "LOT", "lot_id", "투입 LOT"],
+      ["prod", "PROCESS_INPUT", "ITEM", "item_id", "투입 품목"],
+      ["prod", "PROCESS_OUTPUT", "PROCESS_STEP_EXECUTION", "process_step_execution_id", "실행 단계의 산출"],
+      ["prod", "PROCESS_OUTPUT", "LOT", "lot_id", "산출 LOT"],
+      ["prod", "PROCESS_OUTPUT", "ITEM", "item_id", "산출 품목"],
+      ["trace", "LOT_STOCK", "LOT", "lot_id", "LOT별 1개 현재 재고"],
+      ["trace", "LOT_STOCK_HISTORY", "LOT", "lot_id", "LOT 재고 변경 이력"],
+      ["trace", "LOT_TRACE", "LOT", "parent_lot_id", "부모 LOT, NULL 허용"],
+      ["trace", "LOT_TRACE", "LOT", "child_lot_id", "자식 LOT"],
+      ["trace", "LOT_TRACE", "PROCESS_STEP_EXECUTION", "process_step_execution_id", "LOT 생성/소비 실행 단계"],
+      ["bom", "BOM_RECIPE", "PROCESS_STEP", "process_step_id", "레시피 적용 공정 단계"],
+      ["bom", "BOM_INPUT", "BOM_RECIPE", "bom_recipe_id", "레시피 투입 항목"],
+      ["bom", "BOM_INPUT", "ITEM", "item_id", "투입 품목"],
+      ["bom", "BOM_OUTPUT", "BOM_RECIPE", "bom_recipe_id", "레시피 산출 항목"],
+      ["bom", "BOM_OUTPUT", "ITEM", "item_id", "산출 품목"],
+      ["legacy", "PROCESS_LOG", "LOT", "lot_id", "초기 공정 이력의 LOT"],
+      ["legacy", "PROCESS_LOG", "PROCESS_STEP", "step_id", "초기 공정 이력의 단계"],
+      ["legacy", "PROCESS_PARAM", "PROCESS_LOG", "log_id", "공정 이력별 파라미터"],
+      ["legacy", "QC_RESULT", "PROCESS_LOG", "log_id", "공정 이력별 검사 결과"],
+      ["legacy", "SHIPMENT", "LOT", "lot_id", "출하 LOT"]
+    ];
+
+    const labels = {
+      auth: "인증/권한",
+      master: "기준정보",
+      bom: "BOM",
+      prod: "생산",
+      trace: "재고/추적",
+      legacy: "이력/검사"
+    };
+
+    const tbody = document.getElementById("relationRows");
+    const search = document.getElementById("search");
+
+    function renderRows(keyword = "") {
+      const q = keyword.trim().toLowerCase();
+      tbody.innerHTML = "";
+
+      relations
+        .filter(row => row.join(" ").toLowerCase().includes(q))
+        .forEach(row => {
+          const [type, child, parent, fk, memo] = row;
+          const tr = document.createElement("tr");
+          tr.dataset.child = child;
+          tr.dataset.parent = parent;
+          tr.innerHTML = `
+            <td><span class="badge ${type}">${labels[type]}</span></td>
+            <td><code>${child}</code></td>
+            <td><code>${parent}</code></td>
+            <td><code>${fk}</code></td>
+            <td>${memo}</td>
+          `;
+          tr.addEventListener("mouseenter", () => highlight(child, parent, tr));
+          tr.addEventListener("mouseleave", clearHighlight);
+          tr.addEventListener("click", () => highlight(child, parent, tr));
+          tbody.appendChild(tr);
+        });
+    }
+
+    function highlight(child, parent, row) {
+      clearHighlight();
+      document.querySelectorAll(`[data-table="${child}"], [data-table="${parent}"]`)
+        .forEach(card => card.classList.add("is-active"));
+      if (row) row.classList.add("is-active");
+    }
+
+    function clearHighlight() {
+      document.querySelectorAll(".is-active").forEach(el => el.classList.remove("is-active"));
+    }
+
+    document.querySelectorAll(".table-card").forEach(card => {
+      card.addEventListener("click", () => {
+        search.value = card.dataset.table;
+        renderRows(search.value);
+        card.classList.add("is-active");
+      });
+    });
+
+    search.addEventListener("input", event => renderRows(event.target.value));
+    renderRows();
+  </script>
+</body>
+</html>
