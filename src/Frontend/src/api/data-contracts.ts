@@ -15,43 +15,43 @@ export interface ActionResponse {
   executedSql?: string | null;
 }
 
-export interface BomCreateDto {
-  /** @format int32 */
-  parentItemID?: number;
-  /** @format int32 */
-  childItemID?: number;
-  /** @format int32 */
-  bomQty?: number;
+export interface BomRecipeCreateDto {
+  recipeCode?: string | null;
+  recipeName?: string | null;
   /** @format int32 */
   processStepID?: number | null;
+  inputs?: BomRecipeCreateItemDto[] | null;
+  outputs?: BomRecipeCreateItemDto[] | null;
 }
 
-export interface BomDto {
+export interface BomRecipeCreateItemDto {
   /** @format int32 */
-  bomID?: number;
+  itemID?: number;
   /** @format int32 */
-  parentItemID?: number;
-  parentItemName?: string | null;
+  qty?: number;
+}
+
+export interface BomRecipeItemDto {
   /** @format int32 */
-  childItemID?: number;
-  childItemName?: string | null;
+  itemID?: number;
+  itemCode?: string | null;
+  itemName?: string | null;
   /** @format int32 */
-  bomQty?: number;
+  qty?: number;
+}
+
+export interface BomRecipeListDto {
+  /** @format int32 */
+  bomRecipeID?: number;
+  recipeCode?: string | null;
+  recipeName?: string | null;
   /** @format int32 */
   processStepID?: number | null;
   processStepName?: string | null;
-}
-
-export interface BomUpdateDto {
-  /** @format int32 */
-  bomQty?: number;
-  /** @format int32 */
-  processStepID?: number | null;
-}
-
-export interface BomUpdateProcessDto {
-  /** @format int32 */
-  processStepID?: number | null;
+  /** @format date-time */
+  createdAt?: string;
+  inputs?: BomRecipeItemDto[] | null;
+  outputs?: BomRecipeItemDto[] | null;
 }
 
 export interface ColumnMetadata {

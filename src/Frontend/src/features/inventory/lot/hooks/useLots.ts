@@ -7,6 +7,7 @@ export interface LotDto {
   itemName: string;
   lotNo: string;
   qty: number;
+  currentQty: number;
   receivedAt: string;
   status: string;
 }
@@ -40,6 +41,7 @@ export const useLots = () => {
           itemName: lot.itemName,
           lotNo: lot.lotNo,
           qty: lot.qty,
+          currentQty: lot.currentQty !== undefined ? lot.currentQty : lot.qty,
           receivedAt: lot.receivedAt,
           status: lot.status
         }));

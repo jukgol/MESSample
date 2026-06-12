@@ -194,8 +194,6 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
       const updatedList = await fetchBomsByStep(selectedStep.stepID);
       setConnectedBoms(updatedList);
       setSelectedParentID(parentItemID);
-      setIsSelectorOpen(false);
-      setSelectorMode(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -206,7 +204,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
   // 출력 품목 공정 매핑 해제 (해당 부모의 모든 매핑 해제)
   const handleDetachOutput = async (parentItemID: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('해당 출력 품목의 공정 연동을 해제하시겠습니까? 관련 투입 자재 매핑도 모두 해제됩니다.')) return;
+    if (!confirm('해당 BOM 레시피의 공정 연동을 해제하시겠습니까? 관련 투입 자재 매핑도 모두 해제됩니다.')) return;
     setBomsLoading(true);
     try {
       const bomsToDetach = connectedBoms.filter(bom => bom.parentItemID === parentItemID);
@@ -435,7 +433,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
           {/* 상단: 출력(Output/부모) 품목 리스트 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, gap: '0.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'white' }}>생산 제품 (출력)</h3>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'white' }}>BOM 레시피</h3>
               <button
                 type="button"
                 onClick={handleOpenOutputSelector}
@@ -451,7 +449,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
                   gap: '4px'
                 }}
               >
-                <Plus size={12} /> 출력 추가
+                <Plus size={12} /> 레시피 추가
               </button>
             </div>
 
@@ -503,7 +501,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
                 </div>
               ) : (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '0.8rem', padding: '1rem', textAlign: 'center' }}>
-                  등록된 생산 제품이 없습니다.
+                  등록된 BOM 레시피가 없습니다.
                 </div>
               )}
             </div>
@@ -537,7 +535,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
             <div style={{ flex: 1, overflowY: 'auto', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px' }}>
               {selectedParentID === null ? (
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: 'var(--text-secondary)', fontSize: '0.8rem', padding: '1rem', textAlign: 'center' }}>
-                  상단 생산 제품을 먼저 선택하시면<br />투입 자재 구성이 표시됩니다.
+                  상단 BOM 레시피를 먼저 선택하시면<br />투입 자재 구성이 표시됩니다.
                 </div>
               ) : inputsList.length > 0 ? (
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -610,7 +608,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
             </button>
 
             <h3 className="gradient-text" style={{ margin: 0, fontSize: '1.2rem' }}>
-              {selectorMode === 'output' ? '생산 제품 연동 추가' : '투입 자재 매핑 추가'}
+              {selectorMode === 'output' ? 'BOM 레시피 연동 추가' : '투입 자재 매핑 추가'}
             </h3>
 
             {/* 1. 출력 추가 모드 (기존 BOM 레시피 구조에서 선택) */}
@@ -671,7 +669,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
                     </div>
                   ) : (
                     <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                      추가할 수 있는 생산 제품이 없습니다. (품목의 BOM 레시피 구조를 먼저 생성해 주세요.)
+                      추가할 수 있는 BOM 레시피가 없습니다. (품목의 BOM 레시피 구조를 먼저 생성해 주세요.)
                     </div>
                   )}
                 </div>
@@ -682,7 +680,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
             {selectorMode === 'input' && (
               <form onSubmit={handleCreateAndAttachInput} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', flex: 1 }}>
                 <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '6px' }}>
-                  <strong>생산 제품 (출력):</strong> {outputsList.find(o => o.parentItemID === selectedParentID)?.parentItemName}
+                  <strong>BOM 레시피:</strong> {outputsList.find(o => o.parentItemID === selectedParentID)?.parentItemName}
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>

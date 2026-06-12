@@ -10,26 +10,27 @@ BEGIN
             SELECT wo.work_order_id,
                    pse.process_step_execution_id,
                    l.lot_id,
-                   b.child_item_id,
-                   (b.bom_qty * wo.order_qty) AS required_qty,
+                   bi.item_id AS child_item_id,
+                   (bi.input_qty * wo.order_qty) AS required_qty,
                    NVL(ls.current_qty, l.qty) AS current_qty,
                    ROW_NUMBER() OVER (
-                       PARTITION BY pse.process_step_execution_id, b.child_item_id
+                       PARTITION BY pse.process_step_execution_id, bi.item_id
                        ORDER BY l.lot_id DESC
                    ) AS rn
             FROM WORK_ORDER wo
             JOIN PROCESS_STEP_EXECUTION pse ON pse.work_order_id = wo.work_order_id
-            JOIN BOM b ON b.process_step_id = pse.process_step_id
-            JOIN LOT l ON l.item_id = b.child_item_id
+            JOIN BOM_RECIPE br ON br.process_step_id = pse.process_step_id
+            JOIN BOM_INPUT bi ON bi.bom_recipe_id = br.bom_recipe_id
+            JOIN LOT l ON l.item_id = bi.item_id
             LEFT JOIN LOT_STOCK ls ON ls.lot_id = l.lot_id
             WHERE wo.work_order_no = :WorkOrderNo
               AND NVL(ls.reserved_qty, 0) = 0
-              AND NVL(ls.current_qty, l.qty) >= (b.bom_qty * wo.order_qty)
+              AND NVL(ls.current_qty, l.qty) >= (bi.input_qty * wo.order_qty)
               AND NOT EXISTS (
                   SELECT 1
                   FROM PROCESS_INPUT pi
                   WHERE pi.process_step_execution_id = pse.process_step_execution_id
-                    AND pi.item_id = b.child_item_id
+                    AND pi.item_id = bi.item_id
               )
         )
         WHERE rn = 1

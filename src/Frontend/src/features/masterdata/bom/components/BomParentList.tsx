@@ -1,42 +1,45 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Database, Loader2 } from 'lucide-react';
-import type { Item } from '../../item/hooks/useItems';
+import { Search, Database, Loader2, Trash2 } from 'lucide-react';
+import type { BomRecipe } from '../hooks/useBoms';
 
 interface BomParentListProps {
-  items: Item[];
+  recipes: BomRecipe[];
   loading: boolean;
-  selectedItemId: number | null;
-  onSelectItem: (id: number) => void;
+  selectedRecipeId: number | null;
+  onSelectRecipe: (id: number) => void;
+  onDeleteRecipe?: (id: number) => void;
 }
 
 const BomParentList: React.FC<BomParentListProps> = ({
-  items,
+  recipes,
   loading,
-  selectedItemId,
-  onSelectItem
+  selectedRecipeId,
+  onSelectRecipe,
+  onDeleteRecipe
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 품목 필터링 (품목명 또는 ID 또는 타입으로 검색)
-  const filteredItems = useMemo(() => {
-    return items.filter((item) => {
+  // 레시피 필터링 (레시피명 또는 코드 또는 공정명으로 검색)
+  const filteredRecipes = useMemo(() => {
+    return recipes.filter((recipe) => {
       const searchLower = searchTerm.toLowerCase();
-      const nameMatch = item.name?.toLowerCase().includes(searchLower) ?? false;
-      const typeMatch = item.category?.toLowerCase().includes(searchLower) ?? false;
-      const idMatch = item.id?.toString().includes(searchLower) ?? false;
-      return nameMatch || typeMatch || idMatch;
+      const nameMatch = recipe.recipeName?.toLowerCase().includes(searchLower) ?? false;
+      const codeMatch = recipe.recipeCode?.toLowerCase().includes(searchLower) ?? false;
+      const stepMatch = recipe.processStepName?.toLowerCase().includes(searchLower) ?? false;
+      const idMatch = recipe.bomRecipeID?.toString().includes(searchLower) ?? false;
+      return nameMatch || codeMatch || stepMatch || idMatch;
     });
-  }, [items, searchTerm]);
+  }, [recipes, searchTerm]);
 
   return (
     <div className="premium-card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '1.5rem', gap: '1rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <Database size={20} className="gradient-text" />
-        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>출력 품목 목록</h2>
+        <h2 style={{ fontSize: '1.2rem', margin: 0 }}>BOM 레시피 목록</h2>
       </div>
 
       <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
-        BOM 레시피를 정의하거나 조회할 대상 출력 품목을 아래 목록에서 선택하세요.
+        조회하거나 정의할 대상 BOM 레시피를 아래 목록에서 선택하세요.
       </p>
 
       {/* 검색 바 */}
@@ -44,7 +47,7 @@ const BomParentList: React.FC<BomParentListProps> = ({
         <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
         <input
           type="text"
-          placeholder="품목명 또는 구분으로 검색..."
+          placeholder="레시피명 또는 코드로 검색..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           style={{
@@ -60,22 +63,22 @@ const BomParentList: React.FC<BomParentListProps> = ({
         />
       </div>
 
-      {/* 품목 리스트 영역 */}
+      {/* 레시피 리스트 영역 */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             <Loader2 className="animate-spin" style={{ margin: '0 auto 8px' }} size={24} />
-            품목 조회 중...
+            레시피 조회 중...
           </div>
-        ) : filteredItems.length > 0 ? (
-          filteredItems.map((item) => {
-            const itemIdNum = Number(item.id);
-            const isSelected = selectedItemId === itemIdNum;
+        ) : filteredRecipes.length > 0 ? (
+          filteredRecipes.map((recipe) => {
+            const recipeIdNum = Number(recipe.bomRecipeID);
+            const isSelected = selectedRecipeId === recipeIdNum;
 
             return (
               <div
-                key={item.id}
-                onClick={() => onSelectItem(itemIdNum)}
+                key={recipe.bomRecipeID}
+                onClick={() => onSelectRecipe(recipeIdNum)}
                 style={{
                   padding: '12px 16px',
                   borderRadius: '8px',
@@ -102,29 +105,54 @@ const BomParentList: React.FC<BomParentListProps> = ({
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ fontWeight: '600', color: isSelected ? 'var(--accent-primary)' : 'white', fontSize: '0.95rem' }}>
-                    {item.name}
+                    {recipe.recipeName}
                   </span>
-                  <span style={{
-                    fontSize: '0.75rem',
-                    padding: '2px 8px',
-                    background: item.category === '제품' ? 'rgba(16, 185, 129, 0.1)' : item.category === '반제품' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(107, 114, 128, 0.1)',
-                    color: item.category === '제품' ? '#34d399' : item.category === '반제품' ? '#818cf8' : '#9ca3af',
-                    borderRadius: '12px',
-                    border: `1px solid ${item.category === '제품' ? 'rgba(16, 185, 129, 0.2)' : item.category === '반제품' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(107, 114, 128, 0.2)'}`
-                  }}>
-                    {item.category}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{
+                      fontSize: '0.75rem',
+                      padding: '2px 8px',
+                      background: 'rgba(99, 102, 241, 0.1)',
+                      color: '#818cf8',
+                      borderRadius: '12px',
+                      border: '1px solid rgba(99, 102, 241, 0.2)'
+                    }}>
+                      {recipe.recipeCode}
+                    </span>
+                    {onDeleteRecipe && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (confirm('이 레시피를 완전히 삭제하시겠습니까?')) {
+                            onDeleteRecipe(recipeIdNum);
+                          }
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: 'rgba(239, 68, 68, 0.6)',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-                  <span>ID: {item.id}</span>
-                  <span>단위: {item.unit}</span>
+                  <span>ID: {recipe.bomRecipeID}</span>
+                  {recipe.processStepName && (
+                    <span>공정: {recipe.processStepName}</span>
+                  )}
                 </div>
               </div>
             );
           })
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-            검색 조건에 맞는 품목이 없습니다.
+            검색 조건에 맞는 레시피가 없습니다.
           </div>
         )}
       </div>

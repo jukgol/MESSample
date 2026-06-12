@@ -6,13 +6,15 @@ namespace WAS.Services.App
 {
     public interface IBomService
     {
-        Task<IEnumerable<BomDto>> GetBomsByParentAsync(int parentId);
-        Task<IEnumerable<BomDto>> GetBomsByStepAsync(int stepId);
-        Task<IEnumerable<BomDto>> GetAllBomsAsync();
-        Task CreateBomAsync(BomCreateDto dto);
-        Task UpdateBomAsync(int id, BomUpdateDto dto);
-        Task UpdateBomProcessStepAsync(int bomId, int? processStepId);
-        Task DeleteBomAsync(int id);
-        Task LoadScenarioBomsAsync();
+        Task<IEnumerable<BomRecipeListDto>> GetBomRecipeListAsync();
+        Task CreateBomAsync(BomRecipeCreateDto dto);
+        Task AddRecipeInputAsync(int recipeId, int itemId, int qty);
+        Task AddRecipeOutputAsync(int recipeId, int itemId, int qty);
+        Task DeleteRecipeInputAsync(int recipeId, int itemId);
+        Task DeleteRecipeOutputAsync(int recipeId, int itemId);
+        Task UpdateRecipeInputQtyAsync(int recipeId, int itemId, int qty);
+        Task UpdateRecipeOutputQtyAsync(int recipeId, int itemId, int qty);
+        Task DeleteRecipeAsync(int recipeId);
+        Task UpdateRecipeProcessAsync(int recipeId, int? processStepId);
     }
 }

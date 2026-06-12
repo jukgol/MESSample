@@ -1,168 +1,197 @@
 using Shared.Models.App;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.IO;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace WAS.Services.App
 {
     public class BomService : IBomService
     {
         private readonly IScriptExecutor _scriptExecutor;
-        private readonly IItemService _itemService;
-        private readonly ILogger<BomService> _logger;
 
-        public BomService(IScriptExecutor scriptExecutor, IItemService itemService, ILogger<BomService> logger)
+        public BomService(IScriptExecutor scriptExecutor)
         {
             _scriptExecutor = scriptExecutor;
-            _itemService = itemService;
-            _logger = logger;
         }
 
-        public async Task<IEnumerable<BomDto>> GetBomsByParentAsync(int parentId)
+        public async Task<IEnumerable<BomRecipeListDto>> GetBomRecipeListAsync()
         {
-            return await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_PARENT", new { ParentItemId = parentId });
+            var rows = await _scriptExecutor.ExecuteQueryAsync<BomRecipeListRowDto>("App/Bom/GET_BOM_RECIPE_LIST");
+
+            return rows
+                .GroupBy(row => new
+                {
+                    row.BomRecipeID,
+                    row.RecipeCode,
+                    row.RecipeName,
+                    row.ProcessStepID,
+                    row.ProcessStepName,
+                    row.CreatedAt
+                })
+                .Select(group => new BomRecipeListDto
+                {
+                    BomRecipeID = group.Key.BomRecipeID,
+                    RecipeCode = group.Key.RecipeCode,
+                    RecipeName = group.Key.RecipeName,
+                    ProcessStepID = group.Key.ProcessStepID,
+                    ProcessStepName = group.Key.ProcessStepName,
+                    CreatedAt = group.Key.CreatedAt,
+                    Inputs = group
+                        .Where(row => row.InputItemID.HasValue && row.InputQty.HasValue)
+                        .GroupBy(row => row.InputItemID!.Value)
+                        .Select(inputGroup =>
+                        {
+                            var input = inputGroup.First();
+                            return new BomRecipeItemDto
+                            {
+                                ItemID = input.InputItemID!.Value,
+                                ItemCode = input.InputItemCode,
+                                ItemName = input.InputItemName,
+                                Qty = input.InputQty!.Value
+                            };
+                        })
+                        .OrderBy(item => item.ItemName)
+                        .ToList(),
+                    Outputs = group
+                        .Where(row => row.OutputItemID.HasValue && row.OutputQty.HasValue)
+                        .GroupBy(row => row.OutputItemID!.Value)
+                        .Select(outputGroup =>
+                        {
+                            var output = outputGroup.First();
+                            return new BomRecipeItemDto
+                            {
+                                ItemID = output.OutputItemID!.Value,
+                                ItemCode = output.OutputItemCode,
+                                ItemName = output.OutputItemName,
+                                Qty = output.OutputQty!.Value
+                            };
+                        })
+                        .OrderBy(item => item.ItemName)
+                        .ToList()
+                })
+                .OrderBy(recipe => recipe.RecipeName)
+                .ThenBy(recipe => recipe.ProcessStepID)
+                .ToList();
         }
 
-        public async Task<IEnumerable<BomDto>> GetBomsByStepAsync(int stepId)
+        public async Task CreateBomAsync(BomRecipeCreateDto dto)
         {
-            return await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_STEP", new { ProcessStepId = stepId });
-        }
+            var recipeCode = string.IsNullOrWhiteSpace(dto.RecipeCode)
+                ? $"RECIPE_{DateTime.Now:yyyyMMddHHmmssfff}"
+                : dto.RecipeCode.Trim();
 
-        public async Task<IEnumerable<BomDto>> GetAllBomsAsync()
-        {
-            return await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_ALL_BOMS");
-        }
-
-        public async Task CreateBomAsync(BomCreateDto dto)
-        {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM_RECIPE", new
             {
-                ParentItemId = dto.ParentItemID,
-                ChildItemId = dto.ChildItemID,
-                BomQty = dto.BomQty,
+                RecipeCode = recipeCode,
+                RecipeName = dto.RecipeName.Trim(),
                 ProcessStepId = dto.ProcessStepID
+            });
+
+            var recipe = (await _scriptExecutor.ExecuteQueryAsync<BomRecipeIdentityDto>(
+                    "App/Bom/GET_BOM_RECIPE_BY_CODE",
+                    new { RecipeCode = recipeCode }))
+                .FirstOrDefault();
+
+            if (recipe == null)
+            {
+                throw new InvalidOperationException("Created BOM recipe could not be found.");
+            }
+
+            foreach (var input in dto.Inputs)
+            {
+                await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM_INPUT", new
+                {
+                    BomRecipeId = recipe.BomRecipeID,
+                    ItemId = input.ItemID,
+                    InputQty = input.Qty
+                });
+            }
+
+            foreach (var output in dto.Outputs)
+            {
+                await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM_OUTPUT", new
+                {
+                    BomRecipeId = recipe.BomRecipeID,
+                    ItemId = output.ItemID,
+                    OutputQty = output.Qty <= 0 ? 1 : output.Qty
+                });
+            }
+        }
+
+        public async Task AddRecipeInputAsync(int recipeId, int itemId, int qty)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM_INPUT", new
+            {
+                BomRecipeId = recipeId,
+                ItemId = itemId,
+                InputQty = qty
             });
         }
 
-        public async Task UpdateBomAsync(int id, BomUpdateDto dto)
+        public async Task AddRecipeOutputAsync(int recipeId, int itemId, int qty)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/CREATE_BOM_OUTPUT", new
             {
-                BomId = id,
-                BomQty = dto.BomQty,
-                ProcessStepId = dto.ProcessStepID
+                BomRecipeId = recipeId,
+                ItemId = itemId,
+                OutputQty = qty
             });
         }
 
-        public async Task UpdateBomProcessStepAsync(int bomId, int? processStepId)
+        public async Task DeleteRecipeInputAsync(int recipeId, int itemId)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM_PROCESS", new
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/DELETE_BOM_INPUT", new
             {
-                BomId = bomId,
+                BomRecipeId = recipeId,
+                ItemId = itemId
+            });
+        }
+
+        public async Task DeleteRecipeOutputAsync(int recipeId, int itemId)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/DELETE_BOM_OUTPUT", new
+            {
+                BomRecipeId = recipeId,
+                ItemId = itemId
+            });
+        }
+
+        public async Task UpdateRecipeInputQtyAsync(int recipeId, int itemId, int qty)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM_INPUT_QTY", new
+            {
+                BomRecipeId = recipeId,
+                ItemId = itemId,
+                Qty = qty
+            });
+        }
+
+        public async Task UpdateRecipeOutputQtyAsync(int recipeId, int itemId, int qty)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM_OUTPUT_QTY", new
+            {
+                BomRecipeId = recipeId,
+                ItemId = itemId,
+                Qty = qty
+            });
+        }
+
+        public async Task DeleteRecipeAsync(int recipeId)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/DELETE_BOM_RECIPE", new
+            {
+                BomRecipeId = recipeId
+            });
+        }
+
+        public async Task UpdateRecipeProcessAsync(int recipeId, int? processStepId)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/UPDATE_BOM_RECIPE_PROCESS", new
+            {
+                BomRecipeId = recipeId,
                 ProcessStepId = processStepId
             });
-        }
-
-        public async Task DeleteBomAsync(int id)
-        {
-            await _scriptExecutor.ExecuteNonQueryAsync("App/Bom/DELETE_BOM", new
-            {
-                BomId = id
-            });
-        }
-
-        public async Task LoadScenarioBomsAsync()
-        {
-            var currentDir = Directory.GetCurrentDirectory();
-            var path = Path.Combine(currentDir, "..", "senario", "data", "bom.json");
-
-            if (!File.Exists(path))
-            {
-                var dir = currentDir;
-                while (dir != null && !File.Exists(Path.Combine(dir, "senario", "data", "bom.json")))
-                {
-                    dir = Directory.GetParent(dir)?.FullName;
-                }
-
-                if (dir != null)
-                {
-                    path = Path.Combine(dir, "senario", "data", "bom.json");
-                }
-            }
-
-            if (!File.Exists(path))
-            {
-                _logger.LogError("Scenario BOM JSON file not found at: {Path}", path);
-                throw new FileNotFoundException($"시나리오 BOM 레시피 파일을 찾을 수 없습니다: {path}");
-            }
-
-            var jsonText = await File.ReadAllTextAsync(path);
-            var options = new JsonSerializerOptions 
-            { 
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-            };
-            var boms = JsonSerializer.Deserialize<List<BomScenarioDto>>(jsonText, options);
-
-            if (boms == null || boms.Count == 0)
-            {
-                _logger.LogWarning("Scenario BOM list is empty or invalid in JSON.");
-                return;
-            }
-
-            foreach (var bom in boms)
-            {
-                var parentItemResult = await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_BY_CODE", new { ItemCode = bom.ParentItemCode });
-                var parentItem = parentItemResult.FirstOrDefault();
-                if (parentItem == null)
-                {
-                    _logger.LogWarning("[WARN] 부모 품목 코드({ParentCode})가 등록되어 있지 않아 BOM을 스킵합니다.", bom.ParentItemCode);
-                    continue;
-                }
-
-                var childItemResult = await _scriptExecutor.ExecuteQueryAsync<ItemDto>("App/Item/GET_ITEM_BY_CODE", new { ItemCode = bom.ChildItemCode });
-                var childItem = childItemResult.FirstOrDefault();
-                if (childItem == null)
-                {
-                    _logger.LogWarning("[WARN] 자식 품목 코드({ChildCode})가 등록되어 있지 않아 BOM을 스킵합니다.", bom.ChildItemCode);
-                    continue;
-                }
-
-                var parentId = parentItem.ItemID;
-                var childId = childItem.ItemID;
-
-                int? processStepId = null;
-                if (!string.IsNullOrEmpty(bom.ProcessStepName))
-                {
-                    var stepResult = await _scriptExecutor.ExecuteQueryAsync<ProcessStepDto>("App/ProcessStep/GET_PROCESS_STEP_BY_NAME", new { StepName = bom.ProcessStepName });
-                    var step = stepResult.FirstOrDefault();
-                    if (step != null)
-                    {
-                        processStepId = step.StepID;
-                    }
-                }
-
-                var existingBomResult = await _scriptExecutor.ExecuteQueryAsync<BomDto>("App/Bom/GET_BOM_BY_RELATION", new { ParentItemId = parentId, ChildItemId = childId });
-                if (existingBomResult.Any())
-                {
-                    _logger.LogInformation("[SKIP] BOM: {ParentCode} -> {ChildCode} 이미 존재함", bom.ParentItemCode, bom.ChildItemCode);
-                }
-                else
-                {
-                    await CreateBomAsync(new BomCreateDto
-                    {
-                        ParentItemID = parentId,
-                        ChildItemID = childId,
-                        BomQty = bom.BomQty,
-                        ProcessStepID = processStepId
-                    });
-                    _logger.LogInformation("[INSERT] BOM: {ParentCode} -> {ChildCode} (Qty: {Qty}, Step: {StepName}) 추가 완료", bom.ParentItemCode, bom.ChildItemCode, bom.BomQty, bom.ProcessStepName);
-                }
-            }
         }
     }
 }

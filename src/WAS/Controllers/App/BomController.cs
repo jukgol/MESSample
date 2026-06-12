@@ -1,18 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WAS.Services.App;
 using Shared.Models.App;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WAS.Attributes;
 using WAS.Common.Constants;
+using WAS.Services.App;
 
 namespace WAS.Controllers.App
 {
     [ApiController]
     [Route("api/bom")]
-    [Authorize] // 모든 API 호출 시 JWT 토큰 필요
+    [Authorize]
     public class BomController : ControllerBase
     {
         private readonly IBomService _bomService;
@@ -22,54 +23,21 @@ namespace WAS.Controllers.App
             _bomService = bomService;
         }
 
-        [HttpGet("parent/{parentId}")]
-        [HasPermission(Permissions.MasterDataView)]
-        [ProducesResponseType(typeof(IEnumerable<BomDto>), 200)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult<IEnumerable<BomDto>>> GetBomsByParent(int parentId)
-        {
-            try
-            {
-                var boms = await _bomService.GetBomsByParentAsync(parentId);
-                return Ok(boms);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"부모 품목 ID({parentId}) 기준 BOM 목록 조회 중 오류 발생: {ex.Message}" });
-            }
-        }
-
-        [HttpGet("step/{stepId}")]
-        [HasPermission(Permissions.MasterDataView)]
-        [ProducesResponseType(typeof(IEnumerable<BomDto>), 200)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult<IEnumerable<BomDto>>> GetBomsByStep(int stepId)
-        {
-            try
-            {
-                var boms = await _bomService.GetBomsByStepAsync(stepId);
-                return Ok(boms);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = $"공정 단계 ID({stepId}) 기준 BOM 목록 조회 중 오류 발생: {ex.Message}" });
-            }
-        }
-
         [HttpGet]
+        [HttpGet("list")]
         [HasPermission(Permissions.MasterDataView)]
-        [ProducesResponseType(typeof(IEnumerable<BomDto>), 200)]
+        [ProducesResponseType(typeof(IEnumerable<BomRecipeListDto>), 200)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult<IEnumerable<BomDto>>> GetAllBoms()
+        public async Task<ActionResult<IEnumerable<BomRecipeListDto>>> GetBomRecipeList()
         {
             try
             {
-                var boms = await _bomService.GetAllBomsAsync();
-                return Ok(boms);
+                var recipes = await _bomService.GetBomRecipeListAsync();
+                return Ok(recipes);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"전체 BOM 목록 조회 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"BOM recipe list 조회 중 오류 발생: {ex.Message}" });
             }
         }
 
@@ -78,112 +46,194 @@ namespace WAS.Controllers.App
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [ProducesResponseType(401)]
-        public async Task<ActionResult> CreateBom([FromBody] BomCreateDto dto)
+        public async Task<ActionResult> CreateBom([FromBody] BomRecipeCreateDto dto)
         {
             try
             {
-                if (dto == null)
+                var validation = ValidateCreateDto(dto);
+                if (validation != null)
                 {
-                    return BadRequest(new { Message = "요청 본문이 올바르지 않습니다." });
-                }
-
-                if (dto.ParentItemID <= 0 || dto.ChildItemID <= 0 || dto.BomQty <= 0)
-                {
-                    return BadRequest(new { Message = "필수 항목(부모 품목 ID, 자식 품목 ID, 소요량)이 누락되었거나 올바르지 않습니다." });
+                    return validation;
                 }
 
                 await _bomService.CreateBomAsync(dto);
-                return Ok(new { Message = "BOM 항목이 성공적으로 등록되었습니다." });
+                return Ok(new { Message = "BOM recipe가 성공적으로 등록되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"BOM 등록 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"BOM recipe 등록 중 오류 발생: {ex.Message}" });
             }
         }
 
-        [HttpPut("{id}")]
+        private ActionResult? ValidateCreateDto(BomRecipeCreateDto? dto)
+        {
+            if (dto == null)
+            {
+                return BadRequest(new { Message = "요청 본문이 올바르지 않습니다." });
+            }
+
+            if (string.IsNullOrWhiteSpace(dto.RecipeName))
+            {
+                return BadRequest(new { Message = "레시피 이름은 필수입니다." });
+            }
+
+            if (dto.Inputs != null && dto.Inputs.Any(item => item.ItemID <= 0 || item.Qty <= 0))
+            {
+                return BadRequest(new { Message = "BOM input의 품목 ID와 수량은 0보다 커야 합니다." });
+            }
+
+            if (dto.Outputs != null && dto.Outputs.Any(item => item.ItemID <= 0 || item.Qty < 0))
+            {
+                return BadRequest(new { Message = "BOM output의 품목 ID는 0보다 커야 하고 수량은 음수일 수 없습니다." });
+            }
+
+            return null;
+        }
+
+        [HttpPost("{recipeId}/input")]
         [HasPermission(Permissions.MasterDataEdit)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult> UpdateBom(int id, [FromBody] BomUpdateDto dto)
+        public async Task<ActionResult> AddRecipeInput([FromRoute] int recipeId, [FromBody] BomRecipeCreateItemDto dto)
         {
             try
             {
-                if (dto == null)
+                if (dto == null || dto.ItemID <= 0 || dto.Qty <= 0)
                 {
-                    return BadRequest(new { Message = "요청 본문이 올바르지 않습니다." });
+                    return BadRequest(new { Message = "올바른 품목 ID와 수량을 입력해 주세요." });
                 }
+                await _bomService.AddRecipeInputAsync(recipeId, dto.ItemID, dto.Qty);
+                return Ok(new { Message = "입력 품목이 성공적으로 추가되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"입력 품목 추가 중 오류 발생: {ex.Message}" });
+            }
+        }
 
-                if (dto.BomQty <= 0)
+        [HttpPost("{recipeId}/output")]
+        [HasPermission(Permissions.MasterDataEdit)]
+        public async Task<ActionResult> AddRecipeOutput([FromRoute] int recipeId, [FromBody] BomRecipeCreateItemDto dto)
+        {
+            try
+            {
+                if (dto == null || dto.ItemID <= 0 || dto.Qty <= 0)
                 {
-                    return BadRequest(new { Message = "수정 항목(소요량)이 누락되었거나 올바르지 않습니다." });
+                    return BadRequest(new { Message = "올바른 품목 ID와 수량을 입력해 주세요." });
                 }
-
-                await _bomService.UpdateBomAsync(id, dto);
-                return Ok(new { Message = "BOM 정보가 성공적으로 수정되었습니다." });
+                await _bomService.AddRecipeOutputAsync(recipeId, dto.ItemID, dto.Qty);
+                return Ok(new { Message = "출력 품목이 성공적으로 추가되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"BOM 수정 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"출력 품목 추가 중 오류 발생: {ex.Message}" });
             }
         }
 
-        [HttpPut("{id}/step")]
+        [HttpDelete("{recipeId}/input/{itemId}")]
         [HasPermission(Permissions.MasterDataEdit)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult> UpdateBomProcess(int id, [FromBody] BomUpdateProcessDto dto)
+        public async Task<ActionResult> DeleteRecipeInput([FromRoute] int recipeId, [FromRoute] int itemId)
         {
             try
             {
-                if (dto == null)
+                await _bomService.DeleteRecipeInputAsync(recipeId, itemId);
+                return Ok(new { Message = "입력 품목이 레시피에서 삭제되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"입력 품목 삭제 중 오류 발생: {ex.Message}" });
+            }
+        }
+
+        [HttpDelete("{recipeId}/output/{itemId}")]
+        [HasPermission(Permissions.MasterDataEdit)]
+        public async Task<ActionResult> DeleteRecipeOutput([FromRoute] int recipeId, [FromRoute] int itemId)
+        {
+            try
+            {
+                await _bomService.DeleteRecipeOutputAsync(recipeId, itemId);
+                return Ok(new { Message = "출력 품목이 레시피에서 삭제되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"출력 품목 삭제 중 오류 발생: {ex.Message}" });
+            }
+        }
+
+        [HttpPut("{recipeId}/input/{itemId}")]
+        [HasPermission(Permissions.MasterDataEdit)]
+        public async Task<ActionResult> UpdateRecipeInputQty([FromRoute] int recipeId, [FromRoute] int itemId, [FromBody] UpdateQtyRequest request)
+        {
+            try
+            {
+                if (request == null || request.Qty <= 0)
                 {
-                    return BadRequest(new { Message = "요청 본문이 올바르지 않습니다." });
+                    return BadRequest(new { Message = "수량은 1 이상이어야 합니다." });
                 }
-
-                await _bomService.UpdateBomProcessStepAsync(id, dto.ProcessStepID);
-                return Ok(new { Message = "BOM 공정 매핑 정보가 성공적으로 수정되었습니다." });
+                await _bomService.UpdateRecipeInputQtyAsync(recipeId, itemId, request.Qty);
+                return Ok(new { Message = "수량이 성공적으로 수정되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"BOM 공정 매핑 수정 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"수량 수정 중 오류 발생: {ex.Message}" });
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpPut("{recipeId}/output/{itemId}")]
         [HasPermission(Permissions.MasterDataEdit)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult> DeleteBom(int id)
+        public async Task<ActionResult> UpdateRecipeOutputQty([FromRoute] int recipeId, [FromRoute] int itemId, [FromBody] UpdateQtyRequest request)
         {
             try
             {
-                await _bomService.DeleteBomAsync(id);
-                return Ok(new { Message = "BOM 항목이 성공적으로 삭제되었습니다." });
+                if (request == null || request.Qty <= 0)
+                {
+                    return BadRequest(new { Message = "수량은 1 이상이어야 합니다." });
+                }
+                await _bomService.UpdateRecipeOutputQtyAsync(recipeId, itemId, request.Qty);
+                return Ok(new { Message = "수량이 성공적으로 수정되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"BOM 삭제 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"수량 수정 중 오류 발생: {ex.Message}" });
             }
         }
 
-        [HttpPost("dummy")]
+        [HttpDelete("{recipeId}")]
         [HasPermission(Permissions.MasterDataEdit)]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(401)]
-        public async Task<ActionResult> CreateDummyBoms()
+        public async Task<ActionResult> DeleteRecipe([FromRoute] int recipeId)
         {
             try
             {
-                await _bomService.LoadScenarioBomsAsync();
-                return Ok(new { Message = "성공적으로 시나리오 BOM 데이터가 로드되었습니다." });
+                await _bomService.DeleteRecipeAsync(recipeId);
+                return Ok(new { Message = "레시피가 성공적으로 삭제되었습니다." });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = $"BOM 시나리오 데이터 로드 중 오류 발생: {ex.Message}" });
+                return StatusCode(500, new { Message = $"레시피 삭제 중 오류 발생: {ex.Message}" });
             }
         }
+
+        [HttpPut("{recipeId}/process")]
+        [HasPermission(Permissions.MasterDataEdit)]
+        public async Task<ActionResult> UpdateRecipeProcess([FromRoute] int recipeId, [FromBody] UpdateProcessRequest request)
+        {
+            try
+            {
+                await _bomService.UpdateRecipeProcessAsync(recipeId, request?.ProcessStepId);
+                return Ok(new { Message = "레시피 공정 단계가 성공적으로 업데이트되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"레시피 공정 단계 업데이트 중 오류 발생: {ex.Message}" });
+            }
+        }
+    }
+
+    public class UpdateQtyRequest
+    {
+        public int Qty { get; set; }
+    }
+
+    public class UpdateProcessRequest
+    {
+        public int? ProcessStepId { get; set; }
     }
 }

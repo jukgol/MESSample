@@ -59,7 +59,8 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
                 <th style={{ padding: '1rem' }}>자재 ID</th>
                 <th style={{ padding: '1rem' }}>자재명</th>
                 <th style={{ padding: '1rem' }}>LOT 번호</th>
-                <th style={{ padding: '1rem', textAlign: 'right' }}>수량</th>
+                <th style={{ padding: '1rem', textAlign: 'right' }}>최초 수량</th>
+                <th style={{ padding: '1rem', textAlign: 'right' }}>현재 수량</th>
                 <th style={{ padding: '1rem' }}>입고 일시</th>
                 <th style={{ padding: '1rem' }}>상태</th>
                 <th style={{ padding: '1rem', textAlign: 'center' }}>관리</th>
@@ -73,7 +74,8 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
                     <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>{lot.itemID}</td>
                     <td style={{ padding: '1rem', fontWeight: '500' }}>{lot.itemName}</td>
                     <td style={{ padding: '1rem', fontFamily: 'monospace', letterSpacing: '0.5px' }}>{lot.lotNo}</td>
-                    <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700' }}>{lot.qty?.toLocaleString()}</td>
+                    <td style={{ padding: '1rem', textAlign: 'right', color: 'var(--text-secondary)' }}>{lot.qty?.toLocaleString()}</td>
+                    <td style={{ padding: '1rem', textAlign: 'right', fontWeight: '700', color: 'white' }}>{lot.currentQty?.toLocaleString()}</td>
                     <td style={{ padding: '1rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{formatDate(lot.receivedAt)}</td>
                     <td style={{ padding: '1rem' }}>
                       <span style={{
@@ -129,7 +131,7 @@ const LotTable: React.FC<LotTableProps> = ({ lots, loading, error, onOpenUpdateM
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                  <td colSpan={9} style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
                     등록된 LOT 정보가 없습니다.
                   </td>
                 </tr>

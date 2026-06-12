@@ -81,21 +81,10 @@
         }
       }
     },
-    "/api/bom/parent/{parentId}": {
+    "/api/bom/list": {
       "get": {
         "tags": [
           "Bom"
-        ],
-        "parameters": [
-          {
-            "name": "parentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
         ],
         "responses": {
           "200": {
@@ -105,7 +94,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BomDto"
+                    "$ref": "#/components/schemas/BomRecipeListDto"
                   }
                 }
               },
@@ -113,7 +102,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BomDto"
+                    "$ref": "#/components/schemas/BomRecipeListDto"
                   }
                 }
               },
@@ -121,76 +110,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BomDto"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/bom/step/{stepId}": {
-      "get": {
-        "tags": [
-          "Bom"
-        ],
-        "parameters": [
-          {
-            "name": "stepId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BomDto"
-                  }
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BomDto"
-                  }
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BomDto"
+                    "$ref": "#/components/schemas/BomRecipeListDto"
                   }
                 }
               }
@@ -232,7 +152,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BomDto"
+                    "$ref": "#/components/schemas/BomRecipeListDto"
                   }
                 }
               },
@@ -240,7 +160,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BomDto"
+                    "$ref": "#/components/schemas/BomRecipeListDto"
                   }
                 }
               },
@@ -248,7 +168,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BomDto"
+                    "$ref": "#/components/schemas/BomRecipeListDto"
                   }
                 }
               }
@@ -284,17 +204,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BomCreateDto"
+                "$ref": "#/components/schemas/BomRecipeCreateDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/BomCreateDto"
+                "$ref": "#/components/schemas/BomRecipeCreateDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/BomCreateDto"
+                "$ref": "#/components/schemas/BomRecipeCreateDto"
               }
             }
           }
@@ -346,14 +266,14 @@
         }
       }
     },
-    "/api/bom/{id}": {
-      "put": {
+    "/api/bom/{recipeId}/input": {
+      "post": {
         "tags": [
           "Bom"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "recipeId",
             "in": "path",
             "required": true,
             "schema": {
@@ -366,17 +286,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BomUpdateDto"
+                "$ref": "#/components/schemas/BomRecipeCreateItemDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/BomUpdateDto"
+                "$ref": "#/components/schemas/BomRecipeCreateItemDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/BomUpdateDto"
+                "$ref": "#/components/schemas/BomRecipeCreateItemDto"
               }
             }
           }
@@ -384,56 +304,69 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
+          }
+        }
+      }
+    },
+    "/api/bom/{recipeId}/output": {
+      "post": {
+        "tags": [
+          "Bom"
+        ],
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BomRecipeCreateItemDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BomRecipeCreateItemDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/BomRecipeCreateItemDto"
               }
             }
           }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
         }
-      },
+      }
+    },
+    "/api/bom/{recipeId}/input/{itemId}": {
       "delete": {
         "tags": [
           "Bom"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -445,38 +378,25 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
-      }
-    },
-    "/api/bom/{id}/step": {
+      },
       "put": {
         "tags": [
           "Bom"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "itemId",
             "in": "path",
             "required": true,
             "schema": {
@@ -489,17 +409,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/BomUpdateProcessDto"
+                "$ref": "#/components/schemas/UpdateQtyRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/BomUpdateProcessDto"
+                "$ref": "#/components/schemas/UpdateQtyRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/BomUpdateProcessDto"
+                "$ref": "#/components/schemas/UpdateQtyRequest"
               }
             }
           }
@@ -507,78 +427,152 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/api/bom/dummy": {
-      "post": {
+    "/api/bom/{recipeId}/output/{itemId}": {
+      "delete": {
         "tags": [
           "Bom"
+        ],
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Bom"
+        ],
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQtyRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQtyRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateQtyRequest"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bom/{recipeId}": {
+      "delete": {
+        "tags": [
+          "Bom"
+        ],
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/bom/{recipeId}/process": {
+      "put": {
+        "tags": [
+          "Bom"
+        ],
+        "parameters": [
+          {
+            "name": "recipeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProcessRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProcessRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProcessRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -5518,55 +5512,89 @@
         },
         "additionalProperties": false
       },
-      "BomCreateDto": {
+      "BomRecipeCreateDto": {
         "type": "object",
         "properties": {
-          "parentItemID": {
-            "type": "integer",
-            "format": "int32"
+          "recipeCode": {
+            "type": "string",
+            "nullable": true
           },
-          "childItemID": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "bomQty": {
-            "type": "integer",
-            "format": "int32"
+          "recipeName": {
+            "type": "string",
+            "nullable": true
           },
           "processStepID": {
             "type": "integer",
             "format": "int32",
             "nullable": true
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomRecipeCreateItemDto"
+            },
+            "nullable": true
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomRecipeCreateItemDto"
+            },
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
-      "BomDto": {
+      "BomRecipeCreateItemDto": {
         "type": "object",
         "properties": {
-          "bomID": {
+          "itemID": {
             "type": "integer",
             "format": "int32"
           },
-          "parentItemID": {
+          "qty": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BomRecipeItemDto": {
+        "type": "object",
+        "properties": {
+          "itemID": {
             "type": "integer",
             "format": "int32"
           },
-          "parentItemName": {
+          "itemCode": {
             "type": "string",
             "nullable": true
           },
-          "childItemID": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "childItemName": {
+          "itemName": {
             "type": "string",
             "nullable": true
           },
-          "bomQty": {
+          "qty": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "BomRecipeListDto": {
+        "type": "object",
+        "properties": {
+          "bomRecipeID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recipeCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "recipeName": {
+            "type": "string",
+            "nullable": true
           },
           "processStepID": {
             "type": "integer",
@@ -5576,31 +5604,23 @@
           "processStepName": {
             "type": "string",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "BomUpdateDto": {
-        "type": "object",
-        "properties": {
-          "bomQty": {
-            "type": "integer",
-            "format": "int32"
           },
-          "processStepID": {
-            "type": "integer",
-            "format": "int32",
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomRecipeItemDto"
+            },
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "BomUpdateProcessDto": {
-        "type": "object",
-        "properties": {
-          "processStepID": {
-            "type": "integer",
-            "format": "int32",
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BomRecipeItemDto"
+            },
             "nullable": true
           }
         },
@@ -7246,6 +7266,27 @@
               "$ref": "#/components/schemas/ColumnMetadata"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateProcessRequest": {
+        "type": "object",
+        "properties": {
+          "processStepId": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateQtyRequest": {
+        "type": "object",
+        "properties": {
+          "qty": {
+            "type": "integer",
+            "format": "int32"
           }
         },
         "additionalProperties": false

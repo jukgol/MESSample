@@ -1,58 +1,59 @@
 import React, { useState, useEffect } from 'react';
-import { Info } from 'lucide-react';
 import type { Item } from '../../item/hooks/useItems';
 import type { ProcessStep } from '../../step/hooks/useProcessSteps';
 
 interface BomCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  selectedParentItem: Item | null;
-  availableChildItems: Item[];
+  items: Item[];
   processSteps: ProcessStep[];
-  onSubmit: (dto: { childItemID: number; bomQty: number; processStepID?: number | null }) => Promise<boolean>;
+  onSubmit: (dto: { recipeCode?: string; recipeName: string; processStepID?: number | null; outputItemID?: number | null }) => Promise<boolean>;
 }
 
 const BomCreateModal: React.FC<BomCreateModalProps> = ({
   isOpen,
   onClose,
-  selectedParentItem,
-  availableChildItems,
+  items,
   processSteps,
   onSubmit
 }) => {
-  const [form, setForm] = useState<{ childItemID: string; bomQty: number | ''; processStepID: string }>({
-    childItemID: '',
-    bomQty: 1,
-    processStepID: ''
+  const [form, setForm] = useState<{
+    recipeCode: string;
+    recipeName: string;
+    processStepID: string;
+    outputItemID: string;
+  }>({
+    recipeCode: '',
+    recipeName: '',
+    processStepID: '',
+    outputItemID: ''
   });
 
   useEffect(() => {
     if (isOpen) {
       setForm({
-        childItemID: '',
-        bomQty: 1,
-        processStepID: ''
+        recipeCode: '',
+        recipeName: '',
+        processStepID: '',
+        outputItemID: ''
       });
     }
   }, [isOpen]);
 
-  if (!isOpen || !selectedParentItem) return null;
+  if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.childItemID) {
-      alert('입력 품목을 선택해 주세요.');
-      return;
-    }
-    if (form.bomQty === '' || Number(form.bomQty) <= 0) {
-      alert('소요량은 1개 이상이어야 합니다.');
+    if (!form.recipeName.trim()) {
+      alert('레시피 이름을 입력해 주세요.');
       return;
     }
 
     const success = await onSubmit({
-      childItemID: Number(form.childItemID),
-      bomQty: Number(form.bomQty),
-      processStepID: form.processStepID === '' ? null : Number(form.processStepID)
+      recipeCode: form.recipeCode.trim() || undefined,
+      recipeName: form.recipeName.trim(),
+      processStepID: form.processStepID === '' ? null : Number(form.processStepID),
+      outputItemID: form.outputItemID === '' ? null : Number(form.outputItemID)
     });
 
     if (success) {
@@ -68,47 +69,79 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
       display: 'flex', justifyContent: 'center', alignItems: 'center',
       zIndex: 1000
     }}>
-      <div className="premium-card" style={{ width: '450px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#1e1e24', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
-        <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.4rem' }}>BOM 구성 요소 추가</h2>
-        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '6px' }}>
-          <strong>기준 출력 품목:</strong> {selectedParentItem.name} (ID: {selectedParentItem.id})
-        </div>
+      <div className="premium-card" style={{ width: '480px', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: '#1e1e24', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
+        <h2 className="gradient-text" style={{ margin: 0, fontSize: '1.4rem' }}>새 BOM 레시피 추가</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>
+          기본 정보 및 선택적으로 출력 품목/공정을 입력하여 새로운 레시피 껍데기를 생성합니다.
+        </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>추가할 입력 품목</label>
-            {availableChildItems.length > 0 ? (
-              <select
-                required
-                value={form.childItemID}
-                onChange={(e) => setForm({ ...form, childItemID: e.target.value })}
-                style={{
-                  padding: '0.8rem',
-                  background: 'rgba(0,0,0,0.4)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: '8px',
-                  color: 'white',
-                  outline: 'none',
-                  fontSize: '0.95rem'
-                }}
-              >
-                <option value="" style={{ background: '#1e1e24' }}>-- 품목 선택 --</option>
-                {availableChildItems.map((item) => (
-                  <option key={item.id} value={item.id} style={{ background: '#1e1e24' }}>
-                    [{item.category}] {item.name} (ID: {item.id})
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <div style={{ color: '#fbbf24', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px', padding: '8px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '6px' }}>
-                <Info size={16} /> 추가 가능한 다른 입력 품목이 존재하지 않습니다.
-              </div>
-            )}
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>레시피명 (필수)</label>
+            <input
+              type="text"
+              required
+              placeholder="예: 신라면 레시피"
+              value={form.recipeName}
+              onChange={(e) => setForm({ ...form, recipeName: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none',
+                fontSize: '0.95rem'
+              }}
+            />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>투입될 공정 단계 (선택)</label>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>레시피 코드 (선택)</label>
+            <input
+              type="text"
+              placeholder="예: RECIPE_SHIN_01 (미입력 시 자동 생성)"
+              value={form.recipeCode}
+              onChange={(e) => setForm({ ...form, recipeCode: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none',
+                fontSize: '0.95rem'
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>출력 품목 (선택)</label>
+            <select
+              value={form.outputItemID}
+              onChange={(e) => setForm({ ...form, outputItemID: e.target.value })}
+              style={{
+                padding: '0.8rem',
+                background: 'rgba(0,0,0,0.4)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px',
+                color: 'white',
+                outline: 'none',
+                fontSize: '0.95rem'
+              }}
+            >
+              <option value="" style={{ background: '#1e1e24' }}>-- 출력 품목 선택 안함 --</option>
+              {items.map((item) => (
+                <option key={item.id} value={item.id} style={{ background: '#1e1e24' }}>
+                  [{item.category}] {item.name} (ID: {item.id})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>연결 공정 단계 (선택)</label>
             <select
               value={form.processStepID}
               onChange={(e) => setForm({ ...form, processStepID: e.target.value })}
@@ -122,37 +155,13 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
                 fontSize: '0.95rem'
               }}
             >
-              <option value="" style={{ background: '#1e1e24' }}>-- 연결 없음 (미지정) --</option>
+              <option value="" style={{ background: '#1e1e24' }}>-- 연결 공정 선택 안함 --</option>
               {processSteps.map((step) => (
                 <option key={step.stepID} value={step.stepID} style={{ background: '#1e1e24' }}>
                   Seq {step.seqNo}: {step.stepName} ({step.stepType})
                 </option>
               ))}
             </select>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-            <label style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>소요 수량 (Qty)</label>
-            <input
-              type="number"
-              required
-              min={1}
-              placeholder="예: 1"
-              value={form.bomQty}
-              onChange={(e) => {
-                const val = e.target.value;
-                setForm({ ...form, bomQty: val === '' ? '' : Number(val) });
-              }}
-              style={{
-                padding: '0.8rem',
-                background: 'rgba(0,0,0,0.4)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '8px',
-                color: 'white',
-                outline: 'none',
-                fontSize: '0.95rem'
-              }}
-            />
           </div>
 
           <div style={{ display: 'flex', gap: '10px', marginTop: '0.5rem', justifyContent: 'flex-end' }}>
@@ -170,9 +179,14 @@ const BomCreateModal: React.FC<BomCreateModalProps> = ({
             </button>
             <button 
               type="submit"
-              disabled={availableChildItems.length === 0}
+              style={{
+                background: 'var(--primary-color, #6366f1)',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer'
+              }}
             >
-              추가
+              레시피 등록
             </button>
           </div>
         </form>

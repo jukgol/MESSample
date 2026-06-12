@@ -1,107 +1,136 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useItems } from '../../item/hooks/useItems';
 import { useBoms } from '../hooks/useBoms';
-import type { Bom } from '../hooks/useBoms';
 import { useProcessSteps } from '../../step/hooks/useProcessSteps';
 import BomParentList from '../components/BomParentList';
-import BomDetailTable from '../components/BomDetailTable';
+import BomRecipeDetailPanel from '../components/BomRecipeDetailPanel';
+import BomItemListPanel from '../components/BomItemListPanel';
 import BomCreateModal from '../components/BomCreateModal';
-import BomUpdateModal from '../components/BomUpdateModal';
-import BomDeleteModal from '../components/BomDeleteModal';
 import BomHeader from '../components/BomHeader';
 import BomErrorAlert from '../components/BomErrorAlert';
 import BomLayout from '../components/BomLayout';
 import BomActionBar from '../components/BomActionBar';
 
 const BomManagePage: React.FC = () => {
-  // 전체 품목 리스트 가져오기
+  // 전체 품목 리스트
   const { items, loading: itemsLoading, error: itemsError, fetchItems } = useItems();
 
-  // 전체 공정 리스트 가져오기
+  // 전체 공정 리스트
   const { processSteps } = useProcessSteps();
 
-  // BOM CRUD 훅
+  // BOM CRUD 및 레시피 조회 훅
   const {
-    boms,
+    recipes,
     loading: bomsLoading,
     error: bomsError,
-    fetchBomsByParent,
-    createBom,
-    updateBom,
-    deleteBom,
-    generateDummyBoms
+    fetchRecipeList,
+    createRecipe,
+    addRecipeInput,
+    addRecipeOutput,
+    removeRecipeInput,
+    removeRecipeOutput,
+    updateRecipeInputQty,
+    updateRecipeOutputQty,
+    deleteRecipe
   } = useBoms();
 
-  // 선택된 부모 품목 ID 상태
-  const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
+  // 선택된 레시피 ID 상태
+  const [selectedRecipeId, setSelectedRecipeId] = useState<number | null>(null);
 
-  // 모달 활성화 상태
+  // 모달 활성화 상태 (레시피 추가 모달)
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  // 선택된 대상 BOM 객체 상태
-  const [selectedBomForUpdate, setSelectedBomForUpdate] = useState<Bom | null>(null);
-  const [selectedBomIdForDelete, setSelectedBomIdForDelete] = useState<number | null>(null);
+  // 컴포넌트 마운트 시 데이터 로드
+  useEffect(() => {
+    fetchItems();
+    fetchRecipeList();
+  }, [fetchItems, fetchRecipeList]);
 
-  // 현재 선택된 부모 품목 정보 객체
-  const selectedParentItem = useMemo(() => {
-    if (!selectedParentId) return null;
-    return items.find(item => Number(item.id) === selectedParentId) || null;
-  }, [items, selectedParentId]);
+  // 현재 선택된 레시피 객체
+  const selectedRecipe = useMemo(() => {
+    if (selectedRecipeId === null) return null;
+    return recipes.find(r => Number(r.bomRecipeID) === selectedRecipeId) || null;
+  }, [recipes, selectedRecipeId]);
 
-  // 자식 품목으로 선택 가능한 리스트 (부모 품목 및 이미 등록된 자식 품목을 제외하고 드롭다운에 출력)
-  const availableChildItems = useMemo(() => {
-    if (!selectedParentId) return [];
-
-    // 이미 등록된 자식 품목 ID 세트
-    const registeredChildIds = new Set(boms.map(bom => bom.childItemID));
-
-    // 자기 자신(부모) 및 이미 등록된 자식 품목을 제외
-    return items.filter(item => {
-      const itemIdNum = Number(item.id);
-      return itemIdNum !== selectedParentId && !registeredChildIds.has(itemIdNum);
-    });
-  }, [items, selectedParentId, boms]);
-
-  // 부모 품목 선택 핸들러
-  const handleSelectParent = (id: number) => {
-    setSelectedParentId(id);
-    fetchBomsByParent(id);
+  // 레시피 선택 핸들러
+  const handleSelectRecipe = (recipeId: number) => {
+    setSelectedRecipeId(recipeId);
   };
 
-  // 등록 처리
-  const handleCreateSubmit = async (dto: { childItemID: number; bomQty: number; processStepID?: number | null }) => {
-    if (!selectedParentId) return false;
-
-    const success = await createBom({
-      parentItemID: selectedParentId,
-      childItemID: dto.childItemID,
-      bomQty: dto.bomQty,
-      processStepID: dto.processStepID
-    });
-
+  // 신규 레시피 등록 처리
+  const handleCreateSubmit = async (dto: { recipeCode?: string; recipeName: string; processStepID?: number | null; outputItemID?: number | null }) => {
+    const success = await createRecipe(dto);
+    if (success) {
+      await fetchRecipeList();
+    }
     return success;
   };
 
-  // 수정 처리
-  const handleUpdateSubmit = async (dto: { bomQty: number; processStepID?: number | null }) => {
-    if (!selectedParentId || !selectedBomForUpdate) return false;
-
-    const success = await updateBom(selectedBomForUpdate.bomID, selectedParentId, {
-      bomQty: dto.bomQty,
-      processStepID: dto.processStepID
-    });
-
-    return success;
+  // 레시피 입력 품목 추가
+  const handleAddInput = async (itemId: number) => {
+    if (selectedRecipeId === null) return;
+    const success = await addRecipeInput(selectedRecipeId, itemId, 1);
+    if (success) {
+      await fetchRecipeList();
+    }
   };
 
-  // 삭제 처리
-  const handleDeleteConfirm = async () => {
-    if (!selectedParentId || selectedBomIdForDelete === null) return false;
+  // 레시피 출력 품목 추가
+  const handleAddOutput = async (itemId: number) => {
+    if (selectedRecipeId === null) return;
+    const success = await addRecipeOutput(selectedRecipeId, itemId, 1);
+    if (success) {
+      await fetchRecipeList();
+    }
+  };
 
-    const success = await deleteBom(selectedBomIdForDelete, selectedParentId);
-    return success;
+  // 레시피 입력 품목 제거
+  const handleRemoveInput = async (itemId: number) => {
+    if (selectedRecipeId === null) return;
+    if (!confirm('이 입력 자재를 레시피에서 제외하시겠습니까?')) return;
+    const success = await removeRecipeInput(selectedRecipeId, itemId);
+    if (success) {
+      await fetchRecipeList();
+    }
+  };
+
+  // 레시피 출력 품목 제거
+  const handleRemoveOutput = async (itemId: number) => {
+    if (selectedRecipeId === null) return;
+    if (!confirm('이 출력 제품을 레시피에서 제외하시겠습니까?')) return;
+    const success = await removeRecipeOutput(selectedRecipeId, itemId);
+    if (success) {
+      await fetchRecipeList();
+    }
+  };
+
+  // 레시피 입력 품목 수량 수정
+  const handleUpdateInputQty = async (itemId: number, qty: number) => {
+    if (selectedRecipeId === null) return;
+    const success = await updateRecipeInputQty(selectedRecipeId, itemId, qty);
+    if (success) {
+      await fetchRecipeList();
+    }
+  };
+
+  // 레시피 출력 품목 수량 수정
+  const handleUpdateOutputQty = async (itemId: number, qty: number) => {
+    if (selectedRecipeId === null) return;
+    const success = await updateRecipeOutputQty(selectedRecipeId, itemId, qty);
+    if (success) {
+      await fetchRecipeList();
+    }
+  };
+
+  // 레시피 완전히 삭제
+  const handleDeleteRecipe = async (recipeId: number) => {
+    const success = await deleteRecipe(recipeId);
+    if (success) {
+      if (selectedRecipeId === recipeId) {
+        setSelectedRecipeId(null);
+      }
+      await fetchRecipeList();
+    }
   };
 
   return (
@@ -114,81 +143,52 @@ const BomManagePage: React.FC = () => {
 
       {/* 3. 액션 바 */}
       <BomActionBar
-        onGenerateDummy={async () => {
-          await generateDummyBoms(selectedParentId || undefined);
-          await fetchItems();
-        }}
         onRefresh={async () => {
           await fetchItems();
-          if (selectedParentId) {
-            await fetchBomsByParent(selectedParentId);
-          }
+          await fetchRecipeList();
         }}
         onOpenCreate={() => setIsCreateOpen(true)}
         loading={itemsLoading || bomsLoading}
-        hasParentSelected={selectedParentId !== null}
       />
 
-      {/* 4. 2-Pane 레이아웃 그리드 */}
+      {/* 4. 3-Pane 레이아웃 그리드 */}
       <BomLayout
         left={
           <BomParentList
-            items={items}
-            loading={itemsLoading}
-            selectedItemId={selectedParentId}
-            onSelectItem={handleSelectParent}
+            recipes={recipes}
+            loading={bomsLoading}
+            selectedRecipeId={selectedRecipeId}
+            onSelectRecipe={handleSelectRecipe}
+            onDeleteRecipe={handleDeleteRecipe}
+          />
+        }
+        middle={
+          <BomRecipeDetailPanel
+            selectedRecipe={selectedRecipe}
+            loading={bomsLoading}
+            onRemoveInput={handleRemoveInput}
+            onRemoveOutput={handleRemoveOutput}
+            onUpdateInputQty={handleUpdateInputQty}
+            onUpdateOutputQty={handleUpdateOutputQty}
           />
         }
         right={
-          <BomDetailTable
-            selectedItem={selectedParentItem}
-            boms={boms}
-            loading={bomsLoading}
-            error={bomsError}
-            onOpenUpdateModal={(bom) => {
-              setSelectedBomForUpdate(bom);
-              setIsUpdateOpen(true);
-            }}
-            onDelete={(id) => {
-              setSelectedBomIdForDelete(id);
-              setIsDeleteOpen(true);
-            }}
+          <BomItemListPanel
+            items={items}
+            onAddInput={handleAddInput}
+            onAddOutput={handleAddOutput}
+            hasSelectedRecipe={selectedRecipeId !== null}
           />
         }
       />
 
-      {/* BOM 항목 신규 등록 모달 */}
+      {/* BOM 레시피 신규 등록 모달 */}
       <BomCreateModal
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
-        selectedParentItem={selectedParentItem}
-        availableChildItems={availableChildItems}
+        items={items}
         processSteps={processSteps}
         onSubmit={handleCreateSubmit}
-      />
-
-      {/* BOM 소요량 수정 모달 */}
-      <BomUpdateModal
-        isOpen={isUpdateOpen}
-        onClose={() => {
-          setIsUpdateOpen(false);
-          setSelectedBomForUpdate(null);
-        }}
-        selectedParentItem={selectedParentItem}
-        selectedBomForUpdate={selectedBomForUpdate}
-        processSteps={processSteps}
-        onSubmit={handleUpdateSubmit}
-      />
-
-      {/* BOM 항목 삭제 확인 모달 */}
-      <BomDeleteModal
-        isOpen={isDeleteOpen}
-        onClose={() => {
-          setIsDeleteOpen(false);
-          setSelectedBomIdForDelete(null);
-        }}
-        bomId={selectedBomIdForDelete}
-        onConfirm={handleDeleteConfirm}
       />
     </div>
   );
