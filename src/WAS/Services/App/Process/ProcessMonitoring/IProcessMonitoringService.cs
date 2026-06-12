@@ -16,6 +16,7 @@ namespace WAS.Services.App
         Task<IEnumerable<ProcessStepExecutionDto>> GetAllExecutionsAsync();
         Task<ProcessStepExecutionDto?> GetExecutionByIdAsync(int executionId);
         Task CreateExecutionAsync(ProcessStepExecutionCreateDto dto);
+        Task StartExecutionAsync(int executionId);
         Task<IEnumerable<ProcessInputDto>> GetInputsAsync(int executionId);
         Task CreateInputAsync(int executionId, ProcessInputCreateDto dto);
         Task UpdateInputQuantityAsync(int inputId, ProcessInputQuantityUpdateDto dto);
@@ -24,7 +25,5 @@ namespace WAS.Services.App
         Task UpdateOutputQuantityAsync(int outputId, ProcessOutputQuantityUpdateDto dto);
         Task<StartToolSignalResponseDto> SendStartToolStartAsync(StartToolSignalRequestDto? dto);
         Task<StartToolSignalResponseDto> SendStartToolStopAsync(StartToolSignalRequestDto? dto);
-        Task<int> InjectAllInputsAsync(string workOrderNo);
-        Task<ProcessInputInjectionDiagnosticsDto> GetInputInjectionDiagnosticsAsync(string workOrderNo);
     }
 }

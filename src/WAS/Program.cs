@@ -46,6 +46,18 @@ using (var scope = app.Services.CreateScope())
     var rolePermissionService = scope.ServiceProvider.GetRequiredService<WAS.Services.App.IRolePermissionService>();
     await rolePermissionService.InitializeCacheAsync();
 
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    try
+    {
+        var processMonitoringService = scope.ServiceProvider.GetRequiredService<WAS.Services.App.IProcessMonitoringService>();
+        await processMonitoringService.ReloadCurrentStateAsync();
+        logger.LogInformation("Process monitoring state restored from latest approved work orders by process master.");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "Failed to restore process monitoring state on startup.");
+    }
+
 }
 
 // 애플리케이션 종료 시 이벤트 핸들러 등록

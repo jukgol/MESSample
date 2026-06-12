@@ -211,6 +211,8 @@ namespace WAS.Services.App
             var statuses = executions.Select(row => row.Status).ToList();
             if (statuses.Any(status => status == "RUNNING")) return "RUNNING";
             if (statuses.Any(status => status == "PAUSED")) return "PAUSED";
+            if (statuses.Any(status => status == "FAILED")) return "FAILED";
+            if (statuses.Count > 0 && statuses.All(status => status == "DONE")) return "DONE";
             return "WAITING";
         }
 

@@ -79,6 +79,10 @@ namespace WAS.Services.App
                     "App/WorkOrder/CREATE_WORK_ORDER_STEP_EXECUTIONS",
                     new { WorkOrderNo = workOrderNo });
 
+                await _scriptExecutor.ExecuteNonQueryAsync(
+                    "App/WorkOrder/RESERVE_WORK_ORDER_INPUT_LOTS",
+                    new { WorkOrderNo = workOrderNo });
+
                 await _processMonitoringService.AddWorkOrderToCurrentStateAsync(workOrderNo);
             }
 

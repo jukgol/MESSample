@@ -25,7 +25,6 @@ const ProcessMonitoringPage: React.FC = () => {
       <ProcessMonitoringHeader 
         loading={loading} 
         onRefresh={fetchCurrentWorkOrders} 
-        selectedWorkOrderNo={selectedWorkOrder?.workOrderNo}
       />
       <ProcessMonitoringErrorAlert message={error} />
 
