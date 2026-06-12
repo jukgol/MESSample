@@ -13,7 +13,8 @@ const ProcessMonitoringPage: React.FC = () => {
     loading,
     error,
     fetchCurrentWorkOrders,
-    selectWorkOrder
+    selectWorkOrder,
+    deleteCurrentProcessMaster
   } = useProcessMonitoring();
 
   useEffect(() => {
@@ -33,6 +34,7 @@ const ProcessMonitoringPage: React.FC = () => {
         selectedWorkOrderId={selectedWorkOrderId}
         loading={loading}
         onSelectWorkOrder={selectWorkOrder}
+        onDeleteProcessMaster={deleteCurrentProcessMaster}
       />
 
       <section style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', minHeight: 0 }}>

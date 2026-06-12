@@ -5,6 +5,8 @@ SELECT wo.work_order_id AS WorkOrderID,
        wo.order_qty AS OrderQty,
        wo.worker_name AS WorkerName,
        CASE
+           WHEN COUNT(pse.process_step_execution_id) > 0
+                AND SUM(CASE WHEN pse.status = 'DELETED' THEN 1 ELSE 0 END) = COUNT(pse.process_step_execution_id) THEN 'DELETED'
            WHEN SUM(CASE WHEN pse.status = 'RUNNING' THEN 1 ELSE 0 END) > 0 THEN 'RUNNING'
            WHEN SUM(CASE WHEN pse.status = 'PAUSED' THEN 1 ELSE 0 END) > 0 THEN 'PAUSED'
            WHEN COUNT(pse.process_step_execution_id) > 0

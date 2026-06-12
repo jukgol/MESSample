@@ -48,6 +48,22 @@ export class ProcessMonitoring<
    * No description
    *
    * @tags ProcessMonitoring
+   * @name ProcessMonitoringCurrentProcessMastersDelete
+   * @request DELETE:/api/process-monitoring/current/process-masters/{processMasterId}
+   */
+  processMonitoringCurrentProcessMastersDelete = (
+    processMasterId: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ProblemDetails>({
+      path: `/api/process-monitoring/current/process-masters/${processMasterId}`,
+      method: "DELETE",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
    * @name ProcessMonitoringCurrentWorkOrdersDetail
    * @request GET:/api/process-monitoring/current/work-orders/{workOrderId}
    */
@@ -142,6 +158,38 @@ export class ProcessMonitoring<
       path: `/api/process-monitoring/executions/${executionId}`,
       method: "GET",
       format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
+   * @name ProcessMonitoringExecutionsStartCreate
+   * @request POST:/api/process-monitoring/executions/{executionId}/start
+   */
+  processMonitoringExecutionsStartCreate = (
+    executionId: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ProblemDetails>({
+      path: `/api/process-monitoring/executions/${executionId}/start`,
+      method: "POST",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
+   * @name ProcessMonitoringExecutionsCompleteCreate
+   * @request POST:/api/process-monitoring/executions/{executionId}/complete
+   */
+  processMonitoringExecutionsCompleteCreate = (
+    executionId: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ProblemDetails>({
+      path: `/api/process-monitoring/executions/${executionId}/complete`,
+      method: "POST",
       ...params,
     });
   /**
@@ -295,26 +343,6 @@ export class ProcessMonitoring<
       method: "POST",
       body: data,
       type: ContentType.Json,
-      format: "json",
-      ...params,
-    });
-  /**
-   * No description
-   *
-   * @tags ProcessMonitoring
-   * @name ProcessMonitoringStarttoolInputAllCreate
-   * @request POST:/api/process-monitoring/starttool/input-all
-   */
-  processMonitoringStarttoolInputAllCreate = (
-    query?: {
-      workOrderNo?: string;
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<StartToolSignalResponseDto, ProblemDetails | void>({
-      path: `/api/process-monitoring/starttool/input-all`,
-      method: "POST",
-      query: query,
       format: "json",
       ...params,
     });

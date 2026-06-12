@@ -387,6 +387,15 @@ export interface PlcEquipmentDataReceiveResponseDto {
   message?: string | null;
 }
 
+export interface PlcEquipmentProductionRequestDto {
+  equipmentID?: string | null;
+  event?: string | null;
+  /** @format int32 */
+  qty?: number | null;
+  /** @format date-time */
+  occurredAt?: string | null;
+}
+
 export interface PlcEquipmentStateRequestDto {
   equipmentID?: string | null;
   state?: string | null;

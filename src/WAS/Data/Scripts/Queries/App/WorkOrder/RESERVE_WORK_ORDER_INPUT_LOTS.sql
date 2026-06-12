@@ -82,4 +82,4 @@ BEGIN
             CURRENT_TIMESTAMP
         );
     END LOOP;
-END;
+END; -- query end

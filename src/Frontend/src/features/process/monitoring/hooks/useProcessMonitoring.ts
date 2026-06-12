@@ -46,6 +46,21 @@ export const useProcessMonitoring = () => {
     setSelectedWorkOrderId(workOrderId);
   }, []);
 
+  const deleteCurrentProcessMaster = useCallback(async (processMasterId: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await api.api.processMonitoringCurrentProcessMastersDelete(processMasterId);
+      await fetchCurrentWorkOrders();
+    } catch (err: any) {
+      console.error('Failed to delete current process master:', err);
+      const serverMsg = err.response?.data?.message || err.response?.data?.Message || err.message;
+      setError(`현재 공정을 삭제하지 못했습니다: ${serverMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchCurrentWorkOrders]);
+
   useEffect(() => {
     const token = useAuthStore.getState().token;
     if (!token) return;
@@ -112,6 +127,7 @@ export const useProcessMonitoring = () => {
     loading,
     error,
     fetchCurrentWorkOrders,
-    selectWorkOrder
+    selectWorkOrder,
+    deleteCurrentProcessMaster
   };
 };

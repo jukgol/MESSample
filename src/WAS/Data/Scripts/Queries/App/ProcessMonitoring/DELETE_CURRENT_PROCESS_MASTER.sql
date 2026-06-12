@@ -70,4 +70,4 @@ BEGIN
 EXCEPTION
     WHEN NO_DATA_FOUND THEN
         NULL;
-END;
+END; -- query end

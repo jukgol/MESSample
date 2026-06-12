@@ -12,6 +12,7 @@
 
 import {
   PlcEquipmentDataReceiveResponseDto,
+  PlcEquipmentProductionRequestDto,
   PlcEquipmentStateRequestDto,
   PlcEquipmentStateResponseDto,
   ProblemDetails,
@@ -54,6 +55,24 @@ export class PlcEquipmentData<
       body: data,
       type: ContentType.Json,
       format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags PlcEquipmentData
+   * @name PlcEquipmentDataProductionCreate
+   * @request POST:/api/plc/equipment-data/production
+   */
+  plcEquipmentDataProductionCreate = (
+    data: PlcEquipmentProductionRequestDto,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ProblemDetails | void>({
+      path: `/api/plc/equipment-data/production`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
       ...params,
     });
 }

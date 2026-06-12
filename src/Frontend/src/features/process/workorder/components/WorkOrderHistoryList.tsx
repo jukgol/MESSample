@@ -12,7 +12,8 @@ const statusLabels: Record<string, string> = {
   WAITING: '대기',
   RUNNING: '진행중',
   PAUSED: '일시정지',
-  DONE: '완료'
+  DONE: '완료',
+  DELETED: '삭제됨'
 };
 
 const WorkOrderHistoryList: React.FC<WorkOrderHistoryListProps> = ({ history, loading }) => {

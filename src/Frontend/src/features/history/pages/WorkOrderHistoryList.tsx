@@ -44,12 +44,15 @@ const WorkOrderHistoryList: React.FC = () => {
     const s = status ? status.toUpperCase() : '';
     switch (s) {
       case 'COMPLETED':
+      case 'DONE':
         return { bg: 'rgba(16, 185, 129, 0.1)', border: 'rgba(16, 185, 129, 0.2)', color: '#34d399', text: '완료' };
       case 'RUNNING':
         return { bg: 'rgba(99, 102, 241, 0.1)', border: 'rgba(99, 102, 241, 0.2)', color: '#818cf8', text: '진행중' };
       case 'CREATED':
       case 'APPROVED':
         return { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.2)', color: '#60a5fa', text: '승인됨' };
+      case 'DELETED':
+        return { bg: 'rgba(239, 68, 68, 0.1)', border: 'rgba(239, 68, 68, 0.2)', color: '#ef4444', text: '삭제됨' };
       default:
         return { bg: 'rgba(156, 163, 175, 0.1)', border: 'rgba(156, 163, 175, 0.2)', color: '#9ca3af', text: status || '대기' };
     }
@@ -129,6 +132,8 @@ const WorkOrderHistoryList: React.FC = () => {
             <option value="CREATED">CREATED</option>
             <option value="RUNNING">RUNNING</option>
             <option value="COMPLETED">COMPLETED</option>
+            <option value="DONE">DONE</option>
+            <option value="DELETED">DELETED</option>
           </select>
         </div>
       </div>

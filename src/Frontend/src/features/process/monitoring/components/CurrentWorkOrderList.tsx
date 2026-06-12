@@ -7,6 +7,7 @@ interface CurrentWorkOrderListProps {
   selectedWorkOrderId: number | null;
   loading: boolean;
   onSelectWorkOrder: (workOrderId: number) => void;
+  onDeleteProcessMaster: (processMasterId: number) => void;
 }
 
 const formatDateTime = (value?: string | null) => {
@@ -45,7 +46,8 @@ const CurrentWorkOrderList: React.FC<CurrentWorkOrderListProps> = ({
   workOrders,
   selectedWorkOrderId,
   loading,
-  onSelectWorkOrder
+  onSelectWorkOrder,
+  onDeleteProcessMaster
 }) => {
   if (workOrders.length === 0) {
     return (
@@ -91,7 +93,13 @@ const CurrentWorkOrderList: React.FC<CurrentWorkOrderListProps> = ({
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    alert(`삭제 요청: ${workOrder.workOrderNo}`);
+                    if (workOrder.processMasterID) {
+                      if (confirm(`정말 ${workOrder.workOrderNo || '이 작업지시'}의 전체 공정을 삭제하시겠습니까?`)) {
+                        onDeleteProcessMaster(workOrder.processMasterID);
+                      }
+                    } else {
+                      alert('삭제 가능한 공정 마스터 ID가 없습니다.');
+                    }
                   }}
                   style={{
                     padding: '0.2rem 0.45rem',
