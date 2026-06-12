@@ -111,6 +111,24 @@ namespace Shared.Models.App
         public int WorkOrderID { get; set; }
     }
 
+    public class ProcessMonitoringOutputTraceDto
+    {
+        public int LotID { get; set; }
+        public int OutputQty { get; set; }
+    }
+
+    public class ProcessOutputCountDto
+    {
+        public int OutputCount { get; set; }
+    }
+
+    public class ProcessOutputInitialContextDto
+    {
+        public string WorkOrderNo { get; set; } = string.Empty;
+        public int OrderQty { get; set; }
+        public int OutputItemID { get; set; }
+    }
+
     public class CurrentWorkOrderStateDto
     {
         public int WorkOrderID { get; set; }

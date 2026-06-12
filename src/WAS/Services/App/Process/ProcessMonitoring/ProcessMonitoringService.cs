@@ -10,17 +10,23 @@ namespace WAS.Services.App
     public class ProcessMonitoringService : IProcessMonitoringService
     {
         private readonly IScriptExecutor _scriptExecutor;
+        private readonly IProcessInputService _processInputService;
+        private readonly IProcessOutputService _processOutputService;
         private readonly IProcessMonitoringStateStore _stateStore;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _startToolBaseUrl;
 
         public ProcessMonitoringService(
             IScriptExecutor scriptExecutor,
+            IProcessInputService processInputService,
+            IProcessOutputService processOutputService,
             IProcessMonitoringStateStore stateStore,
             IHttpClientFactory httpClientFactory,
             IConfiguration configuration)
         {
             _scriptExecutor = scriptExecutor;
+            _processInputService = processInputService;
+            _processOutputService = processOutputService;
             _stateStore = stateStore;
             _httpClientFactory = httpClientFactory;
             _startToolBaseUrl = configuration["StartTool:BaseUrl"] ?? "http://localhost:9090";
@@ -142,6 +148,7 @@ namespace WAS.Services.App
                 "App/ProcessMonitoring/START_EXECUTION",
                 new { ExecutionId = executionId });
 
+            await _processOutputService.EnsureInitialOutputAsync(executionId);
             await RefreshWorkOrderByExecutionAsync(executionId);
 
             var currentStep = _stateStore.GetCurrentStepByExecution(executionId);
@@ -169,32 +176,13 @@ namespace WAS.Services.App
 
         public async Task CreateInputAsync(int executionId, ProcessInputCreateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync(
-                "App/ProcessMonitoring/CREATE_INPUT",
-                new
-                {
-                    ExecutionId = executionId,
-                    LotId = dto.LotID,
-                    ItemId = dto.ItemID,
-                    InputQty = dto.InputQty,
-                    UsedQty = dto.UsedQty,
-                    RemainQty = dto.RemainQty ?? dto.InputQty - dto.UsedQty
-                });
-
+            await _processInputService.CreateInputAsync(executionId, dto);
             await RefreshWorkOrderByExecutionAsync(executionId);
         }
 
         public async Task UpdateInputQuantityAsync(int inputId, ProcessInputQuantityUpdateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync(
-                "App/ProcessMonitoring/UPDATE_INPUT_QUANTITY",
-                new
-                {
-                    InputId = inputId,
-                    UsedQty = dto.UsedQty,
-                    RemainQty = dto.RemainQty
-                });
-
+            await _processInputService.UpdateInputQuantityAsync(inputId, dto);
             await RefreshWorkOrderByInputAsync(inputId);
         }
 
@@ -207,31 +195,13 @@ namespace WAS.Services.App
 
         public async Task CreateOutputAsync(int executionId, ProcessOutputCreateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync(
-                "App/ProcessMonitoring/CREATE_OUTPUT",
-                new
-                {
-                    ExecutionId = executionId,
-                    LotId = dto.LotID,
-                    ItemId = dto.ItemID,
-                    TargetQty = dto.TargetQty,
-                    OutputQty = dto.OutputQty,
-                    OutputType = string.IsNullOrWhiteSpace(dto.OutputType) ? "GOOD" : dto.OutputType.Trim().ToUpperInvariant()
-                });
-
+            await _processOutputService.CreateOutputAsync(executionId, dto);
             await RefreshWorkOrderByExecutionAsync(executionId);
         }
 
         public async Task UpdateOutputQuantityAsync(int outputId, ProcessOutputQuantityUpdateDto dto)
         {
-            await _scriptExecutor.ExecuteNonQueryAsync(
-                "App/ProcessMonitoring/UPDATE_OUTPUT_QUANTITY",
-                new
-                {
-                    OutputId = outputId,
-                    OutputQty = dto.OutputQty
-                });
-
+            await _processOutputService.UpdateOutputQuantityAsync(outputId, dto.OutputQty);
             await RefreshWorkOrderByOutputAsync(outputId);
         }
 
@@ -258,13 +228,7 @@ namespace WAS.Services.App
                 throw new InvalidOperationException($"Current process step is not running. EquipmentID={equipmentId}, Status={currentStep.Status}");
             }
 
-            var updatedCount = await _scriptExecutor.ExecuteNonQueryAsync(
-                "App/ProcessMonitoring/INCREMENT_OUTPUT_BY_EXECUTION",
-                new
-                {
-                    ExecutionId = currentStep.ProcessStepExecutionID,
-                    Qty = qty
-                });
+            var updatedCount = await _processOutputService.IncrementGoodOutputByExecutionAsync(currentStep.ProcessStepExecutionID, qty);
 
             if (updatedCount == 0)
             {

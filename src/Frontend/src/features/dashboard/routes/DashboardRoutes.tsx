@@ -13,9 +13,9 @@ import RoleManager from '../../system/manager/pages/RoleManager';
 import WorkOrderPage from '../../process/workorder/pages/WorkOrderPage';
 import ProcessMonitoringPage from '../../process/monitoring/pages/ProcessMonitoringPage';
 import { useAuthStore } from '../../../store/useAuthStore';
-import WorkOrderHistoryList from '../../history/pages/WorkOrderHistoryList';
-import LotRelationHistoryList from '../../history/pages/LotRelationHistoryList';
-import LotTraceHistoryList from '../../history/pages/LotTraceHistoryList';
+import WorkOrderHistoryPage from '../../history/workorder/pages/WorkOrderHistoryPage';
+import LotRelationHistoryPage from '../../history/lotrelation/pages/LotRelationHistoryPage';
+import LotTraceHistoryPage from '../../history/lottrace/pages/LotTraceHistoryPage';
 
 // Placeholder components for other routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -69,9 +69,9 @@ const DashboardRoutes = () => {
         {/* 로그 / 이력 */}
         {hasAccess(['ADMIN', 'VIEWER']) && (
           <>
-            <Route path="/history/work-orders" element={<WorkOrderHistoryList />} />
-            <Route path="/history/lot-relations" element={<LotRelationHistoryList />} />
-            <Route path="/history/lot-trace" element={<LotTraceHistoryList />} />
+            <Route path="/history/work-orders" element={<WorkOrderHistoryPage />} />
+            <Route path="/history/lot-relations" element={<LotRelationHistoryPage />} />
+            <Route path="/history/lot-trace" element={<LotTraceHistoryPage />} />
           </>
         )}
         {hasAccess(['ADMIN', 'QC']) && (
