@@ -8,5 +8,6 @@ namespace WAS.Services.PLC
     {
         Task<PlcEquipmentDataReceiveResponseDto> HandleEquipmentDataAsync(JsonElement payload);
         Task<PlcEquipmentStateResponseDto> HandleEquipmentStateAsync(PlcEquipmentStateRequestDto dto);
+        Task HandleProductionEventAsync(PlcEquipmentProductionRequestDto dto);
     }
 }

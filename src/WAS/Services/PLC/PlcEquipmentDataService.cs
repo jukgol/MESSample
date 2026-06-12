@@ -4,6 +4,7 @@ using System;
 using System.Text.Json;
 using System.Threading.Tasks;
 using WAS.Hubs;
+using WAS.Services.App;
 
 namespace WAS.Services.PLC
 {
@@ -11,13 +12,16 @@ namespace WAS.Services.PLC
     {
         private readonly IHubContext<ProcessMonitoringHub> _hubContext;
         private readonly ILogger<PlcEquipmentDataService> _logger;
+        private readonly IProcessMonitoringService _processMonitoringService;
 
         public PlcEquipmentDataService(
             IHubContext<ProcessMonitoringHub> hubContext,
-            ILogger<PlcEquipmentDataService> logger)
+            ILogger<PlcEquipmentDataService> logger,
+            IProcessMonitoringService processMonitoringService)
         {
             _hubContext = hubContext;
             _logger = logger;
+            _processMonitoringService = processMonitoringService;
         }
 
         public async Task<PlcEquipmentDataReceiveResponseDto> HandleEquipmentDataAsync(JsonElement payload)
@@ -39,6 +43,37 @@ namespace WAS.Services.PLC
                 ReceivedAt = receivedAt,
                 Message = "PLC equipment data received."
             };
+        }
+
+        public async Task HandleProductionEventAsync(PlcEquipmentProductionRequestDto dto)
+        {
+            var equipmentId = dto.EquipmentID.Trim();
+            var productionEvent = string.IsNullOrWhiteSpace(dto.Event)
+                ? "PRODUCED"
+                : dto.Event.Trim().ToUpperInvariant();
+            var qty = dto.Qty.GetValueOrDefault(1);
+            var receivedAt = DateTime.UtcNow;
+
+            var isCompleted = string.Equals(productionEvent, "COMPLETED", StringComparison.OrdinalIgnoreCase);
+            var currentStep = await _processMonitoringService.RecordProductionByEquipmentAsync(equipmentId, qty, isCompleted);
+
+            _logger.LogInformation(
+                "PLC production event received. EquipmentID: {EquipmentID}, Event: {Event}, Qty: {Qty}, ExecutionId: {ExecutionId}, OccurredAt: {OccurredAt}",
+                equipmentId,
+                productionEvent,
+                qty,
+                currentStep.ProcessStepExecutionID,
+                dto.OccurredAt);
+
+            await _hubContext.Clients.All.SendAsync("PlcProductionEventReceived", new
+            {
+                EquipmentID = equipmentId,
+                Event = productionEvent,
+                Qty = qty,
+                ProcessStepExecutionID = currentStep.ProcessStepExecutionID,
+                OccurredAt = dto.OccurredAt,
+                ReceivedAt = receivedAt
+            });
         }
 
         public async Task<PlcEquipmentStateResponseDto> HandleEquipmentStateAsync(PlcEquipmentStateRequestDto dto)

@@ -127,6 +127,15 @@ namespace WAS.Services.App
             await RefreshWorkOrderByExecutionAsync(executionId);
         }
 
+        public async Task CompleteExecutionAsync(int executionId)
+        {
+            await _scriptExecutor.ExecuteNonQueryAsync(
+                "App/ProcessMonitoring/COMPLETE_EXECUTION",
+                new { ExecutionId = executionId });
+
+            await RefreshWorkOrderByExecutionAsync(executionId);
+        }
+
         public async Task<IEnumerable<ProcessInputDto>> GetInputsAsync(int executionId)
         {
             return await _scriptExecutor.ExecuteQueryAsync<ProcessInputDto>(
@@ -200,6 +209,52 @@ namespace WAS.Services.App
                 });
 
             await RefreshWorkOrderByOutputAsync(outputId);
+        }
+
+        public async Task<CurrentProcessStepStateDto> RecordProductionByEquipmentAsync(string equipmentId, int qty, bool completeExecution = false)
+        {
+            if (string.IsNullOrWhiteSpace(equipmentId))
+            {
+                throw new ArgumentException("EquipmentID is required.");
+            }
+
+            if (qty <= 0)
+            {
+                throw new ArgumentException("Qty must be greater than zero.");
+            }
+
+            var currentStep = _stateStore.GetCurrentStepByEquipment(equipmentId.Trim());
+            if (currentStep == null)
+            {
+                throw new InvalidOperationException($"Current process step was not found. EquipmentID={equipmentId}");
+            }
+
+            if (!string.Equals(currentStep.Status, "RUNNING", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Current process step is not running. EquipmentID={equipmentId}, Status={currentStep.Status}");
+            }
+
+            var updatedCount = await _scriptExecutor.ExecuteNonQueryAsync(
+                "App/ProcessMonitoring/INCREMENT_OUTPUT_BY_EXECUTION",
+                new
+                {
+                    ExecutionId = currentStep.ProcessStepExecutionID,
+                    Qty = qty
+                });
+
+            if (updatedCount == 0)
+            {
+                throw new InvalidOperationException($"Process output was not found. ExecutionId={currentStep.ProcessStepExecutionID}");
+            }
+
+            await RefreshWorkOrderByExecutionAsync(currentStep.ProcessStepExecutionID);
+
+            if (completeExecution)
+            {
+                await CompleteExecutionAsync(currentStep.ProcessStepExecutionID);
+            }
+
+            return _stateStore.GetCurrentStepByExecution(currentStep.ProcessStepExecutionID) ?? currentStep;
         }
 
         public Task<StartToolSignalResponseDto> SendStartToolStartAsync(StartToolSignalRequestDto? dto)

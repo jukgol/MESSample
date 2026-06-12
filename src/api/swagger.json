@@ -2069,6 +2069,60 @@
         }
       }
     },
+    "/api/plc/equipment-data/production": {
+      "post": {
+        "tags": [
+          "PlcEquipmentData"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlcEquipmentProductionRequestDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlcEquipmentProductionRequestDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlcEquipmentProductionRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
     "/api/plc/process-master": {
       "get": {
         "tags": [
@@ -3024,6 +3078,69 @@
       }
     },
     "/api/process-monitoring/executions/{executionId}/start": {
+      "post": {
+        "tags": [
+          "ProcessMonitoring"
+        ],
+        "parameters": [
+          {
+            "name": "executionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/process-monitoring/executions/{executionId}/complete": {
       "post": {
         "tags": [
           "ProcessMonitoring"
@@ -6173,6 +6290,30 @@
           },
           "message": {
             "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PlcEquipmentProductionRequestDto": {
+        "type": "object",
+        "properties": {
+          "equipmentID": {
+            "type": "string",
+            "nullable": true
+          },
+          "event": {
+            "type": "string",
+            "nullable": true
+          },
+          "qty": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
             "nullable": true
           }
         },

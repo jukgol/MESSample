@@ -112,5 +112,27 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"공정 실행 시작 중 오류 발생: {ex.Message}" });
             }
         }
+        [HttpPost("executions/{executionId}/complete")]
+        [HasPermission(Permissions.ProcessExecute)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> CompleteExecution(int executionId)
+        {
+            try
+            {
+                if (executionId <= 0)
+                {
+                    return BadRequest(new { Message = "공정 실행 ID가 올바르지 않습니다." });
+                }
+
+                await _processMonitoringService.CompleteExecutionAsync(executionId);
+                return Ok(new { Message = "공정 실행이 완료되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"공정 실행 완료 중 오류 발생: {ex.Message}" });
+            }
+        }
     }
 }

@@ -17,12 +17,14 @@ namespace WAS.Services.App
         Task<ProcessStepExecutionDto?> GetExecutionByIdAsync(int executionId);
         Task CreateExecutionAsync(ProcessStepExecutionCreateDto dto);
         Task StartExecutionAsync(int executionId);
+        Task CompleteExecutionAsync(int executionId);
         Task<IEnumerable<ProcessInputDto>> GetInputsAsync(int executionId);
         Task CreateInputAsync(int executionId, ProcessInputCreateDto dto);
         Task UpdateInputQuantityAsync(int inputId, ProcessInputQuantityUpdateDto dto);
         Task<IEnumerable<ProcessOutputDto>> GetOutputsAsync(int executionId);
         Task CreateOutputAsync(int executionId, ProcessOutputCreateDto dto);
         Task UpdateOutputQuantityAsync(int outputId, ProcessOutputQuantityUpdateDto dto);
+        Task<CurrentProcessStepStateDto> RecordProductionByEquipmentAsync(string equipmentId, int qty, bool completeExecution = false);
         Task<StartToolSignalResponseDto> SendStartToolStartAsync(StartToolSignalRequestDto? dto);
         Task<StartToolSignalResponseDto> SendStartToolStopAsync(StartToolSignalRequestDto? dto);
     }
