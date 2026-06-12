@@ -13,26 +13,26 @@ const LotTraceHistoryList: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // 1. Get all lots
       const lotsRes = await api.api.getLot();
       const lotList = lotsRes.data || [];
-      
+
       if (lotList.length === 0) {
         setTraceList([]);
         return;
       }
 
       // 2. Fetch traces for all lots in parallel
-      const promises = lotList.map((lot: LotDto) => 
+      const promises = lotList.map((lot: LotDto) =>
         api.api.historyLotsTraceList(lot.lotID!)
           .then((res: any) => res.data || [])
           .catch(() => [] as LotTraceHistoryDto[])
       );
-      
+
       const results = await Promise.all(promises);
       const merged = results.flat();
-      
+
       // 3. Deduplicate traces based on parentLotNo and childLotNo and relationType
       const seen = new Set();
       const unique = merged.filter(item => {
@@ -151,7 +151,7 @@ const LotTraceHistoryList: React.FC = () => {
                   {traceList.length > 0 ? (
                     traceList.map((item, index) => {
                       const isForward = item.direction === 'FORWARD' || item.direction === 'Forward';
-                      
+
                       return (
                         <tr key={index} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }} className="table-row">
                           <td style={{ padding: '1rem' }}>

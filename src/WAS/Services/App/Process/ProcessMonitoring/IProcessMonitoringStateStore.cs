@@ -17,5 +17,6 @@ namespace WAS.Services.App
             IEnumerable<ProcessStepExecutionDto> executions,
             IEnumerable<ProcessInputDto> inputs,
             IEnumerable<ProcessOutputDto> outputs);
+        void RemoveWorkOrder(int workOrderId);
     }
 }

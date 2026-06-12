@@ -8,6 +8,7 @@ interface CurrentWorkOrderListProps {
   loading: boolean;
   onSelectWorkOrder: (workOrderId: number) => void;
   onDeleteProcessMaster: (processMasterId: number) => void;
+  onCompleteWorkOrder: (workOrderId: number) => void;
 }
 
 const formatDateTime = (value?: string | null) => {
@@ -25,6 +26,8 @@ const statusLabel = (status?: string | null) => {
       return '일시정지';
     case 'WAITING':
       return '대기';
+    case 'DONE':
+      return '완료 가능';
     default:
       return status || '-';
   }
@@ -39,6 +42,10 @@ const statusStyle = (status?: string | null): React.CSSProperties => {
     return { color: '#f97316', background: 'rgba(249, 115, 22, 0.12)', border: '1px solid rgba(249, 115, 22, 0.28)' };
   }
 
+  if (status === 'DONE') {
+    return { color: '#818cf8', background: 'rgba(129, 140, 248, 0.12)', border: '1px solid rgba(129, 140, 248, 0.28)' };
+  }
+
   return { color: '#93c5fd', background: 'rgba(147, 197, 253, 0.12)', border: '1px solid rgba(147, 197, 253, 0.28)' };
 };
 
@@ -47,7 +54,8 @@ const CurrentWorkOrderList: React.FC<CurrentWorkOrderListProps> = ({
   selectedWorkOrderId,
   loading,
   onSelectWorkOrder,
-  onDeleteProcessMaster
+  onDeleteProcessMaster,
+  onCompleteWorkOrder
 }) => {
   if (workOrders.length === 0) {
     return (
@@ -89,39 +97,75 @@ const CurrentWorkOrderList: React.FC<CurrentWorkOrderListProps> = ({
                 <span style={{ ...statusStyle(workOrder.status), borderRadius: '8px', padding: '0.25rem 0.5rem', fontSize: '0.78rem', fontWeight: 700 }}>
                   {statusLabel(workOrder.status)}
                 </span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (workOrder.processMasterID) {
-                      if (confirm(`정말 ${workOrder.workOrderNo || '이 작업지시'}의 전체 공정을 삭제하시겠습니까?`)) {
-                        onDeleteProcessMaster(workOrder.processMasterID);
+                {workOrder.status === 'DONE' ? (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (workOrder.workOrderID) {
+                        if (confirm(`정말 ${workOrder.workOrderNo || '이 작업지시'}의 모든 공정을 완료하고 모니터링에서 내리겠습니까?`)) {
+                          onCompleteWorkOrder(workOrder.workOrderID);
+                        }
+                      } else {
+                        alert('완료 가능한 작업지시 ID가 없습니다.');
                       }
-                    } else {
-                      alert('삭제 가능한 공정 마스터 ID가 없습니다.');
-                    }
-                  }}
-                  style={{
-                    padding: '0.2rem 0.45rem',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: '#f87171',
-                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
-                    border: '1px solid rgba(248, 113, 113, 0.2)',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    whiteSpace: 'nowrap'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(248, 113, 113, 0.2)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
-                  }}
-                >
-                  삭제
-                </button>
+                    }}
+                    style={{
+                      padding: '0.2rem 0.45rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: '#a7f3d0',
+                      backgroundColor: 'rgba(52, 211, 153, 0.15)',
+                      border: '1px solid rgba(52, 211, 153, 0.3)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(52, 211, 153, 0.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(52, 211, 153, 0.15)';
+                    }}
+                  >
+                    완료
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (workOrder.processMasterID) {
+                        if (confirm(`정말 ${workOrder.workOrderNo || '이 작업지시'}의 전체 공정을 삭제하시겠습니까?`)) {
+                          onDeleteProcessMaster(workOrder.processMasterID);
+                        }
+                      } else {
+                        alert('삭제 가능한 공정 마스터 ID가 없습니다.');
+                      }
+                    }}
+                    style={{
+                      padding: '0.2rem 0.45rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: '#f87171',
+                      backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                      border: '1px solid rgba(248, 113, 113, 0.2)',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s',
+                      whiteSpace: 'nowrap'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(248, 113, 113, 0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
+                    }}
+                  >
+                    삭제
+                  </button>
+                )}
               </div>
             </div>
 

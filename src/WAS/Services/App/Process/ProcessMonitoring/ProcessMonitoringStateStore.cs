@@ -209,6 +209,14 @@ namespace WAS.Services.App
             }
         }
 
+        public void RemoveWorkOrder(int workOrderId)
+        {
+            lock (_lock)
+            {
+                RemoveWorkOrderIndexes(workOrderId);
+            }
+        }
+
         private void RemoveWorkOrderIndexes(int workOrderId)
         {
             if (!_byWorkOrder.TryGetValue(workOrderId, out var existing))

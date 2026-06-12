@@ -15,7 +15,8 @@ const ProcessMonitoringPage: React.FC = () => {
     error,
     fetchCurrentWorkOrders,
     selectWorkOrder,
-    deleteCurrentProcessMaster
+    deleteCurrentProcessMaster,
+    completeWorkOrder
   } = useProcessMonitoring();
 
   const [selectedExecutionId, setSelectedExecutionId] = useState<number | null>(null);
@@ -61,6 +62,7 @@ const ProcessMonitoringPage: React.FC = () => {
         loading={loading}
         onSelectWorkOrder={selectWorkOrder}
         onDeleteProcessMaster={deleteCurrentProcessMaster}
+        onCompleteWorkOrder={completeWorkOrder}
       />
 
       <section style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', minHeight: 0 }}>

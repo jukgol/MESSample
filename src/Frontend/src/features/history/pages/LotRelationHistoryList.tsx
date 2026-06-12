@@ -41,7 +41,7 @@ const LotRelationHistoryList: React.FC = () => {
       const matchParent = parentLot.toLowerCase().includes(searchParentLot.toLowerCase());
       const matchChild = childLot.toLowerCase().includes(searchChildLot.toLowerCase());
       const matchItem = parentItem.toLowerCase().includes(searchItemName.toLowerCase()) ||
-                        childItem.toLowerCase().includes(searchItemName.toLowerCase());
+        childItem.toLowerCase().includes(searchItemName.toLowerCase());
 
       return matchParent && matchChild && matchItem;
     });

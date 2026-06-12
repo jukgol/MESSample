@@ -134,5 +134,28 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"공정 실행 완료 중 오류 발생: {ex.Message}" });
             }
         }
+
+        [HttpPost("work-orders/{workOrderId}/complete")]
+        [HasPermission(Permissions.ProcessExecute)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> CompleteWorkOrder(int workOrderId)
+        {
+            try
+            {
+                if (workOrderId <= 0)
+                {
+                    return BadRequest(new { Message = "작업지시 ID가 올바르지 않습니다." });
+                }
+
+                await _processMonitoringService.CompleteWorkOrderAsync(workOrderId);
+                return Ok(new { Message = "작업지시 공정이 완료 처리되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"작업지시 완료 처리 중 오류 발생: {ex.Message}" });
+            }
+        }
     }
 }

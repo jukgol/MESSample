@@ -10,7 +10,7 @@ SELECT wo.work_order_id AS WorkOrderID,
            WHEN SUM(CASE WHEN pse.status = 'RUNNING' THEN 1 ELSE 0 END) > 0 THEN 'RUNNING'
            WHEN SUM(CASE WHEN pse.status = 'PAUSED' THEN 1 ELSE 0 END) > 0 THEN 'PAUSED'
            WHEN COUNT(pse.process_step_execution_id) > 0
-                AND SUM(CASE WHEN pse.status = 'DONE' THEN 1 ELSE 0 END) = COUNT(pse.process_step_execution_id) THEN 'DONE'
+                AND SUM(CASE WHEN pse.status IN ('DONE', 'COMPLETED') THEN 1 ELSE 0 END) = COUNT(pse.process_step_execution_id) THEN 'DONE'
            WHEN COUNT(pse.process_step_execution_id) > 0 THEN 'WAITING'
            ELSE 'APPROVED'
        END AS Status,

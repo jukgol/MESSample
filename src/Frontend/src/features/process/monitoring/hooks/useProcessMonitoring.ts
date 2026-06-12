@@ -61,6 +61,21 @@ export const useProcessMonitoring = () => {
     }
   }, [fetchCurrentWorkOrders]);
 
+  const completeWorkOrder = useCallback(async (workOrderId: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await api.api.processMonitoringWorkOrdersCompleteCreate(workOrderId);
+      await fetchCurrentWorkOrders();
+    } catch (err: any) {
+      console.error('Failed to complete work order:', err);
+      const serverMsg = err.response?.data?.message || err.response?.data?.Message || err.message;
+      setError(`작업지시 완료 처리에 실패했습니다: ${serverMsg}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchCurrentWorkOrders]);
+
   useEffect(() => {
     const token = useAuthStore.getState().token;
     if (!token) return;
@@ -137,6 +152,7 @@ export const useProcessMonitoring = () => {
     error,
     fetchCurrentWorkOrders,
     selectWorkOrder,
-    deleteCurrentProcessMaster
+    deleteCurrentProcessMaster,
+    completeWorkOrder
   };
 };

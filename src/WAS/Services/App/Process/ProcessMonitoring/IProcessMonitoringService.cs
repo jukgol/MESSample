@@ -28,5 +28,6 @@ namespace WAS.Services.App
         Task<CurrentProcessStepStateDto> RecordProductionByEquipmentAsync(string equipmentId, int qty, bool completeExecution = false);
         Task<StartToolSignalResponseDto> SendStartToolStartAsync(StartToolSignalRequestDto? dto);
         Task<StartToolSignalResponseDto> SendStartToolStopAsync(StartToolSignalRequestDto? dto);
+        Task CompleteWorkOrderAsync(int workOrderId);
     }
 }

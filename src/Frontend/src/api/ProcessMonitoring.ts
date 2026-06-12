@@ -196,6 +196,22 @@ export class ProcessMonitoring<
    * No description
    *
    * @tags ProcessMonitoring
+   * @name ProcessMonitoringWorkOrdersCompleteCreate
+   * @request POST:/api/process-monitoring/work-orders/{workOrderId}/complete
+   */
+  processMonitoringWorkOrdersCompleteCreate = (
+    workOrderId: number,
+    params: RequestParams = {},
+  ) =>
+    this.request<void, ProblemDetails>({
+      path: `/api/process-monitoring/work-orders/${workOrderId}/complete`,
+      method: "POST",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags ProcessMonitoring
    * @name ProcessMonitoringExecutionsInputsList
    * @request GET:/api/process-monitoring/executions/{executionId}/inputs
    */

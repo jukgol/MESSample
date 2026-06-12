@@ -391,5 +391,18 @@ namespace WAS.Services.App
             }
         }
 
+        public async Task CompleteWorkOrderAsync(int workOrderId)
+        {
+            if (workOrderId <= 0)
+            {
+                throw new ArgumentException("WorkOrderID must be greater than zero.");
+            }
+
+            await _scriptExecutor.ExecuteNonQueryAsync(
+                "App/ProcessMonitoring/COMPLETE_WORK_ORDER_EXECUTIONS",
+                new { WorkOrderId = workOrderId });
+
+            _stateStore.RemoveWorkOrder(workOrderId);
+        }
     }
 }
