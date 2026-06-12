@@ -148,7 +148,7 @@ namespace WAS.Services.App
                 "App/ProcessMonitoring/START_EXECUTION",
                 new { ExecutionId = executionId });
 
-            await _processOutputService.EnsureInitialOutputAsync(executionId);
+            await _processInputService.ConsumeInputsByExecutionAsync(executionId);
             await RefreshWorkOrderByExecutionAsync(executionId);
 
             var currentStep = _stateStore.GetCurrentStepByExecution(executionId);
@@ -160,6 +160,8 @@ namespace WAS.Services.App
 
         public async Task CompleteExecutionAsync(int executionId)
         {
+            await _processOutputService.CompleteOutputsAsync(executionId);
+
             await _scriptExecutor.ExecuteNonQueryAsync(
                 "App/ProcessMonitoring/COMPLETE_EXECUTION",
                 new { ExecutionId = executionId });

@@ -5,13 +5,13 @@ namespace WAS.Services.App
         public async Task IncreaseLotStockAsync(int lotId, int qty, string reason, string? refType = null, int? refId = null)
         {
             if (qty <= 0) throw new ArgumentException("Increase quantity must be greater than 0.");
-            await ChangeLotStockAsync(lotId, qty, "INCREASE", reason, refType, refId);
+            await ChangeLotStockAsync(lotId, qty, "INCREASE", reason, refType, refId, resetReservedQty: false);
         }
 
         public async Task DecreaseLotStockAsync(int lotId, int qty, string reason, string? refType = null, int? refId = null)
         {
             if (qty <= 0) throw new ArgumentException("Decrease quantity must be greater than 0.");
-            await ChangeLotStockAsync(lotId, -qty, "DECREASE", reason, refType, refId);
+            await ChangeLotStockAsync(lotId, -qty, "DECREASE", reason, refType, refId, resetReservedQty: true);
         }
 
         public async Task AdjustLotStockAsync(int lotId, int targetQty, string reason, string? refType = null, int? refId = null)
@@ -39,7 +39,7 @@ namespace WAS.Services.App
             }
         }
 
-        private async Task ChangeLotStockAsync(int lotId, int changeQty, string changeType, string reason, string? refType, int? refId)
+        private async Task ChangeLotStockAsync(int lotId, int changeQty, string changeType, string reason, string? refType, int? refId, bool resetReservedQty)
         {
             using var connection = _db.CreateConnection();
             connection.Open();
@@ -55,7 +55,14 @@ namespace WAS.Services.App
                     throw new InvalidOperationException($"Lot stock cannot be negative. LotId={lotId}, CurrentQty={beforeQty}, ChangeQty={changeQty}");
                 }
 
-                await UpdateLotStockAsync(connection, transaction, lotId, afterQty);
+                if (resetReservedQty)
+                {
+                    await UpdateLotStockAsync(connection, transaction, lotId, afterQty, 0);
+                }
+                else
+                {
+                    await UpdateLotStockAsync(connection, transaction, lotId, afterQty);
+                }
                 await InsertLotStockHistoryAsync(connection, transaction, lotId, changeType, beforeQty, changeQty, afterQty, reason, refType, refId);
 
                 transaction.Commit();

@@ -5,10 +5,51 @@ namespace WAS.Services.App
     public class ProcessInputService : IProcessInputService
     {
         private readonly IScriptExecutor _scriptExecutor;
+        private readonly ILotService _lotService;
 
-        public ProcessInputService(IScriptExecutor scriptExecutor)
+        public ProcessInputService(IScriptExecutor scriptExecutor, ILotService lotService)
         {
             _scriptExecutor = scriptExecutor;
+            _lotService = lotService;
+        }
+
+        public async Task ReserveWorkOrderInputLotsAsync(string workOrderNo)
+        {
+            if (string.IsNullOrWhiteSpace(workOrderNo))
+            {
+                throw new ArgumentException("WorkOrderNo is required.");
+            }
+
+            await _scriptExecutor.ExecuteNonQueryAsync(
+                "App/WorkOrder/RESERVE_WORK_ORDER_INPUT_LOTS",
+                new { WorkOrderNo = workOrderNo.Trim() });
+        }
+
+        public async Task ConsumeInputsByExecutionAsync(int executionId)
+        {
+            if (executionId <= 0) throw new ArgumentException("ExecutionId must be greater than zero.");
+
+            var inputs = await _scriptExecutor.ExecuteQueryAsync<ProcessInputDto>(
+                "App/ProcessMonitoring/GET_INPUTS_BY_EXECUTION",
+                new { ExecutionId = executionId });
+
+            foreach (var input in inputs.Where(x => x.UsedQty == 0 && x.RemainQty == x.InputQty))
+            {
+                await _lotService.DecreaseLotStockAsync(
+                    input.LotID,
+                    input.InputQty,
+                    "Reserved lot consumed by process execution start",
+                    "PROCESS_STEP_EXECUTION",
+                    executionId);
+
+                await UpdateInputQuantityAsync(
+                    input.ProcessInputID,
+                    new ProcessInputQuantityUpdateDto
+                    {
+                        UsedQty = input.InputQty,
+                        RemainQty = 0
+                    });
+            }
         }
 
         public async Task CreateInputAsync(int executionId, ProcessInputCreateDto dto)

@@ -67,6 +67,23 @@ namespace WAS.Services.App
                 transaction);
         }
 
+        private static async Task UpdateLotStockAsync(IDbConnection connection, IDbTransaction transaction, int lotId, int currentQty, int reservedQty)
+        {
+            await connection.ExecuteAsync(
+                @"UPDATE LOT_STOCK
+                  SET CURRENT_QTY = :CurrentQty,
+                      RESERVED_QTY = :ReservedQty,
+                      UPDATED_AT = CURRENT_TIMESTAMP
+                  WHERE LOT_ID = :LotId",
+                new
+                {
+                    LotId = lotId,
+                    CurrentQty = currentQty,
+                    ReservedQty = reservedQty
+                },
+                transaction);
+        }
+
         private static async Task InsertLotStockHistoryAsync(
             IDbConnection connection,
             IDbTransaction transaction,

@@ -9,15 +9,21 @@ namespace WAS.Services.App
     public class WorkOrderService : IWorkOrderService
     {
         private readonly IScriptExecutor _scriptExecutor;
+        private readonly IProcessInputService _processInputService;
+        private readonly IProcessOutputService _processOutputService;
         private readonly IProcessMonitoringService _processMonitoringService;
         private readonly IProcessMonitoringStateStore _processMonitoringStateStore;
 
         public WorkOrderService(
             IScriptExecutor scriptExecutor,
+            IProcessInputService processInputService,
+            IProcessOutputService processOutputService,
             IProcessMonitoringService processMonitoringService,
             IProcessMonitoringStateStore processMonitoringStateStore)
         {
             _scriptExecutor = scriptExecutor;
+            _processInputService = processInputService;
+            _processOutputService = processOutputService;
             _processMonitoringService = processMonitoringService;
             _processMonitoringStateStore = processMonitoringStateStore;
         }
@@ -79,9 +85,8 @@ namespace WAS.Services.App
                     "App/WorkOrder/CREATE_WORK_ORDER_STEP_EXECUTIONS",
                     new { WorkOrderNo = workOrderNo });
 
-                await _scriptExecutor.ExecuteNonQueryAsync(
-                    "App/WorkOrder/RESERVE_WORK_ORDER_INPUT_LOTS",
-                    new { WorkOrderNo = workOrderNo });
+                await _processInputService.ReserveWorkOrderInputLotsAsync(workOrderNo);
+                await _processOutputService.EnsureInitialOutputsByWorkOrderNoAsync(workOrderNo);
 
                 await _processMonitoringService.AddWorkOrderToCurrentStateAsync(workOrderNo);
             }

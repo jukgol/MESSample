@@ -13,6 +13,23 @@ namespace WAS.Services.App
             _lotService = lotService;
         }
 
+        public async Task EnsureInitialOutputsByWorkOrderNoAsync(string workOrderNo)
+        {
+            if (string.IsNullOrWhiteSpace(workOrderNo))
+            {
+                throw new ArgumentException("WorkOrderNo is required.");
+            }
+
+            var executions = await _scriptExecutor.ExecuteQueryAsync<ProcessStepExecutionDto>(
+                "App/ProcessMonitoring/GET_CURRENT_EXECUTIONS_BY_WORK_ORDER_NO",
+                new { WorkOrderNo = workOrderNo.Trim() });
+
+            foreach (var execution in executions)
+            {
+                await EnsureInitialOutputAsync(execution.ProcessStepExecutionID);
+            }
+        }
+
         public async Task EnsureInitialOutputAsync(int executionId)
         {
             if (executionId <= 0)
@@ -114,6 +131,45 @@ namespace WAS.Services.App
                     ExecutionId = executionId,
                     Qty = qty
                 });
+        }
+
+        public async Task CompleteOutputsAsync(int executionId)
+        {
+            if (executionId <= 0) throw new ArgumentException("ExecutionId must be greater than zero.");
+
+            var outputs = await _scriptExecutor.ExecuteQueryAsync<ProcessOutputDto>(
+                "App/ProcessMonitoring/GET_OUTPUTS_BY_EXECUTION",
+                new { ExecutionId = executionId });
+
+            foreach (var output in outputs)
+            {
+                await _scriptExecutor.ExecuteNonQueryAsync(
+                    "App/ProcessMonitoring/UPDATE_OUTPUT_LOT_COMPLETE",
+                    new
+                    {
+                        LotId = output.LotID,
+                        Qty = output.OutputQty
+                    });
+
+                if (output.OutputQty > 0)
+                {
+                    await _lotService.IncreaseLotStockAsync(
+                        output.LotID,
+                        output.OutputQty,
+                        "Output lot completed by process execution",
+                        "PROCESS_STEP_EXECUTION",
+                        executionId);
+                }
+
+                await _scriptExecutor.ExecuteNonQueryAsync(
+                    "App/ProcessMonitoring/UPDATE_OUTPUT_TRACE_QUANTITY",
+                    new
+                    {
+                        LotId = output.LotID,
+                        ExecutionId = executionId,
+                        OutputQty = output.OutputQty
+                    });
+            }
         }
 
         public async Task CreateMissingOutputLotTracesAsync(int executionId)
