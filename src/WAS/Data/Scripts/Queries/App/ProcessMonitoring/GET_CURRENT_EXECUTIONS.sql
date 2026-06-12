@@ -7,6 +7,12 @@ WITH LATEST_WORK_ORDER AS (
                    ORDER BY wo.approved_at DESC, wo.work_order_id DESC
                ) AS rn
         FROM WORK_ORDER wo
+        WHERE EXISTS (
+            SELECT 1
+            FROM PROCESS_STEP_EXECUTION current_pse
+            WHERE current_pse.work_order_id = wo.work_order_id
+              AND current_pse.status <> 'DELETED'
+        )
     )
     WHERE rn = 1
 )
@@ -34,4 +40,5 @@ JOIN PROCESS_MASTER PM ON WO.PROCESS_MASTER_ID = PM.PROCESS_ID
 JOIN PROCESS_STEP PS ON PSE.PROCESS_STEP_ID = PS.STEP_ID
 JOIN LATEST_WORK_ORDER LWO ON LWO.WORK_ORDER_ID = WO.WORK_ORDER_ID
 LEFT JOIN USER_INFO UI ON PSE.WORKER_USER_ID = UI.USER_ID
+WHERE PSE.STATUS <> 'DELETED'
 ORDER BY WO.APPROVED_AT DESC, PS.SEQ_NO ASC, PSE.PROCESS_STEP_EXECUTION_ID ASC

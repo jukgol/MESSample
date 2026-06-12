@@ -7,6 +7,12 @@ WITH LATEST_WORK_ORDER AS (
                    ORDER BY wo.approved_at DESC, wo.work_order_id DESC
                ) AS rn
         FROM WORK_ORDER wo
+        WHERE EXISTS (
+            SELECT 1
+            FROM PROCESS_STEP_EXECUTION current_pse
+            WHERE current_pse.work_order_id = wo.work_order_id
+              AND current_pse.status <> 'DELETED'
+        )
     )
     WHERE rn = 1
 )
@@ -26,4 +32,5 @@ JOIN PROCESS_STEP_EXECUTION PSE ON PO.PROCESS_STEP_EXECUTION_ID = PSE.PROCESS_ST
 JOIN LATEST_WORK_ORDER LWO ON LWO.WORK_ORDER_ID = PSE.WORK_ORDER_ID
 JOIN LOT L ON PO.LOT_ID = L.LOT_ID
 JOIN ITEM I ON PO.ITEM_ID = I.ITEM_ID
+WHERE PSE.STATUS <> 'DELETED'
 ORDER BY PO.OUTPUT_AT ASC, PO.PROCESS_OUTPUT_ID ASC

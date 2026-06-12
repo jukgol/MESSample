@@ -1,5 +1,5 @@
-import React from 'react';
-import { CheckCircle2, CircleDashed, PauseCircle, PlayCircle, XCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle2, CircleDashed, PauseCircle, PlayCircle, XCircle, X } from 'lucide-react';
 import type { CurrentProcessStepStateDto } from '../../../../api/data-contracts';
 import { api } from '../../../../api/client';
 
@@ -24,6 +24,7 @@ const statusMeta = (status?: string | null) => {
 };
 
 const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, loading }) => {
+  const [selectedInputStep, setSelectedInputStep] = useState<CurrentProcessStepStateDto | null>(null);
   const sortedSteps = [...steps].sort((a, b) => (a.seqNo || 0) - (b.seqNo || 0));
 
   if (sortedSteps.length === 0) {
@@ -35,172 +36,298 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
   }
 
   return (
-    <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '0.85rem' }}>
-      {sortedSteps.map((step, index) => {
-        const meta = statusMeta(step.status);
+    <>
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '0.85rem' }}>
+        {sortedSteps.map((step, index) => {
+          const meta = statusMeta(step.status);
 
-        return (
-          <article
-            key={step.processStepExecutionID || `${step.processStepID}-${index}`}
-            className="premium-card"
-            style={{
-              borderRadius: '8px',
-              padding: '1rem',
-              minHeight: 150,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              gap: '1rem',
-              border: `1px solid ${meta.border}`
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                <span style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(99, 102, 241, 0.16)', display: 'grid', placeItems: 'center', color: 'var(--accent-primary)', fontWeight: 700 }}>
-                  {step.seqNo || index + 1}
-                </span>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: '1rem', color: 'white', lineHeight: 1.3 }}>{step.stepName || '-'}</h3>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
-                    실행 ID {step.processStepExecutionID || '-'}
+          return (
+            <article
+              key={step.processStepExecutionID || `${step.processStepID}-${index}`}
+              className="premium-card"
+              style={{
+                borderRadius: '8px',
+                padding: '1rem',
+                minHeight: 150,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '1rem',
+                border: `1px solid ${meta.border}`
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <span style={{ width: 34, height: 34, borderRadius: 8, background: 'rgba(99, 102, 241, 0.16)', display: 'grid', placeItems: 'center', color: 'var(--accent-primary)', fontWeight: 700 }}>
+                    {step.seqNo || index + 1}
+                  </span>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1rem', color: 'white', lineHeight: 1.3 }}>{step.stepName || '-'}</h3>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.2rem' }}>
+                      실행 ID {step.processStepExecutionID || '-'}
+                    </div>
                   </div>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <button
+                    onClick={async () => {
+                      const isRunning = step.status === 'RUNNING';
+                      try {
+                        const reqDto = {
+                          equipmentId: step.equipmentID || undefined
+                        };
+                        const response = isRunning
+                          ? await api.api.processMonitoringStarttoolStopCreate(reqDto)
+                          : await api.api.processMonitoringStarttoolStartCreate(reqDto);
+
+                        if (response.data?.success) {
+                          console.log(`${isRunning ? '정지' : '시작'} 신호 전송 성공: ${response.data.message}`);
+                        } else {
+                          alert(`${isRunning ? '정지' : '시작'} 신호 전송 실패: ${response.data?.message || '오류 발생'}`);
+                        }
+                      } catch (err: any) {
+                        console.error(err);
+                        alert('서버 연결 실패');
+                      }
+                    }}
+                    style={{
+                      padding: '0.25rem 0.5rem',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: 'white',
+                      backgroundColor: step.status === 'RUNNING' ? '#ef4444' : '#4f46e5',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {step.status === 'RUNNING' ? '정지' : '테스트'}
+                  </button>
+                  <span
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                      color: meta.color,
+                      background: meta.bg,
+                      border: `1px solid ${meta.border}`,
+                      borderRadius: '8px',
+                      padding: '0.3rem 0.5rem',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {meta.icon}
+                    {meta.label}
+                  </span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <button
-                  onClick={async () => {
-                    const isRunning = step.status === 'RUNNING';
-                    try {
-                      const reqDto = {
-                        equipmentId: step.equipmentID || undefined
-                      };
-                      const response = isRunning
-                        ? await api.api.processMonitoringStarttoolStopCreate(reqDto)
-                        : await api.api.processMonitoringStarttoolStartCreate(reqDto);
-
-                      if (response.data?.success) {
-                        console.log(`${isRunning ? '정지' : '시작'} 신호 전송 성공: ${response.data.message}`);
-                      } else {
-                        alert(`${isRunning ? '정지' : '시작'} 신호 전송 실패: ${response.data?.message || '오류 발생'}`);
-                      }
-                    } catch (err: any) {
-                      console.error(err);
-                      alert('서버 연결 실패');
-                    }
-                  }}
-                  style={{
-                    padding: '0.25rem 0.5rem',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: 'white',
-                    backgroundColor: step.status === 'RUNNING' ? '#ef4444' : '#4f46e5',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {step.status === 'RUNNING' ? '정지' : '테스트'}
-                </button>
-                <span
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                    color: meta.color,
-                    background: meta.bg,
-                    border: `1px solid ${meta.border}`,
-                    borderRadius: '8px',
-                    padding: '0.3rem 0.5rem',
-                    fontSize: '0.78rem',
-                    fontWeight: 700,
-                    whiteSpace: 'nowrap'
-                  }}
-                >
-                  {meta.icon}
-                  {meta.label}
-                </span>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
+                <div>
+                  <div>설비</div>
+                  <strong style={{ color: 'white' }}>{step.equipmentID || '-'}</strong>
+                </div>
+                <div>
+                  <div>작업자</div>
+                  <strong style={{ color: 'white' }}>{step.workerName || '-'}</strong>
+                </div>
               </div>
-            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.65rem', color: 'var(--text-secondary)', fontSize: '0.82rem' }}>
-              <div>
-                <div>설비</div>
-                <strong style={{ color: 'white' }}>{step.equipmentID || '-'}</strong>
-              </div>
-              <div>
-                <div>작업자</div>
-                <strong style={{ color: 'white' }}>{step.workerName || '-'}</strong>
-              </div>
-            </div>
-
-            {((step.inputs && step.inputs.length > 0) || (step.outputs && step.outputs.length > 0)) && (
-              <div style={{
-                marginTop: '0.5rem',
-                paddingTop: '0.6rem',
-                borderTop: '1px dashed rgba(255,255,255,0.08)',
-                fontSize: '0.78rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem'
-              }}>
-                {step.inputs && step.inputs.length > 0 && (
-                  <div>
-                    <div style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#a78bfa' }}></span>
-                      투입 LOT ({step.inputs.length})
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
-                      {step.inputs.map(input => (
-                        <div key={input.processInputID} style={{ 
-                          background: 'rgba(167, 139, 250, 0.08)', 
-                          border: '1px solid rgba(167, 139, 250, 0.2)', 
-                          borderRadius: '4px', 
-                          padding: '0.15rem 0.35rem', 
-                          color: '#c084fc',
-                          fontSize: '0.72rem',
-                          display: 'flex',
-                          gap: '0.35rem'
-                        }}>
-                          <span style={{ fontWeight: 600 }}>{input.lotNo || '무명LOT'}</span>
-                          <span style={{ opacity: 0.8, color: '#e9d5ff' }}>{input.usedQty}개</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {step.outputs && step.outputs.length > 0 && (
-                  <div>
-                    <div style={{ color: 'var(--text-secondary)', fontWeight: 600, marginBottom: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              {step.outputs && step.outputs.length > 0 && (
+                <div style={{
+                  marginTop: '0.5rem',
+                  paddingTop: '0.6rem',
+                  borderTop: '1px dashed rgba(255,255,255,0.08)',
+                  fontSize: '0.78rem',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.5rem'
+                }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    <div style={{ color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
                       <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#34d399' }}></span>
                       생산 LOT ({step.outputs.length})
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                       {step.outputs.map(output => (
                         <div key={output.processOutputID} style={{ 
-                          background: 'rgba(52, 211, 153, 0.08)', 
-                          border: '1px solid rgba(52, 211, 153, 0.2)', 
-                          borderRadius: '4px', 
-                          padding: '0.15rem 0.35rem', 
+                          background: 'rgba(52, 211, 153, 0.06)', 
+                          border: '1px solid rgba(52, 211, 153, 0.15)', 
+                          borderRadius: '6px', 
+                          padding: '0.4rem 0.6rem', 
                           color: '#34d399',
-                          fontSize: '0.72rem',
+                          fontSize: '0.75rem',
                           display: 'flex',
-                          gap: '0.35rem'
+                          flexDirection: 'column',
+                          gap: '0.2rem'
                         }}>
-                          <span style={{ fontWeight: 600 }}>{output.lotNo || '무명LOT'}</span>
-                          <span style={{ opacity: 0.8, color: '#a7f3d0' }}>{output.outputQty}개</span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--text-secondary)' }}>제품:</span>
+                            <span style={{ fontWeight: 600, color: 'white' }}>{output.itemName || '-'}</span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <span style={{ color: 'var(--text-secondary)' }}>LOT / 수량:</span>
+                            <span style={{ fontWeight: 700 }}>{output.lotNo || '-'} ({output.outputQty || 0}개)</span>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
+              )}
+
+              <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-end' }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedInputStep(step)}
+                  style={{
+                    width: '100%',
+                    padding: '0.45rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: '#ffffff',
+                    backgroundColor: '#6366f1',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.25rem'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#4f46e5';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#6366f1';
+                  }}
+                >
+                  입력상세보기
+                </button>
               </div>
-            )}
-          </article>
-        );
-      })}
-    </section>
+            </article>
+          );
+        })}
+      </section>
+
+      {selectedInputStep && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'grid',
+          placeItems: 'center',
+          zIndex: 9999,
+          padding: '1rem'
+        }}
+        onClick={() => setSelectedInputStep(null)}
+        >
+          <div style={{
+            background: '#1e1b4b',
+            border: '1px solid rgba(99, 102, 241, 0.3)',
+            borderRadius: '12px',
+            width: '100%',
+            maxWidth: '420px',
+            padding: '1.25rem',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4)',
+            color: 'white',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem'
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>
+                {selectedInputStep.stepName} - 투입 상세 정보
+              </h3>
+              <button
+                type="button"
+                onClick={() => setSelectedInputStep(null)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  display: 'grid',
+                  placeItems: 'center',
+                  padding: '4px',
+                  borderRadius: '50%'
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '300px', overflowY: 'auto' }}>
+              {!selectedInputStep.inputs || selectedInputStep.inputs.length === 0 ? (
+                <div style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '2rem 0', fontSize: '0.9rem' }}>
+                  투입된 원자재(LOT) 정보가 없습니다.
+                </div>
+              ) : (
+                selectedInputStep.inputs.map((input) => (
+                  <div key={input.processInputID} style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    borderRadius: '8px',
+                    padding: '0.75rem',
+                    fontSize: '0.85rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.35rem'
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>원자재 LOT:</span>
+                      <strong style={{ color: '#c084fc' }}>{input.lotNo || '-'}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>품목명:</span>
+                      <span style={{ color: 'white', fontWeight: 500 }}>{input.itemName || '-'}</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginTop: '0.2rem', paddingTop: '0.4rem', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>사용 수량</div>
+                        <strong style={{ color: 'white' }}>{input.usedQty ?? 0}개</strong>
+                      </div>
+                      <div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>잔여 수량</div>
+                        <strong style={{ color: 'white' }}>{input.remainQty ?? 0}개</strong>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setSelectedInputStep(null)}
+              style={{
+                padding: '0.5rem',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                color: 'white',
+                backgroundColor: '#4f46e5',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                textAlign: 'center'
+              }}
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

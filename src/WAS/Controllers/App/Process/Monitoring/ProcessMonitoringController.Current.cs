@@ -27,6 +27,29 @@ namespace WAS.Controllers.App
             }
         }
 
+        [HttpDelete("current/process-masters/{processMasterId}")]
+        [HasPermission(Permissions.ProcessExecute)]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult> DeleteCurrentProcessMaster(int processMasterId)
+        {
+            try
+            {
+                if (processMasterId <= 0)
+                {
+                    return BadRequest(new { Message = "공정 마스터 ID가 올바르지 않습니다." });
+                }
+
+                await _processMonitoringService.DeleteCurrentProcessMasterAsync(processMasterId);
+                return Ok(new { Message = "현재 공정이 삭제되었습니다." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"현재 공정 삭제 중 오류 발생: {ex.Message}" });
+            }
+        }
+
         [HttpGet("current/work-orders/{workOrderId}")]
         [HasPermission(Permissions.ProcessView)]
         [ProducesResponseType(typeof(CurrentWorkOrderStateDto), 200)]

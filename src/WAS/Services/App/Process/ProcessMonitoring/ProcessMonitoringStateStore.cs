@@ -89,7 +89,29 @@ namespace WAS.Services.App
             IEnumerable<ProcessInputDto> inputs,
             IEnumerable<ProcessOutputDto> outputs)
         {
-            var executionList = executions.OrderBy(row => row.SeqNo).ToList();
+            var executionGroups = executions
+                .GroupBy(row => row.WorkOrderID)
+                .ToList();
+
+            if (executionGroups.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var executionGroup in executionGroups)
+            {
+                UpsertSingleWorkOrderCore(
+                    executionGroup.OrderBy(row => row.SeqNo).ToList(),
+                    inputs,
+                    outputs);
+            }
+        }
+
+        private void UpsertSingleWorkOrderCore(
+            List<ProcessStepExecutionDto> executionList,
+            IEnumerable<ProcessInputDto> inputs,
+            IEnumerable<ProcessOutputDto> outputs)
+        {
             if (executionList.Count == 0)
             {
                 return;

@@ -44,6 +44,20 @@ namespace WAS.Services.App
             return _stateStore.GetCurrentStepByEquipment(equipmentId);
         }
 
+        public async Task DeleteCurrentProcessMasterAsync(int processMasterId)
+        {
+            if (processMasterId <= 0)
+            {
+                throw new ArgumentException("ProcessMasterID must be greater than zero.");
+            }
+
+            await _scriptExecutor.ExecuteNonQueryAsync(
+                "App/ProcessMonitoring/DELETE_CURRENT_PROCESS_MASTER",
+                new { ProcessMasterId = processMasterId });
+
+            await ReloadCurrentStateAsync();
+        }
+
         public async Task ReloadCurrentStateAsync()
         {
             var executions = await _scriptExecutor.ExecuteQueryAsync<ProcessStepExecutionDto>(
@@ -62,7 +76,11 @@ namespace WAS.Services.App
                 "App/ProcessMonitoring/GET_CURRENT_EXECUTIONS_BY_WORK_ORDER_NO",
                 new { WorkOrderNo = workOrderNo });
 
-            _stateStore.UpsertWorkOrder(executions, Enumerable.Empty<ProcessInputDto>(), Enumerable.Empty<ProcessOutputDto>());
+            var workOrderId = executions.FirstOrDefault()?.WorkOrderID;
+            if (workOrderId.HasValue)
+            {
+                await AddWorkOrderToCurrentStateAsync(workOrderId.Value);
+            }
         }
 
         public async Task AddWorkOrderToCurrentStateAsync(int workOrderId)

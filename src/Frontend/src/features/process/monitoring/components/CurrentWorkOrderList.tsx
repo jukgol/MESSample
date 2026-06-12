@@ -78,14 +78,43 @@ const CurrentWorkOrderList: React.FC<CurrentWorkOrderListProps> = ({
               transform: 'none'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '0.75rem', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
                 <ClipboardList size={17} />
                 <span style={{ fontSize: '0.82rem' }}>{workOrder.workOrderNo || '-'}</span>
               </div>
-              <span style={{ ...statusStyle(workOrder.status), borderRadius: '8px', padding: '0.25rem 0.5rem', fontSize: '0.78rem', fontWeight: 700 }}>
-                {statusLabel(workOrder.status)}
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <span style={{ ...statusStyle(workOrder.status), borderRadius: '8px', padding: '0.25rem 0.5rem', fontSize: '0.78rem', fontWeight: 700 }}>
+                  {statusLabel(workOrder.status)}
+                </span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    alert(`삭제 요청: ${workOrder.workOrderNo}`);
+                  }}
+                  style={{
+                    padding: '0.2rem 0.45rem',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    color: '#f87171',
+                    backgroundColor: 'rgba(248, 113, 113, 0.1)',
+                    border: '1px solid rgba(248, 113, 113, 0.2)',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    whiteSpace: 'nowrap'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(248, 113, 113, 0.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(248, 113, 113, 0.1)';
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
             </div>
 
             <div style={{ color: 'white', fontWeight: 700, fontSize: '1rem', lineHeight: 1.3 }}>
