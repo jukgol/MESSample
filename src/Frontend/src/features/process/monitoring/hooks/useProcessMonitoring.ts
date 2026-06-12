@@ -103,6 +103,15 @@ export const useProcessMonitoring = () => {
           };
         });
       });
+      
+      // DB 상태 동기화를 위해 백그라운드 새로고침 수행
+      fetchCurrentWorkOrders();
+    });
+
+    connection.on('PlcProductionEventReceived', (data: any) => {
+      console.log('실시간 생산 이벤트 수신:', data);
+      // 생산 수량 증가 및 공정 상태(완료 여부 등)가 DB에 반영되었으므로 화면 전체 상태를 새로고침합니다.
+      fetchCurrentWorkOrders();
     });
 
     connection.start()
@@ -118,7 +127,7 @@ export const useProcessMonitoring = () => {
     return () => {
       connection.stop();
     };
-  }, []);
+  }, [fetchCurrentWorkOrders]);
 
   return {
     currentWorkOrders,

@@ -79,3 +79,4 @@ BEGIN
     WHERE process_step_execution_id = :ExecutionId
       AND status IN ('WAITING', 'RUNNING', 'PAUSED');
 END;
+-- query end

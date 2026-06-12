@@ -143,6 +143,12 @@ namespace WAS.Services.App
                 new { ExecutionId = executionId });
 
             await RefreshWorkOrderByExecutionAsync(executionId);
+
+            var currentStep = _stateStore.GetCurrentStepByExecution(executionId);
+            if (currentStep != null && !string.IsNullOrEmpty(currentStep.EquipmentID))
+            {
+                await SendStartToolStartAsync(new StartToolSignalRequestDto { EquipmentId = currentStep.EquipmentID });
+            }
         }
 
         public async Task CompleteExecutionAsync(int executionId)
@@ -288,9 +294,35 @@ namespace WAS.Services.App
         private async Task<StartToolSignalResponseDto> SendStartToolSignalAsync(string command, StartToolSignalRequestDto? dto)
         {
             var targetId = string.IsNullOrWhiteSpace(dto?.EquipmentId) ? null : dto.EquipmentId.Trim();
+            
+            int? targetQty = null;
+            int? currentQty = null;
+            if (string.Equals(command, "start", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(targetId))
+            {
+                var currentStep = _stateStore.GetCurrentStepByEquipment(targetId);
+                if (currentStep != null)
+                {
+                    var output = currentStep.Outputs.FirstOrDefault();
+                    if (output != null)
+                    {
+                        targetQty = output.TargetQty;
+                        currentQty = output.OutputQty;
+                    }
+                }
+            }
+
             var path = string.IsNullOrEmpty(targetId)
                 ? $"/{command}"
                 : $"/{command}?id={Uri.EscapeDataString(targetId)}";
+
+            if (targetQty.HasValue)
+            {
+                path += $"&target_qty={targetQty.Value}";
+                if (currentQty.HasValue)
+                {
+                    path += $"&current_qty={currentQty.Value}";
+                }
+            }
 
             try
             {

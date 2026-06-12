@@ -28,6 +28,18 @@ class SignalHandler(BaseHTTPRequestHandler):
         
         app_state = self.server.app_state
         target_id = query.get("id", [None])[0]
+        target_qty = query.get("target_qty", [None])[0]
+        current_qty = query.get("current_qty", [None])[0]
+        
+        try:
+            target_qty_val = int(target_qty) if target_qty else 0
+        except (ValueError, TypeError):
+            target_qty_val = 0
+
+        try:
+            current_qty_val = int(current_qty) if current_qty else 0
+        except (ValueError, TypeError):
+            current_qty_val = 0
         
         if path == "/start":
             if target_id:
@@ -42,6 +54,14 @@ class SignalHandler(BaseHTTPRequestHandler):
                         pass
                     
                     if is_match:
+                        # Update physical quantities
+                        app_state.update_step_value(eq_id, "target_qty", target_qty_val)
+                        app_state.update_step_value(eq_id, "produced_qty", current_qty_val)
+                        
+                        # In-memory runs calculation (Assuming 1-to-1 mapping for runs/qty, but separated conceptually)
+                        app_state.update_step_value(eq_id, "target_runs", target_qty_val)
+                        app_state.update_step_value(eq_id, "current_runs", current_qty_val)
+                        
                         app_state.update_step_value(eq_id, "is_running", True)
             else:
                 # Start all steps

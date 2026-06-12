@@ -156,8 +156,10 @@ class AppState:
                     "progress_status": "대기",
                     "ok_count": 0,
                     "ng_count": 0,
-                    "received_qty": 0,
-                    "consumed_qty": 0,
+                    "target_qty": 0,
+                    "produced_qty": 0,
+                    "target_runs": 0,
+                    "current_runs": 0,
                     "interval_sec": 5,
                     "is_running": False,
                     "step_id": step.get("stepID"),
@@ -179,8 +181,10 @@ class AppState:
                 "progress_status": "대기",
                 "ok_count": 0,
                 "ng_count": 0,
-                "received_qty": 0,
-                "consumed_qty": 0,
+                "target_qty": 0,
+                "produced_qty": 0,
+                "target_runs": 0,
+                "current_runs": 0,
                 "interval_sec": 5,
                 "is_running": False,
             }
@@ -209,6 +213,27 @@ class AppState:
                 pass
         except Exception as e:
             print(f"[TestTool] Failed to report state to WAS: {e}")
+
+    def report_production_to_was(self, equipment_id: str, event: str, qty: int) -> None:
+        import datetime
+        url = "http://localhost:5175/api/plc/equipment-data/production"
+        payload = {
+            "EquipmentID": equipment_id,
+            "Event": event,
+            "Qty": qty,
+            "OccurredAt": datetime.datetime.utcnow().isoformat() + "Z"
+        }
+        try:
+            req = urllib.request.Request(
+                url, 
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=3) as response:
+                pass
+        except Exception as e:
+            print(f"[TestTool] Failed to report production to WAS: {e}")
 
     def update_step_value(self, equipment_id: str, key: str, value: any) -> None:
         eq = next((item for item in self.created_equipments if item["equipment_id"] == equipment_id), None)

@@ -190,3 +190,4 @@ BEGIN
         );
     END LOOP;
 END;
+-- query end

@@ -75,8 +75,10 @@ class ProcessGridPanel(ttk.LabelFrame):
             eq_id = eq["equipment_id"]
             if eq_id in self.cards:
                 widgets = self.cards[eq_id]
-                widgets["lbl_recv"].config(text=f"받은 수량: {eq['received_qty']} EA")
-                widgets["lbl_cons"].config(text=f"소모 수량: {eq['consumed_qty']} EA")
+                if "lbl_qty" in widgets:
+                    widgets["lbl_qty"].config(text=f"물품 수량: {eq.get('produced_qty', 0)} / {eq.get('target_qty', 0)} EA")
+                if "lbl_target" in widgets:
+                    widgets["lbl_target"].config(text=f"공정 횟수: {eq.get('current_runs', 0)} / {eq.get('target_runs', 0)} 회")
                 
                 is_running = eq.get("is_running", True)
                 widgets["btn_toggle"].config(
@@ -100,10 +102,12 @@ class ProcessGridPanel(ttk.LabelFrame):
                 except ValueError:
                     pass
 
-    def _update_card_labels(self, eq_id: str, received_qty: int, consumed_qty: int) -> None:
+    def _update_card_labels(self, eq_id: str, produced_qty: int, target_qty: int, current_runs: int, target_runs: int) -> None:
         if eq_id in self.cards:
-            self.cards[eq_id]["lbl_recv"].config(text=f"받은 수량: {received_qty} EA")
-            self.cards[eq_id]["lbl_cons"].config(text=f"소모 수량: {consumed_qty} EA")
+            if "lbl_qty" in self.cards[eq_id]:
+                self.cards[eq_id]["lbl_qty"].config(text=f"물품 수량: {produced_qty} / {target_qty} EA")
+            if "lbl_target" in self.cards[eq_id]:
+                self.cards[eq_id]["lbl_target"].config(text=f"공정 횟수: {current_runs} / {target_runs} 회")
 
     def _toggle_simulation(self, eq_id: str) -> None:
         eq = next((item for item in self.state.created_equipments if item["equipment_id"] == eq_id), None)
@@ -166,16 +170,42 @@ class ProcessGridPanel(ttk.LabelFrame):
             if self.elapsed_times[eq_id] >= interval_limit:
                 self.elapsed_times[eq_id] = 0
                 
-                added_recv = random.randint(1, 3)
-                added_cons = random.randint(0, added_recv)
+                # Increment current runs and produced qty (1-to-1 assumption but decoupled)
+                next_runs = current_eq.get("current_runs", 0) + 1
+                next_qty = current_eq.get("produced_qty", 0) + 1
                 
-                new_recv = current_eq.get("received_qty", 0) + added_recv
-                new_cons = current_eq.get("consumed_qty", 0) + added_cons
+                current_eq["current_runs"] = next_runs
+                current_eq["produced_qty"] = next_qty
                 
-                current_eq["received_qty"] = new_recv
-                current_eq["consumed_qty"] = new_cons
+                target_runs_limit = current_eq.get("target_runs", 0)
+                target_qty_limit = current_eq.get("target_qty", 0)
                 
-                self._update_card_labels(eq_id, new_recv, new_cons)
+                is_done = False
+                event_type = "PRODUCED"
+                
+                if target_qty_limit > 0 and next_qty >= target_qty_limit:
+                    event_type = "COMPLETED"
+                    is_done = True
+                
+                self._update_card_labels(
+                    eq_id, 
+                    next_qty,
+                    target_qty_limit,
+                    next_runs, 
+                    target_runs_limit
+                )
+                
+                # Report production event to WAS in a background thread to prevent UI lag
+                import threading
+                threading.Thread(
+                    target=lambda: self.state.report_production_to_was(eq_id, event_type, 1),
+                    daemon=True
+                ).start()
+                
+                if is_done:
+                    # Target achieved, stop the simulation
+                    self.state.update_step_value(eq_id, "is_running", False)
+                    return
                 
                 if eq_id in self.cards:
                     self.cards[eq_id]["lbl_timer"].config(text=" (0초)", foreground="blue")
@@ -249,14 +279,23 @@ class ProcessGridPanel(ttk.LabelFrame):
             ttk.Separator(card, orient="horizontal").pack(fill=tk.X, pady=4)
             
             # Qty Info Frame (Compact list)
+            # Qty Info Frame (Compact list)
             info_frame = ttk.Frame(card)
             info_frame.pack(fill=tk.X, pady=3)
             
-            lbl_recv = ttk.Label(info_frame, text=f"받은 수량: {eq.get('received_qty', 0)} EA", font=("Malgun Gothic", 9))
-            lbl_recv.pack(anchor=tk.W)
-            
-            lbl_cons = ttk.Label(info_frame, text=f"소모 수량: {eq.get('consumed_qty', 0)} EA", font=("Malgun Gothic", 9))
-            lbl_cons.pack(anchor=tk.W)
+            lbl_qty = ttk.Label(
+                info_frame,
+                text=f"물품 수량: {eq.get('produced_qty', 0)} / {eq.get('target_qty', 0)} EA",
+                font=("Malgun Gothic", 9)
+            )
+            lbl_qty.pack(anchor=tk.W)
+
+            lbl_target = ttk.Label(
+                info_frame, 
+                text=f"공정 횟수: {eq.get('current_runs', 0)} / {eq.get('target_runs', 0)} 회", 
+                font=("Malgun Gothic", 9)
+            )
+            lbl_target.pack(anchor=tk.W)
             
             # Interval config frame (Inline)
             interval_frame = ttk.Frame(card)
@@ -292,15 +331,15 @@ class ProcessGridPanel(ttk.LabelFrame):
             # Save reference
             self.cards[eq_id] = {
                 "card": card,
-                "lbl_recv": lbl_recv,
-                "lbl_cons": lbl_cons,
+                "lbl_qty": lbl_qty,
+                "lbl_target": lbl_target,
                 "var_interval": var_interval,
                 "lbl_timer": lbl_timer,
                 "btn_toggle": btn_toggle,
             }
             
             # Bind mouse wheel to card children so scrolling works everywhere
-            for w in [card, header_frame, lbl_name, info_frame, lbl_recv, lbl_cons, interval_frame, lbl_timer]:
+            for w in [card, header_frame, lbl_name, info_frame, lbl_qty, lbl_target, interval_frame, lbl_timer]:
                 w.bind("<MouseWheel>", lambda e: self.canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
             
             # Start timer if not already running and it is active

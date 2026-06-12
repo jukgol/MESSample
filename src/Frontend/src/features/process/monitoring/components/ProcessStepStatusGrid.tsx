@@ -6,6 +6,8 @@ import { api } from '../../../../api/client';
 interface ProcessStepStatusGridProps {
   steps: CurrentProcessStepStateDto[];
   loading: boolean;
+  selectedExecutionId?: number | null;
+  onSelectExecution?: (id: number) => void;
 }
 
 const statusMeta = (status?: string | null) => {
@@ -23,7 +25,12 @@ const statusMeta = (status?: string | null) => {
   }
 };
 
-const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, loading }) => {
+const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ 
+  steps, 
+  loading,
+  selectedExecutionId = null,
+  onSelectExecution
+}) => {
   const [selectedInputStep, setSelectedInputStep] = useState<CurrentProcessStepStateDto | null>(null);
   const sortedSteps = [...steps].sort((a, b) => (a.seqNo || 0) - (b.seqNo || 0));
 
@@ -40,11 +47,17 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
       <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(230px, 1fr))', gap: '0.85rem' }}>
         {sortedSteps.map((step, index) => {
           const meta = statusMeta(step.status);
+          const isSelected = selectedExecutionId !== null && selectedExecutionId === step.processStepExecutionID;
 
           return (
             <article
               key={step.processStepExecutionID || `${step.processStepID}-${index}`}
               className="premium-card"
+              onClick={() => {
+                if (step.processStepExecutionID && onSelectExecution) {
+                  onSelectExecution(step.processStepExecutionID);
+                }
+              }}
               style={{
                 borderRadius: '8px',
                 padding: '1rem',
@@ -53,7 +66,13 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 gap: '1rem',
-                border: `1px solid ${meta.border}`
+                border: isSelected 
+                  ? '2px solid var(--accent-primary)' 
+                  : `1px solid ${meta.border}`,
+                cursor: step.processStepExecutionID ? 'pointer' : 'default',
+                transform: isSelected ? 'translateY(-2px)' : 'none',
+                boxShadow: isSelected ? '0 8px 20px rgba(99, 102, 241, 0.25)' : 'none',
+                transition: 'all 0.2s ease-in-out'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem' }}>
@@ -71,7 +90,8 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <button
-                    onClick={async () => {
+                    onClick={async (e) => {
+                      e.stopPropagation();
                       const isRunning = step.status === 'RUNNING';
                       try {
                         const reqDto = {
@@ -136,21 +156,21 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                 </div>
               </div>
 
-              {step.outputs && step.outputs.length > 0 && (
-                <div style={{
-                  marginTop: '0.5rem',
-                  paddingTop: '0.6rem',
-                  borderTop: '1px dashed rgba(255,255,255,0.08)',
-                  fontSize: '0.78rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem'
-                }}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                    <div style={{ color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                      <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#34d399' }}></span>
-                      생산 LOT ({step.outputs.length})
-                    </div>
+              <div style={{
+                marginTop: '0.5rem',
+                paddingTop: '0.6rem',
+                borderTop: '1px dashed rgba(255,255,255,0.08)',
+                fontSize: '0.78rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem'
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  <div style={{ color: 'var(--text-secondary)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <span style={{ display: 'inline-block', width: '5px', height: '5px', borderRadius: '50%', background: '#34d399' }}></span>
+                    출력
+                  </div>
+                  {step.outputs && step.outputs.length > 0 ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
                       {step.outputs.map(output => (
                         <div key={output.processOutputID} style={{ 
@@ -161,28 +181,29 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({ steps, lo
                           color: '#34d399',
                           fontSize: '0.75rem',
                           display: 'flex',
-                          flexDirection: 'column',
-                          gap: '0.2rem'
+                          justifyContent: 'space-between',
+                          alignItems: 'center'
                         }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--text-secondary)' }}>제품:</span>
-                            <span style={{ fontWeight: 600, color: 'white' }}>{output.itemName || '-'}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: 'var(--text-secondary)' }}>LOT / 수량:</span>
-                            <span style={{ fontWeight: 700 }}>{output.lotNo || '-'} ({output.outputQty || 0}개)</span>
-                          </div>
+                          <span style={{ fontWeight: 600 }}>{output.itemName || '-'}</span>
+                          <span style={{ fontWeight: 700, color: 'white' }}>{output.outputQty || 0}개</span>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  ) : (
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontStyle: 'italic', paddingLeft: '0.5rem' }}>
+                      생산 대기 중
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               <div style={{ marginTop: '0.5rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
-                  onClick={() => setSelectedInputStep(step)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedInputStep(step);
+                  }}
                   style={{
                     width: '100%',
                     padding: '0.45rem',

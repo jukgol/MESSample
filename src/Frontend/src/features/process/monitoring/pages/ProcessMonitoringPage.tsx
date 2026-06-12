@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import CurrentWorkOrderList from '../components/CurrentWorkOrderList';
 import ProcessMonitoringErrorAlert from '../components/ProcessMonitoringErrorAlert';
 import ProcessMonitoringHeader from '../components/ProcessMonitoringHeader';
 import ProcessStepStatusGrid from '../components/ProcessStepStatusGrid';
 import { useProcessMonitoring } from '../hooks/useProcessMonitoring';
+import { api } from '../../../../api/client';
 
 const ProcessMonitoringPage: React.FC = () => {
   const {
@@ -17,15 +18,40 @@ const ProcessMonitoringPage: React.FC = () => {
     deleteCurrentProcessMaster
   } = useProcessMonitoring();
 
+  const [selectedExecutionId, setSelectedExecutionId] = useState<number | null>(null);
+
   useEffect(() => {
     fetchCurrentWorkOrders();
   }, [fetchCurrentWorkOrders]);
+
+  useEffect(() => {
+    setSelectedExecutionId(null);
+  }, [selectedWorkOrderId]);
+
+  const handleStartExecution = useCallback(async () => {
+    if (!selectedExecutionId) {
+      alert('실행할 공정을 선택해주세요.');
+      return;
+    }
+    try {
+      await api.api.processMonitoringExecutionsStartCreate(selectedExecutionId);
+      alert('공정 실행이 시작되었습니다.');
+      fetchCurrentWorkOrders();
+      setSelectedExecutionId(null);
+    } catch (err: any) {
+      console.error(err);
+      const msg = err.response?.data?.message || err.message || '오류 발생';
+      alert(`공정 실행 시작 실패: ${msg}`);
+    }
+  }, [selectedExecutionId, fetchCurrentWorkOrders]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', minHeight: 0 }}>
       <ProcessMonitoringHeader 
         loading={loading} 
         onRefresh={fetchCurrentWorkOrders} 
+        onStartExecution={handleStartExecution}
+        hasSelection={!!selectedExecutionId}
       />
       <ProcessMonitoringErrorAlert message={error} />
 
@@ -50,6 +76,8 @@ const ProcessMonitoringPage: React.FC = () => {
         <ProcessStepStatusGrid
           steps={selectedWorkOrder?.steps || []}
           loading={loading}
+          selectedExecutionId={selectedExecutionId}
+          onSelectExecution={setSelectedExecutionId}
         />
       </section>
     </div>

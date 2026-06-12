@@ -5,11 +5,15 @@ import { api } from '../../../../api/client';
 interface ProcessMonitoringHeaderProps {
   loading: boolean;
   onRefresh: () => void;
+  onStartExecution?: () => void;
+  hasSelection?: boolean;
 }
 
 const ProcessMonitoringHeader: React.FC<ProcessMonitoringHeaderProps> = ({ 
   loading, 
-  onRefresh 
+  onRefresh,
+  onStartExecution,
+  hasSelection = false
 }) => {
   return (
     <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
@@ -24,6 +28,30 @@ const ProcessMonitoringHeader: React.FC<ProcessMonitoringHeaderProps> = ({
       </div>
 
       <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <button
+          type="button"
+          onClick={onStartExecution}
+          disabled={!hasSelection}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            borderRadius: '8px',
+            border: 'none',
+            background: hasSelection ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(255, 255, 255, 0.08)',
+            color: hasSelection ? 'white' : 'rgba(255, 255, 255, 0.35)',
+            padding: '0.6rem 1rem',
+            cursor: hasSelection ? 'pointer' : 'not-allowed',
+            fontWeight: 600,
+            fontSize: '0.9rem',
+            boxShadow: hasSelection ? '0 4px 12px rgba(16, 185, 129, 0.25)' : 'none',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <Play size={16} fill={hasSelection ? 'white' : 'rgba(255, 255, 255, 0.35)'} />
+          선택 공정 실행
+        </button>
+
         <button
           type="button"
           onClick={async () => {
