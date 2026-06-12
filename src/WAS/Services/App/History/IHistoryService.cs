@@ -7,5 +7,6 @@ namespace WAS.Services.App
         Task<IEnumerable<WorkOrderHistoryDto>> GetWorkOrderHistoryAsync();
         Task<IEnumerable<LotRelationHistoryDto>> GetLotRelationsAsync();
         Task<IEnumerable<LotTraceHistoryDto>> GetLotTraceAsync(int lotId);
+        Task<IEnumerable<LotStockHistoryDto>> GetLotStockHistoryAsync();
     }
 }

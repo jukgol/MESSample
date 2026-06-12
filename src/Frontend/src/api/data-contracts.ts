@@ -282,6 +282,30 @@ export interface LotRelationHistoryDto {
   createdAt?: string;
 }
 
+export interface LotStockHistoryDto {
+  /** @format int32 */
+  lotStockHistoryID?: number;
+  /** @format int32 */
+  lotID?: number;
+  lotNo?: string | null;
+  /** @format int32 */
+  itemID?: number;
+  itemName?: string | null;
+  changeType?: string | null;
+  /** @format int32 */
+  beforeQty?: number;
+  /** @format int32 */
+  changeQty?: number;
+  /** @format int32 */
+  afterQty?: number;
+  reason?: string | null;
+  refType?: string | null;
+  /** @format int32 */
+  refID?: number | null;
+  /** @format date-time */
+  createdAt?: string;
+}
+
 export interface LotTraceHistoryDto {
   /** @format int32 */
   lotRelationID?: number;

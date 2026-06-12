@@ -174,18 +174,19 @@ namespace WAS.Services.App
 
         public async Task CreateMissingOutputLotTracesAsync(int executionId)
         {
-            var outputs = await _scriptExecutor.ExecuteQueryAsync<ProcessMonitoringOutputTraceDto>(
+            var traces = await _scriptExecutor.ExecuteQueryAsync<ProcessMonitoringOutputInputTraceDto>(
                 "App/ProcessMonitoring/GET_OUTPUTS_WITHOUT_TRACE_BY_EXECUTION",
                 new { ExecutionId = executionId });
 
-            foreach (var output in outputs)
+            foreach (var trace in traces)
             {
                 await _lotService.CreateLotTraceAsync(new LotTraceCreateDto
                 {
-                    ChildLotID = output.LotID,
+                    ParentLotID = trace.ParentLotID,
+                    ChildLotID = trace.ChildLotID,
                     TraceType = "PROCESS_OUTPUT",
-                    InputQty = null,
-                    OutputQty = output.OutputQty,
+                    InputQty = trace.InputQty,
+                    OutputQty = trace.OutputQty,
                     ProcessStepExecutionID = executionId,
                     RefType = "PROCESS_STEP_EXECUTION",
                     RefID = executionId

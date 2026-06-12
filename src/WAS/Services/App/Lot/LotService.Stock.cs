@@ -14,6 +14,12 @@ namespace WAS.Services.App
             await ChangeLotStockAsync(lotId, -qty, "DECREASE", reason, refType, refId, resetReservedQty: true);
         }
 
+        public async Task ConsumeLotStockAsync(int lotId, int qty, string reason, string? refType = null, int? refId = null)
+        {
+            if (qty <= 0) throw new ArgumentException("Consume quantity must be greater than 0.");
+            await ChangeLotStockAsync(lotId, -qty, "CONSUME", reason, refType, refId, resetReservedQty: true);
+        }
+
         public async Task AdjustLotStockAsync(int lotId, int targetQty, string reason, string? refType = null, int? refId = null)
         {
             if (targetQty < 0) throw new ArgumentException("Target quantity cannot be negative.");

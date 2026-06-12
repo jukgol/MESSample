@@ -35,7 +35,7 @@ namespace WAS.Services.App
 
             foreach (var input in inputs.Where(x => x.UsedQty == 0 && x.RemainQty == x.InputQty))
             {
-                await _lotService.DecreaseLotStockAsync(
+                await _lotService.ConsumeLotStockAsync(
                     input.LotID,
                     input.InputQty,
                     "Reserved lot consumed by process execution start",

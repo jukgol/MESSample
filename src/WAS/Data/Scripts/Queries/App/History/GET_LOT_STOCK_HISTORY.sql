@@ -1,0 +1,18 @@
+SELECT H.LOT_STOCK_HISTORY_ID AS LotStockHistoryID,
+       H.LOT_ID AS LotID,
+       L.LOT_NO AS LotNo,
+       L.ITEM_ID AS ItemID,
+       I.ITEM_NAME AS ItemName,
+       H.CHANGE_TYPE AS ChangeType,
+       H.BEFORE_QTY AS BeforeQty,
+       H.CHANGE_QTY AS ChangeQty,
+       H.AFTER_QTY AS AfterQty,
+       H.REASON AS Reason,
+       H.REF_TYPE AS RefType,
+       H.REF_ID AS RefID,
+       H.CREATED_AT AS CreatedAt
+FROM LOT_STOCK_HISTORY H
+JOIN LOT L ON L.LOT_ID = H.LOT_ID
+JOIN ITEM I ON I.ITEM_ID = L.ITEM_ID
+ORDER BY H.CREATED_AT DESC,
+         H.LOT_STOCK_HISTORY_ID DESC

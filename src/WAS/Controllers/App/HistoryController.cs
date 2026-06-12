@@ -75,5 +75,22 @@ namespace WAS.Controllers.App
                 return StatusCode(500, new { Message = $"Lot trace history query failed: {ex.Message}" });
             }
         }
+
+        [HttpGet("lot-stock")]
+        [HasPermission(Permissions.ProcessView)]
+        [ProducesResponseType(typeof(IEnumerable<LotStockHistoryDto>), 200)]
+        [ProducesResponseType(401)]
+        public async Task<ActionResult<IEnumerable<LotStockHistoryDto>>> GetLotStockHistory()
+        {
+            try
+            {
+                var rows = await _historyService.GetLotStockHistoryAsync();
+                return Ok(rows);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = $"Lot stock history query failed: {ex.Message}" });
+            }
+        }
     }
 }

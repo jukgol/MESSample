@@ -13,11 +13,9 @@ const LotTraceHistoryPage: React.FC = () => {
     if (!searchText) return traceList;
     const lower = searchText.toLowerCase();
     return traceList.filter(item => {
-      const parentLotMatch = (item.parentLotNo || '').toLowerCase().includes(lower);
-      const childLotMatch = (item.childLotNo || '').toLowerCase().includes(lower);
-      const parentItemMatch = (item.parentItemName || '').toLowerCase().includes(lower);
-      const childItemMatch = (item.childItemName || '').toLowerCase().includes(lower);
-      return parentLotMatch || childLotMatch || parentItemMatch || childItemMatch;
+      const lotNoMatch = (item.lotNo || '').toLowerCase().includes(lower);
+      const itemNameMatch = (item.itemName || '').toLowerCase().includes(lower);
+      return lotNoMatch || itemNameMatch;
     });
   }, [traceList, searchText]);
 

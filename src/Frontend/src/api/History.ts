@@ -12,6 +12,7 @@
 
 import {
   LotRelationHistoryDto,
+  LotStockHistoryDto,
   LotTraceHistoryDto,
   ProblemDetails,
   WorkOrderHistoryDto,
@@ -59,6 +60,20 @@ export class History<
   historyLotsTraceList = (lotId: number, params: RequestParams = {}) =>
     this.request<LotTraceHistoryDto[], ProblemDetails>({
       path: `/api/History/lots/${lotId}/trace`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+   * No description
+   *
+   * @tags History
+   * @name HistoryLotStockList
+   * @request GET:/api/History/lot-stock
+   */
+  historyLotStockList = (params: RequestParams = {}) =>
+    this.request<LotStockHistoryDto[], ProblemDetails>({
+      path: `/api/History/lot-stock`,
       method: "GET",
       format: "json",
       ...params,

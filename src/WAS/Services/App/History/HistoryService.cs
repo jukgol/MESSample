@@ -27,5 +27,11 @@ namespace WAS.Services.App
                 "App/History/GET_LOT_TRACE",
                 new { LotId = lotId });
         }
+
+        public async Task<IEnumerable<LotStockHistoryDto>> GetLotStockHistoryAsync()
+        {
+            return await _scriptExecutor.ExecuteQueryAsync<LotStockHistoryDto>(
+                "App/History/GET_LOT_STOCK_HISTORY");
+        }
     }
 }

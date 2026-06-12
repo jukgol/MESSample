@@ -117,6 +117,14 @@ namespace Shared.Models.App
         public int OutputQty { get; set; }
     }
 
+    public class ProcessMonitoringOutputInputTraceDto
+    {
+        public int ParentLotID { get; set; }
+        public int ChildLotID { get; set; }
+        public int InputQty { get; set; }
+        public int OutputQty { get; set; }
+    }
+
     public class ProcessOutputCountDto
     {
         public int OutputCount { get; set; }

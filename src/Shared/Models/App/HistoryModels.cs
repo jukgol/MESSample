@@ -29,4 +29,21 @@ namespace Shared.Models.App
         public string Direction { get; set; } = string.Empty;
         public int TraceDepth { get; set; }
     }
+
+    public class LotStockHistoryDto
+    {
+        public int LotStockHistoryID { get; set; }
+        public int LotID { get; set; }
+        public string LotNo { get; set; } = string.Empty;
+        public int ItemID { get; set; }
+        public string ItemName { get; set; } = string.Empty;
+        public string ChangeType { get; set; } = string.Empty;
+        public int BeforeQty { get; set; }
+        public int ChangeQty { get; set; }
+        public int AfterQty { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public string RefType { get; set; } = string.Empty;
+        public int? RefID { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
 }

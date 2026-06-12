@@ -788,6 +788,64 @@
         }
       }
     },
+    "/api/History/lot-stock": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotStockHistoryDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotStockHistoryDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LotStockHistoryDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Item": {
       "get": {
         "tags": [
@@ -6135,6 +6193,65 @@
             "nullable": true
           },
           "stepName": {
+            "type": "string",
+            "nullable": true
+          },
+          "refType": {
+            "type": "string",
+            "nullable": true
+          },
+          "refID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LotStockHistoryDto": {
+        "type": "object",
+        "properties": {
+          "lotStockHistoryID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lotID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lotNo": {
+            "type": "string",
+            "nullable": true
+          },
+          "itemID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "itemName": {
+            "type": "string",
+            "nullable": true
+          },
+          "changeType": {
+            "type": "string",
+            "nullable": true
+          },
+          "beforeQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "changeQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "afterQty": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
             "type": "string",
             "nullable": true
           },
