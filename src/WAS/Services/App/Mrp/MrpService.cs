@@ -31,7 +31,8 @@ namespace WAS.Services.App
                     row.StepID,
                     row.StepName,
                     row.SeqNo,
-                    row.StepType
+                    row.StepType,
+                    row.RecipeID
                 })
                 .OrderBy(group => group.Key.SeqNo)
                 .Select(group => new MrpStepDetailDto
@@ -40,11 +41,13 @@ namespace WAS.Services.App
                     StepName = group.Key.StepName,
                     SeqNo = group.Key.SeqNo,
                     StepType = group.Key.StepType,
+                    RecipeID = group.Key.RecipeID,
                     Items = group
                         .Where(row => row.BomID.HasValue && row.ChildItemID.HasValue && row.BomQty.HasValue)
                         .Select(row =>
                         {
                             var requiredQty = row.BomQty!.Value * request.TargetQty;
+                            var hasLotStock = row.LotCount > 0;
                             var shortage = requiredQty > row.CurrentStock ? requiredQty - row.CurrentStock : 0;
 
                             return new MrpItemDetailDto
@@ -56,7 +59,8 @@ namespace WAS.Services.App
                                 RequiredQty = requiredQty,
                                 CurrentStock = row.CurrentStock,
                                 Shortage = shortage,
-                                IsSufficient = row.CurrentStock >= requiredQty
+                                HasLotStock = hasLotStock,
+                                IsSufficient = hasLotStock && row.CurrentStock >= requiredQty
                             };
                         })
                         .ToList()
@@ -65,6 +69,8 @@ namespace WAS.Services.App
 
             var totalItemsCount = steps.Sum(step => step.Items.Count);
             var shortageItemsCount = steps.Sum(step => step.Items.Count(item => !item.IsSufficient));
+            var missingRecipeStepsCount = steps.Count(step => step.Items.Count == 0);
+            var missingLotItemsCount = steps.Sum(step => step.Items.Count(item => !item.HasLotStock));
 
             return new MrpSimulationResultDto
             {
@@ -72,7 +78,9 @@ namespace WAS.Services.App
                 {
                     TotalItemsCount = totalItemsCount,
                     ShortageItemsCount = shortageItemsCount,
-                    IsFeasible = shortageItemsCount == 0
+                    MissingRecipeStepsCount = missingRecipeStepsCount,
+                    MissingLotItemsCount = missingLotItemsCount,
+                    IsFeasible = shortageItemsCount == 0 && missingRecipeStepsCount == 0
                 },
                 Steps = steps
             };

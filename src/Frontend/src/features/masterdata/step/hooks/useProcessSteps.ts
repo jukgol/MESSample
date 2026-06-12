@@ -9,7 +9,7 @@ export interface ProcessStep {
   description: string;
   processMasterID?: number | null;
   processMasterName?: string | null;
-  equipmentID?: string | null;
+  equipmentID: string;
   createdAt?: string;
 }
 
@@ -19,7 +19,7 @@ export interface ProcessStepCreateDto {
   stepType: string;
   description: string;
   processMasterID?: number | null;
-  equipmentID?: string | null;
+  equipmentID: string;
 }
 
 export interface ProcessStepUpdateDto {
@@ -28,7 +28,7 @@ export interface ProcessStepUpdateDto {
   stepType: string;
   description: string;
   processMasterID?: number | null;
-  equipmentID?: string | null;
+  equipmentID: string;
 }
 
 export const useProcessSteps = () => {
@@ -53,7 +53,7 @@ export const useProcessSteps = () => {
           description: step.description || '-',
           processMasterID: step.processMasterID || step.processMasterId || null,
           processMasterName: step.processMasterName || null,
-          equipmentID: step.equipmentID || step.equipmentId || null,
+          equipmentID: step.equipmentID || step.equipmentId || '',
           createdAt: step.createdAt
         }));
         setProcessSteps(mappedSteps);

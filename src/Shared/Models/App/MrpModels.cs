@@ -18,6 +18,8 @@ namespace Shared.Models.App
     {
         public int TotalItemsCount { get; set; }
         public int ShortageItemsCount { get; set; }
+        public int MissingRecipeStepsCount { get; set; }
+        public int MissingLotItemsCount { get; set; }
         public bool IsFeasible { get; set; }
     }
 
@@ -27,6 +29,7 @@ namespace Shared.Models.App
         public string StepName { get; set; } = string.Empty;
         public int SeqNo { get; set; }
         public string StepType { get; set; } = string.Empty;
+        public int? RecipeID { get; set; }
         public List<MrpItemDetailDto> Items { get; set; } = new();
     }
 
@@ -39,6 +42,7 @@ namespace Shared.Models.App
         public int RequiredQty { get; set; }
         public int CurrentStock { get; set; }
         public int Shortage { get; set; }
+        public bool HasLotStock { get; set; }
         public bool IsSufficient { get; set; }
     }
 
@@ -48,10 +52,12 @@ namespace Shared.Models.App
         public string StepName { get; set; } = string.Empty;
         public int SeqNo { get; set; }
         public string StepType { get; set; } = string.Empty;
+        public int? RecipeID { get; set; }
         public int? BomID { get; set; }
         public int? ChildItemID { get; set; }
         public string? ChildItemName { get; set; }
         public int? BomQty { get; set; }
         public int CurrentStock { get; set; }
+        public int LotCount { get; set; }
     }
 }

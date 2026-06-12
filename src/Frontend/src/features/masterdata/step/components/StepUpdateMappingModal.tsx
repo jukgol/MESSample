@@ -10,7 +10,7 @@ interface StepUpdateMappingModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedStep: ProcessStep | null;
-  onUpdateStep: (id: number, dto: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID?: string | null }) => Promise<boolean>;
+  onUpdateStep: (id: number, dto: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID: string }) => Promise<boolean>;
 }
 
 const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
@@ -94,12 +94,16 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
   const handleUpdateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedStep.stepID) return;
+    if (!updateForm.equipmentID.trim()) {
+      alert('?ㅻ퉬 ID (Equipment ID)?? ?꾩닔 ?낅젰 ??ぉ?낅땲??');
+      return;
+    }
     const success = await onUpdateStep(selectedStep.stepID, {
       stepName: updateForm.stepName,
       seqNo: Number(updateForm.seqNo),
       stepType: updateForm.stepType,
       description: updateForm.description,
-      equipmentID: updateForm.equipmentID.trim() || null
+      equipmentID: updateForm.equipmentID.trim()
     });
     if (success) {
       onClose();
@@ -375,6 +379,7 @@ const StepUpdateMappingModal: React.FC<StepUpdateMappingModalProps> = ({
               <input
                 type="text"
                 placeholder="예: EQ-001 (선택 사항)"
+                required
                 value={updateForm.equipmentID}
                 onChange={(e) => setUpdateForm({ ...updateForm, equipmentID: e.target.value })}
                 style={{

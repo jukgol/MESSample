@@ -4,6 +4,8 @@ import type { MrpStepDetail } from '../../hooks/useMrp';
 export interface MrpSummary {
   totalItemsCount: number;
   shortageItemsCount: number;
+  missingRecipeStepsCount: number;
+  missingLotItemsCount: number;
   isFeasible: boolean;
 }
 

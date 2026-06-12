@@ -177,14 +177,16 @@ const ProcessStepStatusGrid: React.FC<ProcessStepStatusGridProps> = ({
                           background: 'rgba(52, 211, 153, 0.06)', 
                           border: '1px solid rgba(52, 211, 153, 0.15)', 
                           borderRadius: '6px', 
-                          padding: '0.4rem 0.6rem', 
+                          padding: '0.7rem 0.75rem', 
                           color: '#34d399',
-                          fontSize: '0.75rem',
+                          fontSize: '1.5rem',
                           display: 'flex',
                           justifyContent: 'space-between',
-                          alignItems: 'center'
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          minHeight: '3.2rem'
                         }}>
-                          <span style={{ fontWeight: 600 }}>{output.itemName || '-'}</span>
+                          <span style={{ fontWeight: 600, fontSize: '0.8rem', lineHeight: 1.15 }}>{output.itemName || '-'}</span>
                           <span style={{ fontWeight: 700, color: 'white' }}>{output.outputQty || 0}개</span>
                         </div>
                       ))}

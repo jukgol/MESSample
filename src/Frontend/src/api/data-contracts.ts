@@ -360,6 +360,7 @@ export interface MrpItemDetailDto {
   currentStock?: number;
   /** @format int32 */
   shortage?: number;
+  hasLotStock?: boolean;
   isSufficient?: boolean;
 }
 
@@ -382,6 +383,8 @@ export interface MrpStepDetailDto {
   /** @format int32 */
   seqNo?: number;
   stepType?: string | null;
+  /** @format int32 */
+  recipeID?: number | null;
   items?: MrpItemDetailDto[] | null;
 }
 
@@ -390,6 +393,10 @@ export interface MrpSummaryDto {
   totalItemsCount?: number;
   /** @format int32 */
   shortageItemsCount?: number;
+  /** @format int32 */
+  missingRecipeStepsCount?: number;
+  /** @format int32 */
+  missingLotItemsCount?: number;
   isFeasible?: boolean;
 }
 
@@ -684,6 +691,16 @@ export interface TableDataResponse {
   columns?: string[] | null;
   rows?: any[] | null;
   metadata?: ColumnMetadata[] | null;
+}
+
+export interface UpdateProcessRequest {
+  /** @format int32 */
+  processStepId?: number | null;
+}
+
+export interface UpdateQtyRequest {
+  /** @format int32 */
+  qty?: number;
 }
 
 export interface UserInfo {

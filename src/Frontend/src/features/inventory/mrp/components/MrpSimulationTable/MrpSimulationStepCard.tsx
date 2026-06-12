@@ -49,7 +49,7 @@ const MrpSimulationStepCard: React.FC<MrpSimulationStepCardProps> = ({ step }) =
       </div>
 
       <div style={{ padding: '0 8px' }}>
-        <MrpMaterialTable items={step.items} />
+        <MrpMaterialTable items={step.items} recipeID={step.recipeID} />
       </div>
     </div>
   );

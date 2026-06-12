@@ -10,6 +10,7 @@ export interface MrpItemDetail {
   requiredQty: number;
   currentStock: number;
   shortage: number;
+  hasLotStock: boolean;
   isSufficient: boolean;
 }
 
@@ -18,12 +19,15 @@ export interface MrpStepDetail {
   stepName: string;
   seqNo: number;
   stepType: string;
+  recipeID?: number | null;
   items: MrpItemDetail[];
 }
 
 interface MrpSummary {
   totalItemsCount: number;
   shortageItemsCount: number;
+  missingRecipeStepsCount: number;
+  missingLotItemsCount: number;
   isFeasible: boolean;
 }
 
@@ -33,6 +37,10 @@ interface MrpSimulationResponse {
     TotalItemsCount?: number;
     shortageItemsCount?: number;
     ShortageItemsCount?: number;
+    missingRecipeStepsCount?: number;
+    MissingRecipeStepsCount?: number;
+    missingLotItemsCount?: number;
+    MissingLotItemsCount?: number;
     isFeasible?: boolean;
     IsFeasible?: boolean;
   };
@@ -44,6 +52,8 @@ interface MrpSimulationResponse {
 const emptySummary: MrpSummary = {
   totalItemsCount: 0,
   shortageItemsCount: 0,
+  missingRecipeStepsCount: 0,
+  missingLotItemsCount: 0,
   isFeasible: true
 };
 
@@ -63,6 +73,7 @@ const mapMrpDetails = (steps: any[] | undefined): MrpStepDetail[] => {
     stepName: step.stepName || step.StepName,
     seqNo: step.seqNo || step.SeqNo,
     stepType: step.stepType || step.StepType,
+    recipeID: step.recipeID !== undefined ? step.recipeID : step.RecipeID,
     items: Array.isArray(step.items || step.Items)
       ? (step.items || step.Items).map((item: any) => ({
         bomID: item.bomID || item.bomId || item.BomID,
@@ -72,6 +83,7 @@ const mapMrpDetails = (steps: any[] | undefined): MrpStepDetail[] => {
         requiredQty: item.requiredQty || item.RequiredQty,
         currentStock: item.currentStock || item.CurrentStock || 0,
         shortage: item.shortage || item.Shortage || 0,
+        hasLotStock: item.hasLotStock ?? item.HasLotStock ?? true,
         isSufficient: item.isSufficient ?? item.IsSufficient ?? false
       }))
       : []
@@ -84,6 +96,8 @@ const mapSummary = (summary: MrpSimulationResponse['summary']): MrpSummary => {
   return {
     totalItemsCount: summary.totalItemsCount ?? summary.TotalItemsCount ?? 0,
     shortageItemsCount: summary.shortageItemsCount ?? summary.ShortageItemsCount ?? 0,
+    missingRecipeStepsCount: summary.missingRecipeStepsCount ?? summary.MissingRecipeStepsCount ?? 0,
+    missingLotItemsCount: summary.missingLotItemsCount ?? summary.MissingLotItemsCount ?? 0,
     isFeasible: summary.isFeasible ?? summary.IsFeasible ?? true
   };
 };

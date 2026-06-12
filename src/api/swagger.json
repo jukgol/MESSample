@@ -6427,6 +6427,9 @@
             "type": "integer",
             "format": "int32"
           },
+          "hasLotStock": {
+            "type": "boolean"
+          },
           "isSufficient": {
             "type": "boolean"
           }
@@ -6482,6 +6485,11 @@
             "type": "string",
             "nullable": true
           },
+          "recipeID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
           "items": {
             "type": "array",
             "items": {
@@ -6500,6 +6508,14 @@
             "format": "int32"
           },
           "shortageItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "missingRecipeStepsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "missingLotItemsCount": {
             "type": "integer",
             "format": "int32"
           },

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 interface StepCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (form: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID: string | null }) => Promise<void>;
+  onSubmit: (form: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID: string }) => Promise<void>;
   defaultSeq: number;
 }
 
@@ -41,9 +41,13 @@ const StepCreateModal: React.FC<StepCreateModalProps> = ({
       alert('공정 단계명은 필수 입력 항목입니다.');
       return;
     }
+    if (!form.equipmentID.trim()) {
+      alert('?ㅻ퉬 ID (Equipment ID)?? ?꾩닔 ?낅젰 ??ぉ?낅땲??');
+      return;
+    }
     await onSubmit({
       ...form,
-      equipmentID: form.equipmentID.trim() || null
+      equipmentID: form.equipmentID.trim()
     });
   };
 
@@ -130,6 +134,7 @@ const StepCreateModal: React.FC<StepCreateModalProps> = ({
             <input
               type="text"
               placeholder="예: EQ-001 (선택 사항)"
+              required
               value={form.equipmentID}
               onChange={(e) => setForm({ ...form, equipmentID: e.target.value })}
               style={{

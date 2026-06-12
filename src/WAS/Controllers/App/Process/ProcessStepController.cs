@@ -80,6 +80,11 @@ namespace WAS.Controllers.App
                     return BadRequest(new { Message = "공정 단계명은 필수 입력 항목입니다." });
                 }
 
+                if (string.IsNullOrWhiteSpace(dto.EquipmentID))
+                {
+                    return BadRequest(new { Message = "?ㅻ퉬 ID (Equipment ID)?? ?꾩닔 ?낅젰 ??ぉ?낅땲??" });
+                }
+
                 await _processStepService.CreateProcessStepAsync(dto);
                 return Ok(new { Message = "공정 단계가 성공적으로 등록되었습니다." });
             }
@@ -106,6 +111,11 @@ namespace WAS.Controllers.App
                 if (string.IsNullOrWhiteSpace(dto.StepName))
                 {
                     return BadRequest(new { Message = "공정 단계명은 필수 입력 항목입니다." });
+                }
+
+                if (string.IsNullOrWhiteSpace(dto.EquipmentID))
+                {
+                    return BadRequest(new { Message = "?ㅻ퉬 ID (Equipment ID)?? ?꾩닔 ?낅젰 ??ぉ?낅땲??" });
                 }
 
                 await _processStepService.UpdateProcessStepAsync(id, dto);

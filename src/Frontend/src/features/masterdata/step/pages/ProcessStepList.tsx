@@ -42,7 +42,7 @@ const ProcessStepList: React.FC = () => {
   }, [processSteps, searchTerm]);
 
   // 등록 처리
-  const handleCreateSubmit = async (form: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID?: string | null }) => {
+  const handleCreateSubmit = async (form: { stepName: string; seqNo: number; stepType: string; description: string; equipmentID: string }) => {
     const success = await createProcessStep(form);
     if (success) {
       setIsCreateOpen(false);
